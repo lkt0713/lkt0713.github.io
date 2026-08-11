@@ -1,0 +1,722 @@
+[
+ {
+  "lst": "2009-08-05 08:00",
+  "radar_file": "Radar_MOSA_CV.200908050000.gif",
+  "q3max_file": "2009080300.f4800.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 09:00",
+  "radar_file": "Radar_MOSA_CV.200908050100.gif",
+  "q3max_file": "2009080300.f4900.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 10:00",
+  "radar_file": "Radar_MOSA_CV.200908050200.gif",
+  "q3max_file": "2009080300.f5000.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 11:00",
+  "radar_file": "Radar_MOSA_CV.200908050300.gif",
+  "q3max_file": "2009080300.f5100.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 12:00",
+  "radar_file": "Radar_MOSA_CV.200908050400.gif",
+  "q3max_file": "2009080300.f5200.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 13:00",
+  "radar_file": "Radar_MOSA_CV.200908050500.gif",
+  "q3max_file": "2009080300.f5300.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 14:00",
+  "radar_file": "Radar_MOSA_CV.200908050600.gif",
+  "q3max_file": "2009080300.f5400.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 15:00",
+  "radar_file": "Radar_MOSA_CV.200908050700.gif",
+  "q3max_file": "2009080300.f5500.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 16:00",
+  "radar_file": "Radar_MOSA_CV.200908050800.gif",
+  "q3max_file": "2009080300.f5600.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 17:00",
+  "radar_file": "Radar_MOSA_CV.200908050900.gif",
+  "q3max_file": "2009080300.f5700.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 18:00",
+  "radar_file": "Radar_MOSA_CV.200908051000.gif",
+  "q3max_file": "2009080300.f5800.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 19:00",
+  "radar_file": "Radar_MOSA_CV.200908051100.gif",
+  "q3max_file": "2009080300.f5900.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 20:00",
+  "radar_file": "Radar_MOSA_CV.200908051200.gif",
+  "q3max_file": "2009080300.f6000.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 21:00",
+  "radar_file": "Radar_MOSA_CV.200908051300.gif",
+  "q3max_file": "2009080300.f6100.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 22:00",
+  "radar_file": "Radar_MOSA_CV.200908051400.gif",
+  "q3max_file": "2009080300.f6200.q3max.png"
+ },
+ {
+  "lst": "2009-08-05 23:00",
+  "radar_file": "Radar_MOSA_CV.200908051500.gif",
+  "q3max_file": "2009080300.f6300.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 00:00",
+  "radar_file": "Radar_MOSA_CV.200908051600.gif",
+  "q3max_file": "2009080300.f6400.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 01:00",
+  "radar_file": "Radar_MOSA_CV.200908051700.gif",
+  "q3max_file": "2009080300.f6500.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 02:00",
+  "radar_file": "Radar_MOSA_CV.200908051800.gif",
+  "q3max_file": "2009080300.f6600.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 03:00",
+  "radar_file": "Radar_MOSA_CV.200908051900.gif",
+  "q3max_file": "2009080300.f6700.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 04:00",
+  "radar_file": "Radar_MOSA_CV.200908052000.gif",
+  "q3max_file": "2009080300.f6800.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 05:00",
+  "radar_file": "Radar_MOSA_CV.200908052100.gif",
+  "q3max_file": "2009080300.f6900.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 06:00",
+  "radar_file": "Radar_MOSA_CV.200908052200.gif",
+  "q3max_file": "2009080300.f7000.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 07:00",
+  "radar_file": "Radar_MOSA_CV.200908052300.gif",
+  "q3max_file": "2009080300.f7100.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 08:00",
+  "radar_file": "Radar_MOSA_CV.200908060000.gif",
+  "q3max_file": "2009080300.f7200.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 09:00",
+  "radar_file": "Radar_MOSA_CV.200908060100.gif",
+  "q3max_file": "2009080300.f7300.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 10:00",
+  "radar_file": "Radar_MOSA_CV.200908060200.gif",
+  "q3max_file": "2009080300.f7400.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 11:00",
+  "radar_file": "Radar_MOSA_CV.200908060300.gif",
+  "q3max_file": "2009080300.f7500.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 12:00",
+  "radar_file": "Radar_MOSA_CV.200908060400.gif",
+  "q3max_file": "2009080300.f7600.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 13:00",
+  "radar_file": "Radar_MOSA_CV.200908060500.gif",
+  "q3max_file": "2009080300.f7700.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 14:00",
+  "radar_file": "Radar_MOSA_CV.200908060600.gif",
+  "q3max_file": "2009080300.f7800.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 15:00",
+  "radar_file": "Radar_MOSA_CV.200908060700.gif",
+  "q3max_file": "2009080300.f7900.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 16:00",
+  "radar_file": "Radar_MOSA_CV.200908060800.gif",
+  "q3max_file": "2009080300.f8000.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 17:00",
+  "radar_file": "Radar_MOSA_CV.200908060900.gif",
+  "q3max_file": "2009080300.f8100.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 18:00",
+  "radar_file": "Radar_MOSA_CV.200908061000.gif",
+  "q3max_file": "2009080300.f8200.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 19:00",
+  "radar_file": "Radar_MOSA_CV.200908061100.gif",
+  "q3max_file": "2009080300.f8300.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 20:00",
+  "radar_file": "Radar_MOSA_CV.200908061200.gif",
+  "q3max_file": "2009080300.f8400.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 21:00",
+  "radar_file": "Radar_MOSA_CV.200908061300.gif",
+  "q3max_file": "2009080300.f8500.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 22:00",
+  "radar_file": "Radar_MOSA_CV.200908061400.gif",
+  "q3max_file": "2009080300.f8600.q3max.png"
+ },
+ {
+  "lst": "2009-08-06 23:00",
+  "radar_file": "Radar_MOSA_CV.200908061500.gif",
+  "q3max_file": "2009080300.f8700.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 00:00",
+  "radar_file": "Radar_MOSA_CV.200908061600.gif",
+  "q3max_file": "2009080300.f8800.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 01:00",
+  "radar_file": "Radar_MOSA_CV.200908061700.gif",
+  "q3max_file": "2009080300.f8900.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 02:00",
+  "radar_file": "Radar_MOSA_CV.200908061800.gif",
+  "q3max_file": "2009080300.f9000.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 03:00",
+  "radar_file": "Radar_MOSA_CV.200908061900.gif",
+  "q3max_file": "2009080300.f9100.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 04:00",
+  "radar_file": "Radar_MOSA_CV.200908062000.gif",
+  "q3max_file": "2009080300.f9200.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 05:00",
+  "radar_file": "Radar_MOSA_CV.200908062100.gif",
+  "q3max_file": "2009080300.f9300.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 06:00",
+  "radar_file": "Radar_MOSA_CV.200908062200.gif",
+  "q3max_file": "2009080300.f9400.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 07:00",
+  "radar_file": "Radar_MOSA_CV.200908062300.gif",
+  "q3max_file": "2009080300.f9500.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 08:00",
+  "radar_file": "Radar_MOSA_CV.200908070000.gif",
+  "q3max_file": "2009080300.f9600.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 09:00",
+  "radar_file": "Radar_MOSA_CV.200908070100.gif",
+  "q3max_file": "2009080300.f9700.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 10:00",
+  "radar_file": "Radar_MOSA_CV.200908070200.gif",
+  "q3max_file": "2009080300.f9800.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 11:00",
+  "radar_file": "Radar_MOSA_CV.200908070300.gif",
+  "q3max_file": "2009080300.f9900.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 12:00",
+  "radar_file": "Radar_MOSA_CV.200908070400.gif",
+  "q3max_file": "2009080300.f10000.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 13:00",
+  "radar_file": "Radar_MOSA_CV.200908070500.gif",
+  "q3max_file": "2009080300.f10100.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 14:00",
+  "radar_file": "Radar_MOSA_CV.200908070600.gif",
+  "q3max_file": "2009080300.f10200.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 15:00",
+  "radar_file": "Radar_MOSA_CV.200908070700.gif",
+  "q3max_file": "2009080300.f10300.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 16:00",
+  "radar_file": "Radar_MOSA_CV.200908070800.gif",
+  "q3max_file": "2009080300.f10400.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 17:00",
+  "radar_file": "Radar_MOSA_CV.200908070900.gif",
+  "q3max_file": "2009080300.f10500.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 18:00",
+  "radar_file": "Radar_MOSA_CV.200908071000.gif",
+  "q3max_file": "2009080300.f10600.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 19:00",
+  "radar_file": "Radar_MOSA_CV.200908071100.gif",
+  "q3max_file": "2009080300.f10700.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 20:00",
+  "radar_file": "Radar_MOSA_CV.200908071200.gif",
+  "q3max_file": "2009080300.f10800.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 21:00",
+  "radar_file": "Radar_MOSA_CV.200908071300.gif",
+  "q3max_file": "2009080300.f10900.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 22:00",
+  "radar_file": "Radar_MOSA_CV.200908071400.gif",
+  "q3max_file": "2009080300.f11000.q3max.png"
+ },
+ {
+  "lst": "2009-08-07 23:00",
+  "radar_file": "Radar_MOSA_CV.200908071500.gif",
+  "q3max_file": "2009080300.f11100.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 00:00",
+  "radar_file": "Radar_MOSA_CV.200908071600.gif",
+  "q3max_file": "2009080300.f11200.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 01:00",
+  "radar_file": "Radar_MOSA_CV.200908071700.gif",
+  "q3max_file": "2009080300.f11300.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 02:00",
+  "radar_file": "Radar_MOSA_CV.200908071800.gif",
+  "q3max_file": "2009080300.f11400.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 03:00",
+  "radar_file": "Radar_MOSA_CV.200908071900.gif",
+  "q3max_file": "2009080300.f11500.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 04:00",
+  "radar_file": "Radar_MOSA_CV.200908072000.gif",
+  "q3max_file": "2009080300.f11600.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 05:00",
+  "radar_file": "Radar_MOSA_CV.200908072100.gif",
+  "q3max_file": "2009080300.f11700.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 06:00",
+  "radar_file": "Radar_MOSA_CV.200908072200.gif",
+  "q3max_file": "2009080300.f11800.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 07:00",
+  "radar_file": "Radar_MOSA_CV.200908072300.gif",
+  "q3max_file": "2009080300.f11900.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 08:00",
+  "radar_file": "Radar_MOSA_CV.200908080000.gif",
+  "q3max_file": "2009080300.f12000.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 09:00",
+  "radar_file": "Radar_MOSA_CV.200908080100.gif",
+  "q3max_file": "2009080300.f12100.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 10:00",
+  "radar_file": "Radar_MOSA_CV.200908080200.gif",
+  "q3max_file": "2009080300.f12200.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 11:00",
+  "radar_file": "Radar_MOSA_CV.200908080300.gif",
+  "q3max_file": "2009080300.f12300.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 12:00",
+  "radar_file": "Radar_MOSA_CV.200908080400.gif",
+  "q3max_file": "2009080300.f12400.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 13:00",
+  "radar_file": "Radar_MOSA_CV.200908080500.gif",
+  "q3max_file": "2009080300.f12500.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 14:00",
+  "radar_file": "Radar_MOSA_CV.200908080600.gif",
+  "q3max_file": "2009080300.f12600.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 15:00",
+  "radar_file": "Radar_MOSA_CV.200908080700.gif",
+  "q3max_file": "2009080300.f12700.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 16:00",
+  "radar_file": "Radar_MOSA_CV.200908080800.gif",
+  "q3max_file": "2009080300.f12800.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 17:00",
+  "radar_file": "Radar_MOSA_CV.200908080900.gif",
+  "q3max_file": "2009080300.f12900.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 18:00",
+  "radar_file": "Radar_MOSA_CV.200908081000.gif",
+  "q3max_file": "2009080300.f13000.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 19:00",
+  "radar_file": "Radar_MOSA_CV.200908081100.gif",
+  "q3max_file": "2009080300.f13100.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 20:00",
+  "radar_file": "Radar_MOSA_CV.200908081200.gif",
+  "q3max_file": "2009080300.f13200.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 21:00",
+  "radar_file": "Radar_MOSA_CV.200908081300.gif",
+  "q3max_file": "2009080300.f13300.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 22:00",
+  "radar_file": "Radar_MOSA_CV.200908081400.gif",
+  "q3max_file": "2009080300.f13400.q3max.png"
+ },
+ {
+  "lst": "2009-08-08 23:00",
+  "radar_file": "Radar_MOSA_CV.200908081500.gif",
+  "q3max_file": "2009080300.f13500.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 00:00",
+  "radar_file": "Radar_MOSA_CV.200908081600.gif",
+  "q3max_file": "2009080300.f13600.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 01:00",
+  "radar_file": "Radar_MOSA_CV.200908081700.gif",
+  "q3max_file": "2009080300.f13700.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 02:00",
+  "radar_file": "Radar_MOSA_CV.200908081800.gif",
+  "q3max_file": "2009080300.f13800.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 03:00",
+  "radar_file": "Radar_MOSA_CV.200908081900.gif",
+  "q3max_file": "2009080300.f13900.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 04:00",
+  "radar_file": "Radar_MOSA_CV.200908082000.gif",
+  "q3max_file": "2009080300.f14000.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 05:00",
+  "radar_file": "Radar_MOSA_CV.200908082100.gif",
+  "q3max_file": "2009080300.f14100.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 06:00",
+  "radar_file": "Radar_MOSA_CV.200908082200.gif",
+  "q3max_file": "2009080300.f14200.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 07:00",
+  "radar_file": "Radar_MOSA_CV.200908082300.gif",
+  "q3max_file": "2009080300.f14300.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 08:00",
+  "radar_file": "Radar_MOSA_CV.200908090000.gif",
+  "q3max_file": "2009080300.f14400.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 09:00",
+  "radar_file": "Radar_MOSA_CV.200908090100.gif",
+  "q3max_file": "2009080300.f14500.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 10:00",
+  "radar_file": "Radar_MOSA_CV.200908090200.gif",
+  "q3max_file": "2009080300.f14600.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 11:00",
+  "radar_file": "Radar_MOSA_CV.200908090300.gif",
+  "q3max_file": "2009080300.f14700.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 12:00",
+  "radar_file": "Radar_MOSA_CV.200908090400.gif",
+  "q3max_file": "2009080300.f14800.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 13:00",
+  "radar_file": "Radar_MOSA_CV.200908090500.gif",
+  "q3max_file": "2009080300.f14900.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 14:00",
+  "radar_file": "Radar_MOSA_CV.200908090600.gif",
+  "q3max_file": "2009080300.f15000.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 15:00",
+  "radar_file": "Radar_MOSA_CV.200908090700.gif",
+  "q3max_file": "2009080300.f15100.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 16:00",
+  "radar_file": "Radar_MOSA_CV.200908090800.gif",
+  "q3max_file": "2009080300.f15200.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 17:00",
+  "radar_file": "Radar_MOSA_CV.200908090900.gif",
+  "q3max_file": "2009080300.f15300.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 18:00",
+  "radar_file": "Radar_MOSA_CV.200908091000.gif",
+  "q3max_file": "2009080300.f15400.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 19:00",
+  "radar_file": "Radar_MOSA_CV.200908091100.gif",
+  "q3max_file": "2009080300.f15500.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 20:00",
+  "radar_file": "Radar_MOSA_CV.200908091200.gif",
+  "q3max_file": "2009080300.f15600.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 21:00",
+  "radar_file": "Radar_MOSA_CV.200908091300.gif",
+  "q3max_file": "2009080300.f15700.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 22:00",
+  "radar_file": "Radar_MOSA_CV.200908091400.gif",
+  "q3max_file": "2009080300.f15800.q3max.png"
+ },
+ {
+  "lst": "2009-08-09 23:00",
+  "radar_file": "Radar_MOSA_CV.200908091500.gif",
+  "q3max_file": "2009080300.f15900.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 00:00",
+  "radar_file": "Radar_MOSA_CV.200908091600.gif",
+  "q3max_file": "2009080300.f16000.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 01:00",
+  "radar_file": "Radar_MOSA_CV.200908091700.gif",
+  "q3max_file": "2009080300.f16100.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 02:00",
+  "radar_file": "Radar_MOSA_CV.200908091800.gif",
+  "q3max_file": "2009080300.f16200.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 03:00",
+  "radar_file": "Radar_MOSA_CV.200908091900.gif",
+  "q3max_file": "2009080300.f16300.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 04:00",
+  "radar_file": "Radar_MOSA_CV.200908092000.gif",
+  "q3max_file": "2009080300.f16400.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 05:00",
+  "radar_file": "Radar_MOSA_CV.200908092100.gif",
+  "q3max_file": "2009080300.f16500.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 06:00",
+  "radar_file": "Radar_MOSA_CV.200908092200.gif",
+  "q3max_file": "2009080300.f16600.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 07:00",
+  "radar_file": "Radar_MOSA_CV.200908092300.gif",
+  "q3max_file": "2009080300.f16700.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 08:00",
+  "radar_file": "Radar_MOSA_CV.200908100000.gif",
+  "q3max_file": "2009080300.f16800.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 09:00",
+  "radar_file": "Radar_MOSA_CV.200908100100.gif",
+  "q3max_file": "2009080300.f16900.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 10:00",
+  "radar_file": "Radar_MOSA_CV.200908100200.gif",
+  "q3max_file": "2009080300.f17000.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 11:00",
+  "radar_file": "Radar_MOSA_CV.200908100300.gif",
+  "q3max_file": "2009080300.f17100.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 12:00",
+  "radar_file": "Radar_MOSA_CV.200908100400.gif",
+  "q3max_file": "2009080300.f17200.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 13:00",
+  "radar_file": "Radar_MOSA_CV.200908100500.gif",
+  "q3max_file": "2009080300.f17300.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 14:00",
+  "radar_file": "Radar_MOSA_CV.200908100600.gif",
+  "q3max_file": "2009080300.f17400.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 15:00",
+  "radar_file": "Radar_MOSA_CV.200908100700.gif",
+  "q3max_file": "2009080300.f17500.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 16:00",
+  "radar_file": "Radar_MOSA_CV.200908100800.gif",
+  "q3max_file": "2009080300.f17600.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 17:00",
+  "radar_file": "Radar_MOSA_CV.200908100900.gif",
+  "q3max_file": "2009080300.f17700.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 18:00",
+  "radar_file": "Radar_MOSA_CV.200908101000.gif",
+  "q3max_file": "2009080300.f17800.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 19:00",
+  "radar_file": "Radar_MOSA_CV.200908101100.gif",
+  "q3max_file": "2009080300.f17900.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 20:00",
+  "radar_file": "Radar_MOSA_CV.200908101200.gif",
+  "q3max_file": "2009080300.f18000.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 21:00",
+  "radar_file": "Radar_MOSA_CV.200908101300.gif",
+  "q3max_file": "2009080300.f18100.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 22:00",
+  "radar_file": "Radar_MOSA_CV.200908101400.gif",
+  "q3max_file": "2009080300.f18200.q3max.png"
+ },
+ {
+  "lst": "2009-08-10 23:00",
+  "radar_file": "Radar_MOSA_CV.200908101500.gif",
+  "q3max_file": "2009080300.f18300.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 00:00",
+  "radar_file": "Radar_MOSA_CV.200908101600.gif",
+  "q3max_file": "2009080300.f18400.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 01:00",
+  "radar_file": "Radar_MOSA_CV.200908101700.gif",
+  "q3max_file": "2009080300.f18500.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 02:00",
+  "radar_file": "Radar_MOSA_CV.200908101800.gif",
+  "q3max_file": "2009080300.f18600.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 03:00",
+  "radar_file": "Radar_MOSA_CV.200908101900.gif",
+  "q3max_file": "2009080300.f18700.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 04:00",
+  "radar_file": "Radar_MOSA_CV.200908102000.gif",
+  "q3max_file": "2009080300.f18800.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 05:00",
+  "radar_file": "Radar_MOSA_CV.200908102100.gif",
+  "q3max_file": "2009080300.f18900.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 06:00",
+  "radar_file": "Radar_MOSA_CV.200908102200.gif",
+  "q3max_file": "2009080300.f19000.q3max.png"
+ },
+ {
+  "lst": "2009-08-11 07:00",
+  "radar_file": "Radar_MOSA_CV.200908102300.gif",
+  "q3max_file": "2009080300.f19100.q3max.png"
+ }
+]

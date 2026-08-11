@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小地盃羽球比賽</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/theme.css">
+<script src="../../assets/site.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans TC','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .35s,color .35s;}
+
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+  .topbar h1{font-size:1.4rem;font-weight:900;color:var(--text);letter-spacing:1px;}
+  .topbar h1 span{color:var(--accent);}
+  .topbar .info{display:flex;gap:16px;align-items:center;font-size:0.85rem;color:var(--text-2);flex-wrap:wrap;}
+  #clock-display{font-size:1.8rem;font-weight:700;color:#16a34a;background:#f0fdf4;padding:4px 14px;border-radius:20px;border:1px solid #bbf7d0;}
+  .btn{cursor:pointer;border:none;border-radius:8px;padding:8px 18px;font-size:0.85rem;font-family:inherit;font-weight:700;transition:all .15s;}
+  .btn-green{background:var(--btn-bg);color:#fff;box-shadow:0 4px 14px rgba(21,88,214,.3);} .btn-green:hover{filter:brightness(1.08);}
+  .btn-gray{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);} .btn-gray:hover{background:var(--accent-lo);color:var(--accent);border-color:var(--accent);}
+  .btn-red{background:#ef4444;color:#fff;} .btn-red:hover{background:#dc2626;}
+  .btn-blue{background:var(--accent);color:#fff;} .btn-blue:hover{filter:brightness(1.1);}
+  .btn-indigo{background:var(--accent-2);color:#fff;} .btn-indigo:hover{filter:brightness(1.1);}
+  .btn-sm{padding:5px 12px;font-size:0.78rem;}
+
+  .page-tabs{display:flex;background:var(--surface-2);border-bottom:2px solid var(--accent);justify-content:center;padding:0 20px;}
+  .page-tab{padding:16px 34px;cursor:pointer;font-size:1.1rem;font-weight:700;color:var(--text-2);border:none;background:transparent;transition:all .2s;font-family:inherit;}
+  .page-tab:hover{color:var(--accent);background:var(--accent-lo);}
+  .page-tab.active{color:var(--accent);background:var(--surface);box-shadow:inset 0 -3px 0 var(--accent);}
+  .page-section{display:none;}
+  .page-section.active{display:block;}
+
+  .main{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:20px 24px;max-width:1400px;margin:0 auto;}
+  @media(max-width:900px){.main{grid-template-columns:1fr;}}
+
+  .timer-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:20px;border:1px solid var(--border);transition:background .35s,border .35s;}
+  .timer-card > .match-header{margin-bottom:2px;}
+  .match-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;}
+  .match-label{font-size:0.78rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;}
+  .match-name{font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:4px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .match-meta{font-size:0.85rem;color:var(--text-2);}
+  .status-badge{display:inline-block;padding:5px 16px;border-radius:20px;font-size:0.82rem;font-weight:700;letter-spacing:1px;white-space:nowrap;margin-top:4px;}
+  .status-waiting{background:#fef9c3;color:#854d0e;}
+  .status-running{background:#dcfce7;color:#166534;}
+  .status-ended{background:#fee2e2;color:#991b1b;}
+  .status-upcoming{background:#e0f2fe;color:#0c4a6e;}
+  .status-done{background:#f1f5f9;color:#64748b;}
+
+  .timer-display{text-align:center;padding:6px 0 8px;}
+  .slot-timer{position:relative;}
+  .slot-clock-left{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:1.8rem;font-weight:700;color:#16a34a;background:#f0fdf4;padding:4px 14px;border-radius:20px;border:1px solid #bbf7d0;}
+  .timer-phase{font-size:0.85rem;font-weight:700;color:#94a3b8;letter-spacing:2px;margin-bottom:4px;}
+  .timer-main{font-size:2.8rem;font-weight:900;line-height:1;letter-spacing:-1px;transition:color .3s;}
+  .timer-ms{font-size:1.2rem;font-weight:700;color:#94a3b8;}
+  .timer-running .timer-main{color:#16a34a;}
+  .timer-upcoming .timer-main{color:#0ea5e9;}
+  .timer-ended .timer-main{color:#ef4444;}
+  .timer-done .timer-main{color:#94a3b8;}
+  .slot-timer{text-align:center;padding:4px 0 10px;}
+  @media(max-width:600px){.timer-main{font-size:2.2rem;}.timer-ms{font-size:1rem;}.slot-clock-left{position:static;transform:none;display:inline-block;margin-bottom:6px;}}
+
+  .courts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:900px){.courts-grid{grid-template-columns:1fr;}}
+  .empty-board{color:var(--text-3);font-size:0.9rem;text-align:center;padding:26px 10px;}
+
+  .scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:10px 0 8px;}
+  .team-block{background:var(--surface-2);border-radius:12px;padding:10px 8px;text-align:center;border:2px solid var(--border);transition:border-color .2s,background .2s;}
+  .team-block.winning{border-color:#16a34a;background:#f0fdf4;}
+  .team-name{font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:6px;word-break:break-all;}
+  .team-score{font-size:2.4rem;font-weight:900;color:var(--text);line-height:1;}
+  .team-wins{font-size:0.78rem;color:var(--text-3);margin-top:4px;}
+  .score-btns{display:flex;gap:6px;justify-content:center;margin-top:10px;}
+  .vs-label{font-size:1.1rem;font-weight:900;color:var(--text-3);text-align:center;}
+
+  .match-actions{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+  .referee-line{font-size:1.05rem;text-align:center;color:var(--text-2);margin-top:4px;font-weight:700;}
+  .referee-name{font-weight:900;color:var(--text);}
+  .forfeit-note{font-size:0.85rem;text-align:center;color:#b45309;margin-top:6px;font-weight:700;min-height:1.2em;}
+
+  .sidebar{display:flex;flex-direction:column;gap:16px;}
+  .card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:20px;border:1px solid var(--border);transition:background .35s,border .35s;}
+  .card-title{font-size:0.85rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+  .match-list{display:flex;flex-direction:column;gap:8px;max-height:440px;overflow-y:auto;}
+  .match-item{padding:10px 12px;border-radius:10px;border:2px solid var(--border);cursor:pointer;transition:all .15s;display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;}
+  .match-item:hover{border-color:#16a34a;background:#f0fdf4;}
+  .match-item.active{border-color:#16a34a;background:#dcfce7;}
+  .match-num{font-size:0.72rem;font-weight:700;color:#fff;background:#94a3b8;border-radius:6px;padding:2px 5px;text-align:center;}
+  .match-item.active .match-num{background:#16a34a;}
+  .match-item.live .match-num{background:#f59e0b;animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .match-teams-txt{font-size:0.82rem;font-weight:700;color:var(--text);line-height:1.4;}
+  .match-time-tag{font-size:0.72rem;color:var(--text-3);text-align:right;}
+  .match-done-tag{font-size:0.72rem;color:#16a34a;font-weight:700;}
+  .venue-map{width:100%;border-radius:10px;border:1px solid var(--border);display:block;background:var(--surface-2);}
+
+  .settings-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;}
+  .settings-panel.open{display:flex;}
+  .settings-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:min(600px,95vw);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+  .settings-box h2{font-size:1.2rem;font-weight:900;margin-bottom:20px;}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:0.8rem;font-weight:700;color:var(--text-2);margin-bottom:5px;}
+  .form-group input,.form-group select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color .15s;background:var(--surface-2);color:var(--text);}
+  .form-group input:focus{border-color:var(--accent);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .col-headers{display:grid;grid-template-columns:24px 1fr 1fr 90px 1fr auto;gap:6px;margin-bottom:4px;}
+  .col-headers span{font-size:0.7rem;color:var(--text-3);font-weight:700;text-align:center;}
+  .match-edit-row{display:grid;grid-template-columns:24px 1fr 1fr 90px 1fr auto;gap:6px;align-items:center;margin-bottom:7px;}
+  .match-edit-row span{font-size:0.78rem;font-weight:700;color:var(--text-3);text-align:center;}
+  .match-edit-row input{padding:7px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:0.82rem;font-family:inherit;outline:none;text-align:center;background:var(--surface-2);color:var(--text);}
+  .match-edit-row input:focus{border-color:var(--accent);}
+  .del-btn{background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.85rem;padding:4px;}
+  .add-match-btn{background:#f0fdf4;color:#16a34a;border:2px dashed #86efac;border-radius:8px;padding:8px;width:100%;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:4px;}
+  .add-match-btn:hover{background:#dcfce7;}
+  .settings-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+  .standings-wrap{max-width:1400px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:1fr;gap:16px;}
+  .detail-tabs{display:flex;gap:0;border-bottom:2px solid var(--accent);margin:0 0 14px 0;overflow-x:auto;white-space:nowrap;}
+  .detail-tab{border:none;background:var(--surface-2);color:var(--text-2);padding:14px 22px;font-size:1.1rem;font-weight:700;cursor:pointer;min-width:130px;transition:all .15s;font-family:inherit;}
+  .detail-tab:hover{background:var(--accent-lo);color:var(--accent);}
+  .detail-tab.active{background:var(--surface);color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent);}
+  .detail-pane{display:none;}
+  .detail-pane.active{display:block;}
+  .knockout-actions{display:flex;justify-content:flex-end;gap:12px;margin-bottom:10px;}
+
+  #page-standings .card-title{font-size:1rem;}
+  #score-summary-compact{font-size:1rem !important;line-height:1.7;}
+  #score-summary-detail{font-size:1rem !important;line-height:1.7;}
+  #score-summary-detail table{font-size:0.95rem !important;}
+  #score-summary-detail th,#score-summary-detail td{padding:8px 8px !important;}
+
+  .note{font-size:0.78rem;color:var(--text-3);text-align:center;margin-top:8px;}
+
+  body.projector{font-size:20px;}
+  body.projector .topbar{padding:16px 28px;}
+  body.projector .topbar h1{font-size:2rem;}
+  body.projector .topbar .info{font-size:1.05rem;gap:18px;}
+  body.projector #clock-display{font-size:2.25rem;padding:6px 16px;}
+  body.projector .btn{font-size:1rem;padding:10px 20px;border-radius:10px;}
+  body.projector .btn-sm{font-size:0.95rem;padding:8px 16px;}
+
+  body.projector .page-tab{font-size:1.3rem;padding:18px 42px;}
+  body.projector .main{max-width:1700px;grid-template-columns:1fr 420px;gap:24px;}
+  body.projector .timer-card, body.projector .card{padding:24px;}
+
+  body.projector .match-label{font-size:0.95rem;}
+  body.projector .match-name{font-size:1.8rem;}
+  body.projector .match-meta{font-size:1rem;}
+  body.projector .status-badge{font-size:0.95rem;padding:7px 18px;}
+
+  body.projector .timer-phase{font-size:1rem;}
+  body.projector .timer-main{font-size:3.6rem;}
+  body.projector .timer-ms{font-size:1.6rem;}
+  body.projector .slot-clock-left{font-size:2.25rem;padding:6px 16px;}
+
+  body.projector .team-name{font-size:1.1rem;}
+  body.projector .team-score{font-size:3rem;}
+  body.projector .team-wins{font-size:0.95rem;}
+  body.projector .vs-label{font-size:1.4rem;}
+
+  body.projector .card-title{font-size:1.05rem;}
+  body.projector .match-list{max-height:620px;}
+  body.projector .match-item{padding:12px 14px;}
+  body.projector .match-teams-txt{font-size:0.95rem;}
+  body.projector .match-time-tag{font-size:0.85rem;}
+
+  body.projector .standings-wrap{max-width:1700px;}
+  body.projector #score-summary-compact{font-size:1.12rem !important;}
+  body.projector #score-summary-detail{font-size:1.12rem !important;}
+  body.projector .detail-tab{font-size:1.2rem;padding:16px 24px;}
+  body.projector #score-summary-detail table{font-size:1.05rem !important;}
+  body.projector #score-summary-detail th,
+  body.projector #score-summary-detail td{padding:10px 10px !important;}
+</style>
+</head>
+<body class="projector">
+
+<div class="topbar">
+  <h1><span>小地盃</span> 羽球比賽</h1>
+  <div class="info">
+    <span id="meta-date"></span>
+    <span id="meta-place">中正堂</span>
+    <button class="btn btn-sm btn-gray" id="mode-normal-btn" onclick="setDisplayMode('normal')">一般模式</button>
+    <button class="btn btn-sm btn-indigo" id="mode-projector-btn" onclick="setDisplayMode('projector')">投影模式</button>
+    <button class="btn btn-indigo btn-sm" id="fullscreen-btn" onclick="toggleFullscreen()">全螢幕</button>
+    <button class="btn btn-gray btn-sm" onclick="openSettings()">設定</button>
+    <a class="btn btn-gray btn-sm" href="index.html" style="text-decoration:none">賽程表</a>
+    <a class="btn btn-gray btn-sm" href="../../index.html" style="text-decoration:none">← 作品集</a>
+    <button class="btn btn-gray btn-sm" type="button" id="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
+  </div>
+</div>
+
+<div class="page-tabs">
+  <button class="page-tab active" id="page-tab-timer" onclick="showPageTab('timer')">計時器</button>
+  <button class="page-tab" id="page-tab-standings" onclick="showPageTab('standings')">戰績表</button>
+</div>
+
+<div class="page-section active" id="page-timer">
+<div class="main">
+  <div class="timer-card">
+    <div class="match-header">
+      <div>
+        <div class="match-name" id="slot-title">— 請從右側選擇一個時段 —</div>
+      </div>
+      <span class="status-badge status-waiting" id="slot-badge">等待中</span>
+    </div>
+    <div class="slot-timer timer-display timer-upcoming" id="slot-timer-display">
+      <span class="slot-clock-left" id="clock-display">--:--:--</span>
+      <div class="timer-phase" id="slot-timer-phase">──</div>
+      <span class="timer-main" id="slot-timer-main">--:--:--</span><span class="timer-ms" id="slot-timer-ms"></span>
+      <div class="note" id="slot-timer-note">根據系統時間自動計時</div>
+    </div>
+    <div class="courts-grid" id="courts-grid">
+      <div class="empty-board">請先在設定中新增場次</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="card">
+      <div class="card-title"><i class="fa fa-list"></i> 場次列表</div>
+      <div class="match-list" id="match-list"><div style="color:#94a3b8;font-size:0.85rem;">請先在設定中新增場次</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fa fa-map"></i> 場地配置圖</div>
+      <img src="venue.jpg" alt="場地配置圖" class="venue-map" onerror="this.style.display='none'">
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="page-section" id="page-standings">
+  <div class="standings-wrap">
+    <div class="card">
+      <div class="card-title"><i class="fa fa-trophy"></i> 戰績總覽</div>
+      <div id="score-summary-compact" style="font-size:0.85rem;color:#94a3b8;">尚未有完成的場次</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fa fa-table"></i> 五組詳細戰績</div>
+      <div class="knockout-actions">
+        <button class="btn btn-blue btn-sm" onclick="applyKnockoutParticipants()">產生複賽名單</button>
+        <button class="btn btn-indigo btn-sm" onclick="applyFinalParticipants()">產生決賽人員</button>
+      </div>
+      <div id="score-summary-detail" style="font-size:0.85rem;color:#94a3b8;">尚未有完成的場次</div>
+    </div>
+  </div>
+</div>
+
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-box">
+    <h2>比賽設定</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>比賽日期</label>
+        <input type="date" id="s-date">
+      </div>
+      <div class="form-group">
+        <label>場地名稱</label>
+        <input type="text" id="s-place" placeholder="例：XX體育館" value="中正堂">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>每場時長（分鐘）</label>
+        <input type="number" id="s-duration" value="20" min="1" max="300">
+      </div>
+      <div class="form-group">
+        <label>比賽名稱</label>
+        <input type="text" id="s-title" value="小地盃羽球">
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0 16px;">
+    <div class="card-title"><i class="fa fa-table-tennis"></i> 場次管理</div>
+    <div class="col-headers">
+      <span>#</span><span>隊伍A</span><span>隊伍B</span><span>開始時間<br>(HHMM)</span><span>裁判</span><span></span>
+    </div>
+    <div id="matches-editor"></div>
+    <button class="add-match-btn" onclick="addMatchRow()">＋ 新增場次</button>
+    <div class="settings-footer">
+      <button class="btn btn-gray" onclick="closeSettings()">取消</button>
+      <button class="btn btn-green" onclick="applySettings()">確認套用</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let config = {
+  date: '2026-03-07',
+  place: '中正堂',
+  duration: 20,
+  title: '小地盃羽球',
+};
+
+let matches = [{"id": 1, "teamA": "場地 1｜混雙A：詹宇崴/蔡依宸", "teamB": "楊舒心/簡家浩", "startTime": "0840", "referee": "陳冠岳", "done": false}, {"id": 2, "teamA": "場地 2｜混雙A：李長融/蔡仲元", "teamB": "蕭人豪/顏語緗", "startTime": "0840", "referee": "游承晏", "done": false}, {"id": 3, "teamA": "場地 3｜混雙B：江宜達/陳雅玲", "teamB": "曹嘉修/劉怡伶", "startTime": "0840", "referee": "陳冠曄", "done": false}, {"id": 4, "teamA": "場地 4｜混雙B：徐子鈞/許寧珊", "teamB": "邱詠恬/潘昌志", "startTime": "0840", "referee": "李佳翰", "done": false}, {"id": 5, "teamA": "場地 1｜男單A：潘昌志", "teamB": "黃振嘉", "startTime": "0910", "referee": "顏語緗", "done": false}, {"id": 6, "teamA": "場地 2｜男單A：李承恩", "teamB": "王昱文", "startTime": "0910", "referee": "蔡依宸", "done": false}, {"id": 7, "teamA": "場地 3｜男單B：曹嘉修", "teamB": "李長融", "startTime": "0910", "referee": "林星辰", "done": false}, {"id": 8, "teamA": "場地 4｜混雙B：曾瑀婕/許淏丞", "teamB": "江宜達/陳雅玲", "startTime": "0910", "referee": "許寧珊", "done": false}, {"id": 9, "teamA": "場地 1｜混雙A：林星辰/陳予禮", "teamB": "詹宇崴/蔡依宸", "startTime": "0940", "referee": "蕭人豪", "done": false}, {"id": 10, "teamA": "場地 2｜男雙：陳冠曄/李佳翰", "teamB": "王昱文/黃振嘉", "startTime": "0940", "referee": "江宜達", "done": false}, {"id": 11, "teamA": "場地 3｜混雙B：邱詠恬/潘昌志", "teamB": "曾瑀婕/許淏丞", "startTime": "0940", "referee": "李長融", "done": false}, {"id": 12, "teamA": "場地 4｜混雙B：曹嘉修/劉怡伶", "teamB": "徐子鈞/許寧珊", "startTime": "0940", "referee": "陳冠岳", "done": false}, {"id": 13, "teamA": "場地 1｜男單A：潘昌志", "teamB": "李承恩", "startTime": "1010", "referee": "李錦坤", "done": false}, {"id": 14, "teamA": "場地 2｜男單A：黃振嘉", "teamB": "王昱文", "startTime": "1010", "referee": "陳冠曄", "done": false}, {"id": 15, "teamA": "場地 3｜男雙：詹宇崴/許淏丞", "teamB": "陳冠岳/游承晏", "startTime": "1010", "referee": "曹嘉修", "done": false}, {"id": 16, "teamA": "場地 4｜混雙B：江宜達/陳雅玲", "teamB": "徐子鈞/許寧珊", "startTime": "1010", "referee": "陳予禮", "done": false}, {"id": 17, "teamA": "場地 1｜男雙：徐子鈞/李錦坤", "teamB": "詹宇崴/許淏丞", "startTime": "1040", "referee": "王昱文", "done": false}, {"id": 18, "teamA": "場地 2｜男雙：陳冠岳/游承晏", "teamB": "陳冠曄/李佳翰", "startTime": "1040", "referee": "黃振嘉", "done": false}, {"id": 19, "teamA": "場地 3｜混雙A：蕭人豪/顏語緗", "teamB": "林星辰/陳予禮", "startTime": "1040", "referee": "楊舒心", "done": false}, {"id": 20, "teamA": "場地 4｜男單B：江宜達", "teamB": "李長融", "startTime": "1040", "referee": "簡家浩", "done": false}, {"id": 21, "teamA": "場地 1｜混雙B：曹嘉修/劉怡伶", "teamB": "邱詠恬/潘昌志", "startTime": "1110", "referee": "陳予禮", "done": false}, {"id": 22, "teamA": "場地 2｜混雙B：徐子鈞/許寧珊", "teamB": "曾瑀婕/許淏丞", "startTime": "1110", "referee": "楊舒心", "done": false}, {"id": 23, "teamA": "場地 3｜男雙：陳冠岳/游承晏", "teamB": "王昱文/黃振嘉", "startTime": "1110", "referee": "林星辰", "done": false}, {"id": 24, "teamA": "場地 4｜混雙A：詹宇崴/蔡依宸", "teamB": "李長融/蔡仲元", "startTime": "1110", "referee": "顏語緗", "done": false}, {"id": 25, "teamA": "場地 1｜男單A：潘昌志", "teamB": "王昱文", "startTime": "1140", "referee": "蔡仲元", "done": false}, {"id": 26, "teamA": "場地 2｜男單A：黃振嘉", "teamB": "李承恩", "startTime": "1140", "referee": "徐子鈞", "done": false}, {"id": 27, "teamA": "場地 3｜混雙A：楊舒心/簡家浩", "teamB": "蕭人豪/顏語緗", "startTime": "1140", "referee": "許寧珊", "done": false}, {"id": 28, "teamA": "場地 4｜混雙B：曹嘉修/劉怡伶", "teamB": "曾瑀婕/許淏丞", "startTime": "1140", "referee": "邱詠恬", "done": false}, {"id": 29, "teamA": "場地 1｜男雙：詹宇崴/許淏丞", "teamB": "陳冠曄/李佳翰", "startTime": "1305", "referee": "蔡依宸", "done": false}, {"id": 30, "teamA": "場地 2｜男雙：陳冠岳/游承晏", "teamB": "徐子鈞/李錦坤", "startTime": "1305", "referee": "楊舒心", "done": false}, {"id": 31, "teamA": "場地 3｜混雙A：李長融/蔡仲元", "teamB": "林星辰/陳予禮", "startTime": "1305", "referee": "陳雅玲", "done": false}, {"id": 32, "teamA": "場地 4｜男單B：江宜達", "teamB": "曹嘉修", "startTime": "1305", "referee": "曾瑀婕", "done": false}, {"id": 33, "teamA": "場地 1｜混雙A：詹宇崴/蔡依宸", "teamB": "蕭人豪/顏語緗", "startTime": "1330", "referee": "游承晏", "done": false}, {"id": 34, "teamA": "場地 2｜混雙A：楊舒心/簡家浩", "teamB": "林星辰/陳予禮", "startTime": "1330", "referee": "許淏丞", "done": false}, {"id": 35, "teamA": "場地 3｜混雙B：江宜達/陳雅玲", "teamB": "邱詠恬/潘昌志", "startTime": "1330", "referee": "李承恩", "done": false}, {"id": 36, "teamA": "場地 4｜男雙：王昱文/黃振嘉", "teamB": "徐子鈞/李錦坤", "startTime": "1330", "referee": "陳冠曄", "done": false}, {"id": 37, "teamA": "場地 1｜男雙：詹宇崴/許淏丞", "teamB": "王昱文/黃振嘉", "startTime": "1355", "referee": "陳予禮", "done": false}, {"id": 38, "teamA": "場地 2｜男雙：陳冠曄/李佳翰", "teamB": "徐子鈞/李錦坤", "startTime": "1355", "referee": "顏語緗", "done": false}, {"id": 39, "teamA": "場地 3｜混雙A：楊舒心/簡家浩", "teamB": "李長融/蔡仲元", "startTime": "1355", "referee": "曾瑀婕", "done": false}, {"id": 40, "teamA": "場地 1｜男單準決賽（1）A1", "teamB": "B2", "startTime": "1420", "referee": "詹宇崴", "done": false}, {"id": 41, "teamA": "場地 2｜男單準決賽（2）A2", "teamB": "B1", "startTime": "1420", "referee": "許淏丞", "done": false}, {"id": 42, "teamA": "場地 1｜混雙準決賽（3）A1", "teamB": "B2", "startTime": "1445", "referee": "李佳翰", "done": false}, {"id": 43, "teamA": "場地 2｜混雙準決賽（4）A2", "teamB": "B1", "startTime": "1445", "referee": "王昱文", "done": false}, {"id": 44, "teamA": "場地 1｜男單決賽（1）勝", "teamB": "（2）勝", "startTime": "1510", "referee": "劉怡伶", "done": false}, {"id": 45, "teamA": "場地 1｜男雙決賽", "teamB": "待定", "startTime": "1530", "referee": "陳雅玲", "done": false}, {"id": 46, "teamA": "場地 1｜混雙決賽（3）勝", "teamB": "（4）勝", "startTime": "1555", "referee": "李承恩", "done": false}];
+
+let teamWins = {};
+let matchScores = {};
+let visibleMatchIndexes = [];
+let forcedSlotStartTime = null;
+let currentStandingsTab = '混雙A';
+let coinTossRanks = {};
+let matchForfeit = {};
+let latestGroupRankings = {};
+
+function nowTenths() {
+  const d = new Date();
+  return (d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds())*10 + Math.floor(d.getMilliseconds()/100);
+}
+
+function parseTimeTenths(hhmm) {
+  const s = String(hhmm).padStart(4,'0');
+  return (parseInt(s.substring(0,2))*3600 + parseInt(s.substring(2,4))*60)*10;
+}
+
+function fmtTenths(t) {
+  if (t < 0) t = 0;
+  const ms = t % 10; t = Math.floor(t/10);
+  const s = t % 60; t = Math.floor(t/60);
+  const m = t % 60; t = Math.floor(t/60);
+  const h = t;
+  return {
+    main: String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'),
+    ms: '.'+ms,
+    h,m,s,ms
+  };
+}
+
+function pad(n){return String(n).padStart(2,'0');}
+
+function displayTeamName(name) {
+  if (!name) return '';
+  const withoutCourt = String(name).replace(/^場地\s*\d+｜\s*/, '').trim();
+  const cleaned = withoutCourt.replace(/^[^：:]+[：:]\s*/, '').trim();
+  if (/(準決賽|決賽)/.test(cleaned)) {
+    const seeds = cleaned.match(/[A-Za-z]\s*\d+/g);
+    if (seeds && seeds.length) {
+      return seeds[seeds.length - 1].replace(/\s+/g, '').toUpperCase();
+    }
+    const slotNum = cleaned.match(/（(\d+)）/);
+    const stripped = cleaned.replace(/^.*?(準決賽|決賽)(?:（[^）]+）)?\s*/, '').trim();
+    if (stripped) {
+      if (slotNum && !/[A-Za-z]\s*\d+/.test(stripped)) {
+        return `（${slotNum[1]}）${stripped}`;
+      }
+      return stripped;
+    }
+    if (cleaned.includes('待定')) return '待定';
+    if (cleaned.includes('勝者')) return '勝者';
+    if (/^(?:男單|混雙|男雙)?\s*(?:準決賽|決賽)(?:（[^）]+）)?$/.test(cleaned)) return '待定';
+  }
+  return cleaned;
+}
+
+function displayMatchListTeam(name) {
+  const raw = String(name || '').trim();
+  if (!raw) return '';
+  if (/(準決賽|決賽)/.test(raw) && !raw.includes('待定') && !raw.includes('勝者')) {
+    const hasSeed = /[A-Za-z]\s*\d+/.test(raw);
+    const hasSlot = /（\d+）/.test(raw);
+    if (!hasSeed && !hasSlot) return `${raw} 待定`;
+  }
+  return raw;
+}
+
+function stripCourtPrefix(name) {
+  return String(name || '').replace(/^場地\s*\d+｜/, '').trim();
+}
+
+function getStageLabel(name) {
+  const text = stripCourtPrefix(name);
+  const m = text.match(/((?:男單|混雙|男雙)?\s*(?:準決賽|決賽)(?:（[^）]+）)?)/);
+  if (m) return m[1].replace(/（\d+）/g, '').replace(/\s+/g, '');
+  return '';
+}
+
+function getCourtLabel(name) {
+  const m = String(name || '').match(/^(場地\s*\d+)/);
+  return m ? m[1] : '場地';
+}
+
+function getGroupLabel(name) {
+  const m = String(name || '').match(/(混雙A|混雙B|男單A|男單B|男雙)[：:]/);
+  return m ? m[1] : '';
+}
+
+function ensureScoreState(idx) {
+  if (!matchScores[idx]) {
+    matchScores[idx] = {a: 0, b: 0};
+  }
+  return matchScores[idx];
+}
+
+function recalculateTeamWins() {
+  teamWins = {};
+  matches.forEach((m, idx) => {
+    if (!m.done) return;
+    const state = ensureScoreState(idx);
+    const forfeitSide = matchForfeit[idx] || null;
+    const winner = forfeitSide === 'a'
+      ? m.teamB
+      : forfeitSide === 'b'
+        ? m.teamA
+        : state.a > state.b
+          ? m.teamA
+          : state.b > state.a
+            ? m.teamB
+            : null;
+    if (winner) teamWins[winner] = (teamWins[winner] || 0) + 1;
+  });
+}
+
+function setForfeit(idx, side) {
+  const m = matches[idx];
+  if (!m || m.done) return;
+  matchForfeit[idx] = side;
+  const noteEl = document.getElementById('forfeit-note-'+idx);
+  if (!noteEl) return;
+  if (side === 'a') noteEl.textContent = `棄權：${displayTeamName(m.teamA)}`;
+  else if (side === 'b') noteEl.textContent = `棄權：${displayTeamName(m.teamB)}`;
+  else noteEl.textContent = '';
+}
+
+function withCourtPrefix(original, label) {
+  const m = String(original || '').match(/^(場地\s*\d+｜)/);
+  return m ? (m[1] + label) : label;
+}
+
+function isPreliminaryMatch(match) {
+  const text = `${match.teamA || ''} ${match.teamB || ''}`;
+  return !/(準決賽|決賽)/.test(text);
+}
+
+function getMatchWinnerName(match, idx) {
+  if (!match || !match.done) return null;
+  const state = ensureScoreState(idx);
+  const forfeitSide = matchForfeit[idx] || null;
+  if (forfeitSide === 'a') return displayTeamName(match.teamB);
+  if (forfeitSide === 'b') return displayTeamName(match.teamA);
+  if (state.a === state.b) return null;
+  return state.a > state.b ? displayTeamName(match.teamA) : displayTeamName(match.teamB);
+}
+
+function applyKnockoutParticipants() {
+  const prelimMatches = matches.filter(isPreliminaryMatch);
+  const pendingPrelim = prelimMatches.filter(m => !m.done);
+  if (pendingPrelim.length > 0) {
+    alert(`尚有 ${pendingPrelim.length} 場預賽未完成，請先完成後再產生複賽名單。`);
+    return;
+  }
+
+  const getTopName = (group, rank) => latestGroupRankings[group]?.[rank - 1]?.name || null;
+
+  const msa1 = getTopName('男單A', 1), msa2 = getTopName('男單A', 2);
+  const msb1 = getTopName('男單B', 1), msb2 = getTopName('男單B', 2);
+  const mixa1 = getTopName('混雙A', 1), mixa2 = getTopName('混雙A', 2);
+  const mixb1 = getTopName('混雙B', 1), mixb2 = getTopName('混雙B', 2);
+  const md1 = getTopName('男雙', 1), md2 = getTopName('男雙', 2);
+
+  if (!msa1 || !msa2 || !msb1 || !msb2 || !mixa1 || !mixa2 || !mixb1 || !mixb2 || !md1 || !md2) {
+    alert('分組戰績資料不足，無法完整產生複賽名單。');
+    return;
+  }
+
+  matches.forEach(m => {
+    const aText = stripCourtPrefix(m.teamA);
+    if (aText.includes('男單準決賽（1）')) {
+      m.teamA = withCourtPrefix(m.teamA, `男單準決賽（1）${msa1}`);
+      m.teamB = msb2;
+    } else if (aText.includes('男單準決賽（2）')) {
+      m.teamA = withCourtPrefix(m.teamA, `男單準決賽（2）${msa2}`);
+      m.teamB = msb1;
+    } else if (aText.includes('混雙準決賽（3）')) {
+      m.teamA = withCourtPrefix(m.teamA, `混雙準決賽（3）${mixa1}`);
+      m.teamB = mixb2;
+    } else if (aText.includes('混雙準決賽（4）')) {
+      m.teamA = withCourtPrefix(m.teamA, `混雙準決賽（4）${mixa2}`);
+      m.teamB = mixb1;
+    } else if (aText.includes('男雙決賽')) {
+      m.teamA = withCourtPrefix(m.teamA, `男雙決賽（循環賽前2名）${md1}`);
+      m.teamB = md2;
+    }
+  });
+
+  renderCourtBoards();
+  renderMatchList();
+  renderScoreSummary();
+  alert('已自動填入複賽名單（男單/混雙準決賽）與男雙決賽名單。');
+}
+
+function applyFinalParticipants() {
+  const findIndexByLabel = (label) => matches.findIndex(m => stripCourtPrefix(m.teamA).includes(label));
+
+  const msSemi1Idx = findIndexByLabel('男單準決賽（1）');
+  const msSemi2Idx = findIndexByLabel('男單準決賽（2）');
+  const mixSemi1Idx = findIndexByLabel('混雙準決賽（3）');
+  const mixSemi2Idx = findIndexByLabel('混雙準決賽（4）');
+  const msFinalIdx = findIndexByLabel('男單決賽');
+  const mixFinalIdx = findIndexByLabel('混雙決賽');
+
+  if (msFinalIdx < 0 && mixFinalIdx < 0) {
+    alert('找不到男單或混雙決賽場次。');
+    return;
+  }
+
+  const msWinner1 = getMatchWinnerName(matches[msSemi1Idx], msSemi1Idx);
+  const msWinner2 = getMatchWinnerName(matches[msSemi2Idx], msSemi2Idx);
+  const mixWinner1 = getMatchWinnerName(matches[mixSemi1Idx], mixSemi1Idx);
+  const mixWinner2 = getMatchWinnerName(matches[mixSemi2Idx], mixSemi2Idx);
+
+  const missing = [];
+  if (msFinalIdx >= 0 && (!msWinner1 || !msWinner2)) missing.push('男單準決賽（1）（2）');
+  if (mixFinalIdx >= 0 && (!mixWinner1 || !mixWinner2)) missing.push('混雙準決賽（3）（4）');
+  if (missing.length) {
+    alert(`以下場次尚未有可用勝者，請先完成：${missing.join('、')}`);
+    return;
+  }
+
+  if (msFinalIdx >= 0) {
+    matches[msFinalIdx].teamA = withCourtPrefix(matches[msFinalIdx].teamA, `男單決賽${msWinner1}`);
+    matches[msFinalIdx].teamB = msWinner2;
+  }
+  if (mixFinalIdx >= 0) {
+    matches[mixFinalIdx].teamA = withCourtPrefix(matches[mixFinalIdx].teamA, `混雙決賽${mixWinner1}`);
+    matches[mixFinalIdx].teamB = mixWinner2;
+  }
+
+  renderCourtBoards();
+  renderMatchList();
+  renderScoreSummary();
+  alert('已自動產生男單/混雙決賽人員。');
+}
+
+function getCoinTossRank(group, teamName) {
+  const key = `${group}|${teamName}`;
+  if (coinTossRanks[key] === undefined) {
+    coinTossRanks[key] = Math.random();
+  }
+  return coinTossRanks[key];
+}
+
+function tickClock() {
+  const d = new Date();
+  document.getElementById('clock-display').textContent = pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+}
+
+function getSlotStartTimeToShow() {
+  if (forcedSlotStartTime && matches.some(m => String(m.startTime).padStart(4,'0') === forcedSlotStartTime)) {
+    return forcedSlotStartTime;
+  }
+
+  const pending = matches.filter(m => !m.done);
+  if (!pending.length) return null;
+
+  const unique = [...new Set(pending.map(m => String(m.startTime).padStart(4,'0')))].sort();
+  const now = nowTenths();
+  const durT = config.duration * 60 * 10;
+  const overtime = 60 * 10;
+
+  for (const slotTime of unique) {
+    const s = parseTimeTenths(slotTime);
+    const e = s + durT;
+    if (now <= e + overtime) return slotTime;
+  }
+  return unique[0];
+}
+
+function getVisibleMatches() {
+  const slotTime = getSlotStartTimeToShow();
+  if (!slotTime) return [];
+
+  const layoutOrder = {2: 1, 1: 2, 4: 3, 3: 4};
+  const getCourtNumber = (teamA) => {
+    const m = String(teamA || '').match(/^場地\s*(\d+)/);
+    return m ? parseInt(m[1], 10) : 999;
+  };
+
+  return matches
+    .map((m, idx) => ({...m, idx}))
+    .filter(m => String(m.startTime).padStart(4,'0') === slotTime)
+    .sort((a, b) => {
+      const orderA = layoutOrder[getCourtNumber(a.teamA)] || 999;
+      const orderB = layoutOrder[getCourtNumber(b.teamA)] || 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.idx - b.idx;
+    })
+    .slice(0, 4);
+}
+
+function getMatchTimerState(m, now) {
+  const startT = parseTimeTenths(m.startTime);
+  const durT = config.duration * 60 * 10;
+  const endT = startT + durT;
+  const overtime = 60 * 10;
+
+  if (m.done) {
+    return {phase: '已結束', mainTxt: '00:00:00', msTxt: '.0', cls: 'timer-done', badgeClass: 'status-done', badgeLabel: '已完成', note: ''};
+  }
+  if (now < startT) {
+    const f = fmtTenths(startT - now);
+    return {
+      phase: '距離開始', mainTxt: f.main, msTxt: f.ms, cls: 'timer-upcoming',
+      badgeClass: 'status-upcoming', badgeLabel: '即將開始',
+      note: `開始時間：${String(m.startTime).padStart(4,'0').substring(0,2)}:${String(m.startTime).padStart(4,'0').substring(2)}`
+    };
+  }
+  if (now <= endT) {
+    return {
+      phase: '進行中', mainTxt: '進行中', msTxt: '', cls: 'timer-running',
+      badgeClass: 'status-running', badgeLabel: '進行中', note: ''
+    };
+  }
+  if (now <= endT + overtime) {
+    const f = fmtTenths(now - endT);
+    return {
+      phase: '時間結束', mainTxt: '+'+f.main, msTxt: f.ms, cls: 'timer-ended',
+      badgeClass: 'status-ended', badgeLabel: '時間到', note: '已超時'
+    };
+  }
+  return {phase: '已結束', mainTxt: '00:00:00', msTxt: '.0', cls: 'timer-done', badgeClass: 'status-done', badgeLabel: '已結束', note: ''};
+}
+
+function fmtEndTime(endTenths) {
+  const totalSec = Math.floor(endTenths / 10);
+  const h = Math.floor(totalSec/3600);
+  const m = Math.floor((totalSec%3600)/60);
+  return pad(h)+':'+pad(m);
+}
+
+function updateLiveIndicator() {
+  const now = nowTenths();
+  matches.forEach((m,i) => {
+    const el = document.getElementById('mi-'+i);
+    if (!el) return;
+    const s = parseTimeTenths(m.startTime);
+    const e = s + config.duration*60*10;
+    const numEl = el.querySelector('.match-num');
+    if (!m.done && now >= s && now <= e) {
+      el.classList.add('live');
+      numEl.style.background='#f59e0b';
+    } else {
+      el.classList.remove('live');
+      if (visibleMatchIndexes.includes(i)) numEl.style.background='#16a34a';
+      else numEl.style.background='#94a3b8';
+    }
+  });
+}
+
+function setSlotBadge(cls, label) {
+  const b = document.getElementById('slot-badge');
+  b.className = 'status-badge ' + cls;
+  b.textContent = label;
+}
+
+function setCardBadge(idx, cls, label) {
+  const b = document.getElementById('status-badge-'+idx);
+  if (!b) return;
+  b.className = 'status-badge ' + cls;
+  b.textContent = label;
+}
+
+function renderCourtBoards() {
+  const el = document.getElementById('courts-grid');
+  const visible = getVisibleMatches();
+  visibleMatchIndexes = visible.map(v => v.idx);
+
+  if (!visible.length) {
+    document.getElementById('slot-title').textContent = '— 今日場次已全部完成 —';
+    document.getElementById('slot-timer-phase').textContent = '已結束';
+    document.getElementById('slot-timer-main').textContent = '00:00:00';
+    document.getElementById('slot-timer-ms').textContent = '.0';
+    document.getElementById('slot-timer-note').textContent = '';
+    document.getElementById('slot-timer-display').className = 'slot-timer timer-display timer-done';
+    setSlotBadge('status-done', '全部完成');
+    el.innerHTML = '<div class="empty-board">目前沒有可顯示的四場時段</div>';
+    return;
+  }
+
+  const slotTime = String(visible[0].startTime).padStart(4, '0');
+  document.getElementById('slot-title').textContent = `${slotTime.substring(0,2)}:${slotTime.substring(2)}`;
+
+  el.innerHTML = visible.map((m, cardIdx) => {
+    const state = ensureScoreState(m.idx);
+    const courtLabel = getCourtLabel(m.teamA);
+    const groupLabel = getGroupLabel(m.teamA);
+    const stageLabel = getStageLabel(m.teamA);
+    const leftTopLabel = groupLabel || stageLabel;
+    return `<div class="card" data-match-idx="${m.idx}">
+      <div class="match-header">
+        <div>
+          <div class="match-label">第${m.idx+1}場｜${courtLabel}${leftTopLabel ? '｜' + leftTopLabel : ''}</div>
+          <div class="match-name">${displayTeamName(m.teamA)} vs ${displayTeamName(m.teamB)}</div>
+          <div class="match-meta">開始 ${slotTime.substring(0,2)}:${slotTime.substring(2)}</div>
+        </div>
+        <span class="status-badge status-waiting" id="status-badge-${m.idx}">等待中</span>
+      </div>
+      <div class="scoreboard">
+        <div class="team-block" id="team-a-block-${m.idx}">
+          <div class="team-name">${displayTeamName(m.teamA)}</div>
+          <div class="team-score" id="score-a-${m.idx}">${state.a}</div>
+          <div class="team-wins" id="wins-a-${m.idx}">勝 ${teamWins[m.teamA]||0} 場</div>
+          <div class="score-btns">
+            <button class="btn btn-green btn-sm" onclick="changeScore(${m.idx},'a',1)">+1</button>
+            <button class="btn btn-red btn-sm" onclick="changeScore(${m.idx},'a',-1)">-1</button>
+          </div>
+        </div>
+        <div class="vs-label">VS</div>
+        <div class="team-block" id="team-b-block-${m.idx}">
+          <div class="team-name">${displayTeamName(m.teamB)}</div>
+          <div class="team-score" id="score-b-${m.idx}">${state.b}</div>
+          <div class="team-wins" id="wins-b-${m.idx}">勝 ${teamWins[m.teamB]||0} 場</div>
+          <div class="score-btns">
+            <button class="btn btn-green btn-sm" onclick="changeScore(${m.idx},'b',1)">+1</button>
+            <button class="btn btn-red btn-sm" onclick="changeScore(${m.idx},'b',-1)">-1</button>
+          </div>
+        </div>
+      </div>
+      <div class="referee-line">裁判：<span class="referee-name">${m.referee || '待定'}</span></div>
+      <div class="match-actions">
+        ${m.done ? `
+          <button class="btn btn-gray btn-sm" onclick="reopenMatch(${m.idx})">取消結束（重改）</button>
+        ` : `
+          <button class="btn btn-blue btn-sm" onclick="markMatchDone(${m.idx})">記錄結果並結束此場</button>
+          <button class="btn btn-gray btn-sm" onclick="resetScore(${m.idx})">重置比分</button>
+          <button class="btn btn-red btn-sm" onclick="setForfeit(${m.idx},'a')">A棄權</button>
+          <button class="btn btn-red btn-sm" onclick="setForfeit(${m.idx},'b')">B棄權</button>
+        `}
+      </div>
+      <div class="forfeit-note" id="forfeit-note-${m.idx}">${matchForfeit[m.idx]==='a' ? `棄權：${displayTeamName(m.teamA)}` : matchForfeit[m.idx]==='b' ? `棄權：${displayTeamName(m.teamB)}` : ''}</div>
+    </div>`;
+  }).join('');
+
+  visible.forEach(m => highlightWinner(m.idx));
+  updateTimersForVisibleBoards();
+}
+
+function updateTimersForVisibleBoards() {
+  if (!visibleMatchIndexes.length) return;
+  const now = nowTenths();
+  let hasRunning = false;
+  let hasUpcoming = false;
+  let representative = null;
+
+  visibleMatchIndexes.forEach(idx => {
+    const m = matches[idx];
+    if (!m) return;
+    const t = getMatchTimerState(m, now);
+    setCardBadge(idx, t.badgeClass, t.badgeLabel);
+
+    if (!representative && !m.done) representative = t;
+    if (!representative) representative = t;
+
+    if (t.badgeClass === 'status-running') hasRunning = true;
+    if (t.badgeClass === 'status-upcoming') hasUpcoming = true;
+  });
+
+  if (representative) {
+    const slotDisplay = document.getElementById('slot-timer-display');
+    slotDisplay.className = 'slot-timer timer-display ' + representative.cls;
+    document.getElementById('slot-timer-phase').textContent = representative.phase;
+    document.getElementById('slot-timer-main').textContent = representative.mainTxt;
+    document.getElementById('slot-timer-ms').textContent = representative.msTxt;
+    document.getElementById('slot-timer-note').textContent = representative.note;
+  }
+
+  if (hasRunning) setSlotBadge('status-running', '進行中');
+  else if (hasUpcoming) setSlotBadge('status-upcoming', '即將開始');
+  else setSlotBadge('status-ended', '本時段結束');
+}
+
+function tick() {
+  tickClock();
+  updateTimersForVisibleBoards();
+  updateLiveIndicator();
+}
+
+function changeScore(idx, team, delta) {
+  const m = matches[idx];
+  if (!m || m.done) return;
+  const state = ensureScoreState(idx);
+  if (team === 'a') {
+    state.a = Math.max(0, state.a + delta);
+    document.getElementById('score-a-'+idx).textContent = state.a;
+  } else {
+    state.b = Math.max(0, state.b + delta);
+    document.getElementById('score-b-'+idx).textContent = state.b;
+  }
+  highlightWinner(idx);
+}
+
+function resetScore(idx) {
+  const m = matches[idx];
+  if (!m || m.done) return;
+  matchScores[idx] = {a: 0, b: 0};
+  document.getElementById('score-a-'+idx).textContent = '0';
+  document.getElementById('score-b-'+idx).textContent = '0';
+  highlightWinner(idx);
+}
+
+function highlightWinner(idx) {
+  const state = ensureScoreState(idx);
+  const blockA = document.getElementById('team-a-block-'+idx);
+  const blockB = document.getElementById('team-b-block-'+idx);
+  if (!blockA || !blockB) return;
+  blockA.classList.toggle('winning', state.a > state.b);
+  blockB.classList.toggle('winning', state.b > state.a);
+}
+
+function selectMatch(idx) {
+  forcedSlotStartTime = String(matches[idx].startTime).padStart(4, '0');
+  renderCourtBoards();
+  renderMatchList();
+}
+
+function markMatchDone(idx) {
+  const m = matches[idx];
+  if (!m) return;
+  if (m.done) { alert('此場次已記錄完成。'); return; }
+
+  m.done = true;
+  recalculateTeamWins();
+
+  renderCourtBoards();
+  renderMatchList();
+  renderScoreSummary();
+}
+
+function reopenMatch(idx) {
+  const m = matches[idx];
+  if (!m || !m.done) return;
+  m.done = false;
+  recalculateTeamWins();
+
+  renderCourtBoards();
+  renderMatchList();
+  renderScoreSummary();
+}
+
+function renderMatchList() {
+  const el = document.getElementById('match-list');
+  if (!matches.length) { el.innerHTML='<div style="color:#94a3b8;font-size:0.85rem;">請先在設定中新增場次</div>'; return; }
+  el.innerHTML = matches.map((m,i) => {
+    const st = String(m.startTime).padStart(4,'0');
+    const timeLabel = st.substring(0,2)+':'+st.substring(2);
+    const teamALabel = displayMatchListTeam(m.teamA);
+    const teamBLabel = displayMatchListTeam(m.teamB);
+    const refereeLabel = m.referee || '待定';
+    return `<div class="match-item ${visibleMatchIndexes.includes(i)?'active':''}" id="mi-${i}" onclick="selectMatch(${i})">
+      <span class="match-num">${i+1}</span>
+      <span class="match-teams-txt">${teamALabel} <small style="color:#94a3b8;font-weight:400;font-size:0.7rem;">vs</small> ${teamBLabel}<br><small style="color:#64748b;font-weight:700;font-size:0.86rem;">裁判：<span class="referee-name">${refereeLabel}</span></small></span>
+      <span class="match-time-tag">${timeLabel}<br>${m.done?'<span class="match-done-tag">完成</span>':''}</span>
+    </div>`;
+  }).join('');
+  updateLiveIndicator();
+}
+
+function renderScoreSummary() {
+  const groups = ['混雙A', '混雙B', '男單A', '男單B', '男雙'];
+  latestGroupRankings = {};
+  const groupStats = Object.fromEntries(groups.map(g => [g, {}]));
+  const groupHeadToHead = Object.fromEntries(groups.map(g => [g, {}]));
+  const groupResultMatrix = Object.fromEntries(groups.map(g => [g, {}]));
+  const groupMatchRecords = Object.fromEntries(groups.map(g => [g, []]));
+
+  function extractGroupName(teamA) {
+    const m = String(teamA || '').match(/(混雙A|混雙B|男單A|男單B|男雙)[：:]/);
+    return m ? m[1] : null;
+  }
+
+  function ensureTeamStats(group, teamName) {
+    if (!groupStats[group][teamName]) {
+      groupStats[group][teamName] = {w: 0, l: 0, f: 0, played: 0, points: 0, pf: 0, pa: 0};
+    }
+    return groupStats[group][teamName];
+  }
+
+  function addHeadToHead(group, winner, loser) {
+    if (!groupHeadToHead[group][winner]) groupHeadToHead[group][winner] = {};
+    if (!groupHeadToHead[group][loser]) groupHeadToHead[group][loser] = {};
+    groupHeadToHead[group][winner][loser] = (groupHeadToHead[group][winner][loser] || 0) + 1;
+  }
+
+  function setMatrixResult(group, teamA, teamB, scoreA, scoreB) {
+    if (!groupResultMatrix[group][teamA]) groupResultMatrix[group][teamA] = {};
+    if (!groupResultMatrix[group][teamB]) groupResultMatrix[group][teamB] = {};
+    groupResultMatrix[group][teamA][teamB] = `${scoreA}:${scoreB}`;
+    groupResultMatrix[group][teamB][teamA] = `${scoreB}:${scoreA}`;
+  }
+
+  matches.forEach((m, idx) => {
+    const group = extractGroupName(m.teamA);
+    if (!group || !groupStats[group]) return;
+
+    const teamAName = displayTeamName(m.teamA);
+    const teamBName = displayTeamName(m.teamB);
+
+    const aStats = ensureTeamStats(group, teamAName);
+    const bStats = ensureTeamStats(group, teamBName);
+
+    if (m.done) {
+      aStats.played += 1;
+      bStats.played += 1;
+
+      const state = ensureScoreState(idx);
+      const forfeitSide = matchForfeit[idx] || null;
+      const scoreA = forfeitSide === 'a' ? 0 : state.a;
+      const scoreB = forfeitSide === 'b' ? 0 : state.b;
+
+      aStats.pf += scoreA;
+      aStats.pa += scoreB;
+      bStats.pf += scoreB;
+      bStats.pa += scoreA;
+
+      if (forfeitSide === 'a') {
+        bStats.w += 1;
+        bStats.points += 2;
+        aStats.f += 1;
+        addHeadToHead(group, teamBName, teamAName);
+        setMatrixResult(group, teamAName, teamBName, 'W/O', 'W');
+      } else if (forfeitSide === 'b') {
+        aStats.w += 1;
+        aStats.points += 2;
+        bStats.f += 1;
+        addHeadToHead(group, teamAName, teamBName);
+        setMatrixResult(group, teamAName, teamBName, 'W', 'W/O');
+      } else {
+        if (scoreA > scoreB) {
+          aStats.w += 1;
+          aStats.points += 2;
+          bStats.l += 1;
+          bStats.points += 1;
+          addHeadToHead(group, teamAName, teamBName);
+        }
+        if (scoreB > scoreA) {
+          bStats.w += 1;
+          bStats.points += 2;
+          aStats.l += 1;
+          aStats.points += 1;
+          addHeadToHead(group, teamBName, teamAName);
+        }
+        setMatrixResult(group, teamAName, teamBName, scoreA, scoreB);
+      }
+
+      groupMatchRecords[group].push({
+        teamA: teamAName,
+        teamB: teamBName,
+        scoreA,
+        scoreB,
+      });
+    }
+  });
+
+  const hasDone = matches.some(m => m.done);
+  if (!hasDone) {
+    document.getElementById('score-summary-compact').innerHTML = '<span style="color:#94a3b8;font-size:0.85rem;">尚未有完成的場次</span>';
+    document.getElementById('score-summary-detail').innerHTML = '<span style="color:#94a3b8;font-size:0.85rem;">尚未有完成的場次</span>';
+    return;
+  }
+
+  function compareByDiffThenPf(group, a, b) {
+    const [nameA, statA] = a;
+    const [nameB, statB] = b;
+    const diffA = statA.pf - statA.pa;
+    const diffB = statB.pf - statB.pa;
+    if (diffB !== diffA) return diffB - diffA;
+    if (statB.pf !== statA.pf) return statB.pf - statA.pf;
+    const coinA = getCoinTossRank(group, nameA);
+    const coinB = getCoinTossRank(group, nameB);
+    if (coinA !== coinB) return coinA - coinB;
+    return nameA.localeCompare(nameB, 'zh-Hant');
+  }
+
+  function getRelatedDiffMap(group, namesSet) {
+    const related = {};
+    namesSet.forEach(name => related[name] = 0);
+    groupMatchRecords[group].forEach(record => {
+      const inA = namesSet.has(record.teamA);
+      const inB = namesSet.has(record.teamB);
+      if (!inA || !inB) return;
+      related[record.teamA] += record.scoreA - record.scoreB;
+      related[record.teamB] += record.scoreB - record.scoreA;
+    });
+    return related;
+  }
+
+  function getSortedGroupEntries(group) {
+    const entries = Object.entries(groupStats[group]);
+    const pointsBuckets = {};
+
+    entries.forEach(entry => {
+      const points = entry[1].points;
+      if (!pointsBuckets[points]) pointsBuckets[points] = [];
+      pointsBuckets[points].push(entry);
+    });
+
+    const pointsLevels = Object.keys(pointsBuckets).map(Number).sort((a, b) => b - a);
+    const ranked = [];
+
+    pointsLevels.forEach(points => {
+      const bucket = pointsBuckets[points];
+      if (bucket.length === 1) {
+        ranked.push(bucket[0]);
+        return;
+      }
+
+      if (bucket.length === 2) {
+        const [teamX, teamY] = bucket;
+        const xName = teamX[0];
+        const yName = teamY[0];
+        const h2hX = groupHeadToHead[group][xName]?.[yName] || 0;
+        const h2hY = groupHeadToHead[group][yName]?.[xName] || 0;
+
+        if (h2hX > h2hY) {
+          ranked.push(teamX, teamY);
+          return;
+        }
+        if (h2hY > h2hX) {
+          ranked.push(teamY, teamX);
+          return;
+        }
+
+        ranked.push(...bucket.sort((a, b) => compareByDiffThenPf(group, a, b)));
+        return;
+      }
+
+      const tieNames = new Set(bucket.map(([name]) => name));
+      const relatedDiff = getRelatedDiffMap(group, tieNames);
+      ranked.push(...bucket.sort((a, b) => {
+        const [nameA, statA] = a;
+        const [nameB, statB] = b;
+
+        if (relatedDiff[nameB] !== relatedDiff[nameA]) {
+          return relatedDiff[nameB] - relatedDiff[nameA];
+        }
+
+        const diffA = statA.pf - statA.pa;
+        const diffB = statB.pf - statB.pa;
+        if (diffB !== diffA) return diffB - diffA;
+
+        const coinA = getCoinTossRank(group, nameA);
+        const coinB = getCoinTossRank(group, nameB);
+        if (coinA !== coinB) return coinA - coinB;
+
+        return nameA.localeCompare(nameB, 'zh-Hant');
+      }));
+    });
+
+    return ranked;
+  }
+
+  const detailedPanes = groups.map(group => {
+    const sorted = getSortedGroupEntries(group);
+    latestGroupRankings[group] = sorted.map(([name, s]) => ({name, ...s}));
+
+    return `
+      <div class="detail-pane" id="detail-pane-${group}" style="margin-bottom:12px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+        <div style="background:#f8fafc;color:#334155;font-weight:700;padding:6px 10px;">${group}（取前2名晉級）</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+          <tr style="color:#94a3b8;border-bottom:1px solid #e2e8f0;">
+            <th style="text-align:left;padding:5px 6px;font-weight:700;">隊伍</th>
+            <th style="padding:5px 6px;font-weight:700;">出賽</th>
+            <th style="padding:5px 6px;font-weight:700;">積分</th>
+            <th style="padding:5px 6px;font-weight:700;">得分</th>
+            <th style="padding:5px 6px;font-weight:700;">失分</th>
+            <th style="padding:5px 6px;font-weight:700;">勝場</th>
+            <th style="padding:5px 6px;font-weight:700;">敗場</th>
+            <th style="padding:5px 6px;font-weight:700;">棄權</th>
+            <th style="padding:5px 6px;font-weight:700;">得失分</th>
+          </tr>
+          ${sorted.length ? sorted.map(([name, s], i) => `
+            <tr style="border-bottom:1px solid #f1f5f9;${i===0&&s.w>0?'background:#f0fdf4;font-weight:700;':''}">
+              <td style="padding:6px;">${name}${i<2?' <span style="color:#2563eb;font-weight:700;">(晉級)</span>':''}</td>
+              <td style="text-align:center;padding:6px;">${s.played}</td>
+              <td style="text-align:center;padding:6px;color:#1e3a8a;font-weight:700;">${s.points}</td>
+              <td style="text-align:center;padding:6px;">${s.pf}</td>
+              <td style="text-align:center;padding:6px;">${s.pa}</td>
+              <td style="text-align:center;padding:6px;color:#16a34a;font-weight:700;">${s.w}</td>
+              <td style="text-align:center;padding:6px;color:#f59e0b;font-weight:700;">${s.l}</td>
+              <td style="text-align:center;padding:6px;color:#ef4444;font-weight:700;">${s.f}</td>
+              <td style="text-align:center;padding:6px;">${(s.pf-s.pa)>=0?'+':''}${s.pf-s.pa}</td>
+            </tr>`).join('') : `<tr><td colspan="9" style="padding:8px;color:#94a3b8;text-align:center;">尚無資料</td></tr>`}
+        </table>
+        ${sorted.length ? `
+        <div style="padding:8px 10px 4px;color:#64748b;font-weight:700;">對戰成績紀錄表</div>
+        <div style="padding:0 10px 10px;overflow:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.8rem;min-width:520px;">
+            <tr style="background:#f8fafc;color:#475569;">
+              <th style="border:1px solid #e2e8f0;padding:6px;text-align:left;white-space:nowrap;">隊伍</th>
+              ${sorted.map(([colName]) => `<th style="border:1px solid #e2e8f0;padding:6px;text-align:center;white-space:nowrap;">${colName}</th>`).join('')}
+            </tr>
+            ${sorted.map(([rowName], rowIdx) => `
+              <tr>
+                <td style="border:1px solid #e2e8f0;padding:6px;white-space:nowrap;">${rowIdx+1}. ${rowName}</td>
+                ${sorted.map(([colName], colIdx) => {
+                  if (rowName === colName) {
+                    return `<td style="border:1px solid #e2e8f0;padding:6px;text-align:center;color:#94a3b8;">✕</td>`;
+                  }
+                  const score = groupResultMatrix[group][rowName]?.[colName] || '';
+                  return `<td style="border:1px solid #e2e8f0;padding:6px;text-align:center;">${score}</td>`;
+                }).join('')}
+              </tr>`).join('')}
+          </table>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+
+  const tabsHtml = `
+    <div class="detail-tabs">
+      ${groups.map(group => `<button class="detail-tab" id="detail-tab-${group}" onclick="showStandingsTab('${group}')">${group}</button>`).join('')}
+    </div>`;
+
+  const detailedHtml = tabsHtml + detailedPanes;
+
+  const compactHtml = groups.map(group => {
+    const sorted = getSortedGroupEntries(group);
+
+    const top1 = sorted[0];
+    const top2 = sorted[1];
+    if (!top1) {
+      return `<div style="padding:6px 0;border-bottom:1px solid #f1f5f9;"><b>${group}</b>：<span style="color:#94a3b8;">尚無資料</span></div>`;
+    }
+    const [name1, s1] = top1;
+    const [name2, s2] = top2 || [null, null];
+    const diff1 = s1.pf - s1.pa;
+    const top1Txt = `1) ${name1}（${s1.points}分 / ${s1.w}勝 / 得${s1.pf} 失${s1.pa} / ${diff1>=0?'+':''}${diff1}）`;
+    const top2Txt = s2 ? ` 2) ${name2}（${s2.points}分 / ${s2.w}勝 / 得${s2.pf} 失${s2.pa} / ${(s2.pf-s2.pa)>=0?'+':''}${s2.pf-s2.pa}）` : '';
+    return `<div style="padding:6px 0;border-bottom:1px solid #f1f5f9;"><b>${group}</b>：${top1Txt}${top2Txt}</div>`;
+  }).join('');
+
+  document.getElementById('score-summary-compact').innerHTML = compactHtml;
+  document.getElementById('score-summary-detail').innerHTML = detailedHtml;
+  showStandingsTab(currentStandingsTab);
+}
+
+function showStandingsTab(group) {
+  currentStandingsTab = group;
+  const groups = ['混雙A', '混雙B', '男單A', '男單B', '男雙'];
+  groups.forEach(g => {
+    const tab = document.getElementById('detail-tab-' + g);
+    const pane = document.getElementById('detail-pane-' + g);
+    if (tab) tab.classList.toggle('active', g === group);
+    if (pane) pane.classList.toggle('active', g === group);
+  });
+}
+
+function showPageTab(tab) {
+  const isTimer = tab === 'timer';
+  document.getElementById('page-tab-timer').classList.toggle('active', isTimer);
+  document.getElementById('page-tab-standings').classList.toggle('active', !isTimer);
+  document.getElementById('page-timer').classList.toggle('active', isTimer);
+  document.getElementById('page-standings').classList.toggle('active', !isTimer);
+}
+
+function updateFullscreenButton() {
+  const btn = document.getElementById('fullscreen-btn');
+  if (!btn) return;
+  btn.textContent = document.fullscreenElement ? '離開全螢幕' : '全螢幕';
+}
+
+function updateModeButtons() {
+  const normalBtn = document.getElementById('mode-normal-btn');
+  const projectorBtn = document.getElementById('mode-projector-btn');
+  if (!normalBtn || !projectorBtn) return;
+
+  const isProjector = document.body.classList.contains('projector');
+  normalBtn.classList.toggle('btn-indigo', !isProjector);
+  normalBtn.classList.toggle('btn-gray', isProjector);
+  projectorBtn.classList.toggle('btn-indigo', isProjector);
+  projectorBtn.classList.toggle('btn-gray', !isProjector);
+}
+
+function setDisplayMode(mode) {
+  const isProjector = mode === 'projector';
+  document.body.classList.toggle('projector', isProjector);
+  updateModeButtons();
+  localStorage.setItem('displayMode', isProjector ? 'projector' : 'normal');
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+}
+
+function openSettings() {
+  document.getElementById('s-date').value = config.date;
+  document.getElementById('s-place').value = config.place;
+  document.getElementById('s-duration').value = config.duration;
+  document.getElementById('s-title').value = config.title;
+  renderMatchesEditor();
+  document.getElementById('settings-panel').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settings-panel').classList.remove('open');
+}
+function renderMatchesEditor() {
+  document.getElementById('matches-editor').innerHTML = matches.map((m,i)=>`
+    <div class="match-edit-row">
+      <span>${i+1}</span>
+      <input type="text" value="${m.teamA}" id="ea-${i}" placeholder="隊伍A">
+      <input type="text" value="${m.teamB}" id="eb-${i}" placeholder="隊伍B">
+      <input type="text" value="${m.startTime}" id="et-${i}" placeholder="0900" maxlength="4">
+      <input type="text" value="${m.referee || ''}" id="er-${i}" placeholder="裁判姓名">
+      <button class="del-btn" onclick="deleteMatchRow(${i})">刪除</button>
+    </div>`).join('');
+}
+function addMatchRow() {
+  matches.push({id:Date.now(),teamA:'',teamB:'',startTime:'',referee:'',done:false});
+  renderMatchesEditor();
+}
+function deleteMatchRow(i) {
+  if(matches.length<=1){alert('至少保留一場！');return;}
+  matches.splice(i,1);
+  renderMatchesEditor();
+}
+function applySettings() {
+  config.date = document.getElementById('s-date').value;
+  config.place = document.getElementById('s-place').value || '中正堂';
+  config.duration = parseInt(document.getElementById('s-duration').value)||30;
+  config.title = document.getElementById('s-title').value||'小地盃羽球';
+  matches = matches.map((_,i)=>({
+    id:i+1,
+    teamA:document.getElementById('ea-'+i)?.value||'隊伍A',
+    teamB:document.getElementById('eb-'+i)?.value||'隊伍B',
+    startTime:document.getElementById('et-'+i)?.value||'0900',
+    referee:document.getElementById('er-'+i)?.value||'',
+    done: matches[i].done,
+  }));
+  matchScores = {};
+  teamWins = {};
+  matchForfeit = {};
+  coinTossRanks = {};
+  forcedSlotStartTime = null;
+  const d = config.date ? config.date.substring(5).replace('-','/') : '';
+  document.getElementById('meta-date').textContent = d;
+  document.getElementById('meta-place').textContent = config.place;
+  document.title = config.title + ' 計時器';
+  closeSettings();
+  renderCourtBoards();
+  renderMatchList();
+  renderScoreSummary();
+}
+
+const tournamentDate = '2026-03-07';
+document.getElementById('s-date').value = tournamentDate;
+const d = tournamentDate.substring(5).replace('-','/');
+document.getElementById('meta-date').textContent = d;
+
+renderCourtBoards();
+renderMatchList();
+renderScoreSummary();
+document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+const savedDisplayMode = localStorage.getItem('displayMode');
+if (savedDisplayMode === 'normal' || savedDisplayMode === 'projector') {
+  setDisplayMode(savedDisplayMode);
+} else {
+  updateModeButtons();
+}
+
+updateFullscreenButton();
+setInterval(tick, 100);
+tick();
+</script>
+</body>
+</html>

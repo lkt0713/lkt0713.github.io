@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>莫拉克颱風 q3max vs 氣象署雷達回波 對比</title>
+<link rel="stylesheet" href="../../assets/theme.css">
+<script src="../../assets/site.js"></script>
+<style>
+  /* Legacy variable names remapped onto the shared portfolio tokens */
+  :root {
+    --panel:        var(--surface);
+    --panel-border: var(--border);
+    --muted:        var(--text-2);
+    --accent2:      var(--accent-2);
+  }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+    animation: fadeUp .5s ease-out .1s both;
+  }
+
+  /* Intro block (was the old page <header>) */
+  .page-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .page-intro h1 {
+    font-size: 1.35em; font-weight: 800; letter-spacing: -.4px;
+    line-height: 1.35; color: var(--text);
+    margin: 0 0 12px; padding-bottom: 13px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .sub {
+    color: var(--text-2);
+    font-size: 0.88rem;
+    line-height: 1.75;
+  }
+  .sub b { color: var(--text); font-weight: 700; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .controls button {
+    background: var(--btn-bg);
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(21,88,214,.3);
+    transition: all .18s;
+  }
+  .controls button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,88,214,.4); }
+  .controls button.secondary {
+    background: var(--surface);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .controls button.secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .controls button:active { transform: translateY(1px); }
+  .timeline-wrap { flex: 1 1 320px; display: flex; align-items: center; gap: 10px; min-width: 240px; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  .timestamp {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 172px;
+    text-align: center;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 12px;
+    font-family: 'Courier New', monospace;
+    color: var(--text);
+  }
+  .frame-count {
+    color: var(--text-3); font-size: 0.75rem; min-width: 70px;
+    font-weight: 700; letter-spacing: .5px;
+  }
+
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 860px) {
+    .panels { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: background .35s, border .35s;
+  }
+  .panel-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px; flex-wrap: wrap;
+  }
+  .panel-head h2 {
+    font-size: 0.95rem; margin: 0; font-weight: 800; letter-spacing: -.2px;
+  }
+  .panel-head .tag {
+    font-size: 0.7rem;
+    color: var(--text-3);
+    font-family: 'Courier New', monospace;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+  }
+  .panel.left  .panel-head { border-bottom: 2px solid var(--accent); }
+  .panel.right .panel-head { border-bottom: 2px solid var(--accent-2); }
+  .panel.left  .panel-head h2 { color: var(--accent); }
+  .panel.right .panel-head h2 { color: var(--accent-2); }
+  .img-wrap {
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+  }
+  .img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .panel-foot {
+    padding: 10px 18px;
+    font-size: 0.74rem;
+    color: var(--text-3);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .legend-note {
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 18px 22px;
+    font-size: 0.83rem;
+    color: var(--text-2);
+    line-height: 1.8;
+  }
+  .legend-note b { color: var(--text); font-weight: 700; }
+  code {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body data-page-title="莫拉克 q3max vs 氣象署雷達回波"
+      data-page-subtitle="ERA5-CE 模擬 vs CWA 合成雷達回波 · 逐時比對"
+      data-page-icon="📡">
+
+<main>
+  <div class="page-intro">
+  <h1>颱風莫拉克（Morakot, 2009）：ERA5-CE <code>q3max</code> 模擬 vs. 氣象署合成雷達回波圖 對比</h1>
+  <div class="sub">
+    左：<b>q3max</b>（初始場 2009/08/03 00Z 之 ERA5-CE 模擬，柱狀最大混合比 g/kg）　|
+    右：<b>中央氣象署颱風資料庫</b> 台灣地區合成雷達回波圖（來源：rdc28.cwa.gov.tw）<br>
+    時間範圍：<b>2009/08/05 08:00 – 2009/08/11 07:00（台灣當地時間 LST/TST）</b>，逐小時比對，共 <b>144</b> 個時間點。
+  </div>
+  </div>
+  <div class="controls">
+    <button id="playBtn">▶ 播放</button>
+    <button class="secondary" id="prevBtn">◀ 上一張</button>
+    <button class="secondary" id="nextBtn">下一張 ▶</button>
+    <div class="timeline-wrap">
+      <input type="range" id="slider" min="0" max="143" value="0" step="1">
+    </div>
+    <div class="timestamp" id="timestamp">2009-08-05 08:00</div>
+    <div class="frame-count" id="frameCount">1 / 144</div>
+    <select id="speedSelect">
+      <option value="600">快 (0.6s)</option>
+      <option value="1000" selected>中 (1s)</option>
+      <option value="1800">慢 (1.8s)</option>
+    </select>
+  </div>
+
+  <div class="panels">
+    <div class="panel left">
+      <div class="panel-head">
+        <h2>ERA5-CE q3max（模擬）</h2>
+        <span class="tag" id="q3maxFile"></span>
+      </div>
+      <div class="img-wrap"><img id="q3maxImg" alt="q3max"></div>
+      <div class="panel-foot">來源檔案：<code>data/q3max/</code> 資料夾，初始場 2009080300</div>
+    </div>
+    <div class="panel right">
+      <div class="panel-head">
+        <h2>CWA 合成雷達回波圖（觀測）</h2>
+        <span class="tag" id="radarFile"></span>
+      </div>
+      <div class="img-wrap"><img id="radarImg" alt="radar"></div>
+      <div class="panel-foot">來源：中央氣象署颱風資料庫 Radar_MOSA_CV（TST 台灣標準時）</div>
+    </div>
+  </div>
+
+  <div class="legend-note">
+    <b>使用說明：</b>拖曳上方時間軸或按播放鍵，即可逐小時比對模式模擬的降水/水氣柱最大值（q3max）與觀測雷達回波的空間分布是否吻合，藉此檢視模式對莫拉克颱風強降雨系統移動路徑與強度演變的掌握程度。<br>
+    <b>注意：</b>兩者物理量不同（q3max 為模式柱狀最大混合比，雷達回波為觀測反射率 dBZ），色階亦不同，比對重點應放在<b>降雨/回波系統的空間位置、形狀與移動趨勢</b>，而非數值本身的直接對應。
+  </div>
+</main>
+
+<script>
+const manifest = [{"lst": "2009-08-05 08:00", "radar_file": "Radar_MOSA_CV.200908050000.gif", "q3max_file": "2009080300.f4800.q3max.png"}, {"lst": "2009-08-05 09:00", "radar_file": "Radar_MOSA_CV.200908050100.gif", "q3max_file": "2009080300.f4900.q3max.png"}, {"lst": "2009-08-05 10:00", "radar_file": "Radar_MOSA_CV.200908050200.gif", "q3max_file": "2009080300.f5000.q3max.png"}, {"lst": "2009-08-05 11:00", "radar_file": "Radar_MOSA_CV.200908050300.gif", "q3max_file": "2009080300.f5100.q3max.png"}, {"lst": "2009-08-05 12:00", "radar_file": "Radar_MOSA_CV.200908050400.gif", "q3max_file": "2009080300.f5200.q3max.png"}, {"lst": "2009-08-05 13:00", "radar_file": "Radar_MOSA_CV.200908050500.gif", "q3max_file": "2009080300.f5300.q3max.png"}, {"lst": "2009-08-05 14:00", "radar_file": "Radar_MOSA_CV.200908050600.gif", "q3max_file": "2009080300.f5400.q3max.png"}, {"lst": "2009-08-05 15:00", "radar_file": "Radar_MOSA_CV.200908050700.gif", "q3max_file": "2009080300.f5500.q3max.png"}, {"lst": "2009-08-05 16:00", "radar_file": "Radar_MOSA_CV.200908050800.gif", "q3max_file": "2009080300.f5600.q3max.png"}, {"lst": "2009-08-05 17:00", "radar_file": "Radar_MOSA_CV.200908050900.gif", "q3max_file": "2009080300.f5700.q3max.png"}, {"lst": "2009-08-05 18:00", "radar_file": "Radar_MOSA_CV.200908051000.gif", "q3max_file": "2009080300.f5800.q3max.png"}, {"lst": "2009-08-05 19:00", "radar_file": "Radar_MOSA_CV.200908051100.gif", "q3max_file": "2009080300.f5900.q3max.png"}, {"lst": "2009-08-05 20:00", "radar_file": "Radar_MOSA_CV.200908051200.gif", "q3max_file": "2009080300.f6000.q3max.png"}, {"lst": "2009-08-05 21:00", "radar_file": "Radar_MOSA_CV.200908051300.gif", "q3max_file": "2009080300.f6100.q3max.png"}, {"lst": "2009-08-05 22:00", "radar_file": "Radar_MOSA_CV.200908051400.gif", "q3max_file": "2009080300.f6200.q3max.png"}, {"lst": "2009-08-05 23:00", "radar_file": "Radar_MOSA_CV.200908051500.gif", "q3max_file": "2009080300.f6300.q3max.png"}, {"lst": "2009-08-06 00:00", "radar_file": "Radar_MOSA_CV.200908051600.gif", "q3max_file": "2009080300.f6400.q3max.png"}, {"lst": "2009-08-06 01:00", "radar_file": "Radar_MOSA_CV.200908051700.gif", "q3max_file": "2009080300.f6500.q3max.png"}, {"lst": "2009-08-06 02:00", "radar_file": "Radar_MOSA_CV.200908051800.gif", "q3max_file": "2009080300.f6600.q3max.png"}, {"lst": "2009-08-06 03:00", "radar_file": "Radar_MOSA_CV.200908051900.gif", "q3max_file": "2009080300.f6700.q3max.png"}, {"lst": "2009-08-06 04:00", "radar_file": "Radar_MOSA_CV.200908052000.gif", "q3max_file": "2009080300.f6800.q3max.png"}, {"lst": "2009-08-06 05:00", "radar_file": "Radar_MOSA_CV.200908052100.gif", "q3max_file": "2009080300.f6900.q3max.png"}, {"lst": "2009-08-06 06:00", "radar_file": "Radar_MOSA_CV.200908052200.gif", "q3max_file": "2009080300.f7000.q3max.png"}, {"lst": "2009-08-06 07:00", "radar_file": "Radar_MOSA_CV.200908052300.gif", "q3max_file": "2009080300.f7100.q3max.png"}, {"lst": "2009-08-06 08:00", "radar_file": "Radar_MOSA_CV.200908060000.gif", "q3max_file": "2009080300.f7200.q3max.png"}, {"lst": "2009-08-06 09:00", "radar_file": "Radar_MOSA_CV.200908060100.gif", "q3max_file": "2009080300.f7300.q3max.png"}, {"lst": "2009-08-06 10:00", "radar_file": "Radar_MOSA_CV.200908060200.gif", "q3max_file": "2009080300.f7400.q3max.png"}, {"lst": "2009-08-06 11:00", "radar_file": "Radar_MOSA_CV.200908060300.gif", "q3max_file": "2009080300.f7500.q3max.png"}, {"lst": "2009-08-06 12:00", "radar_file": "Radar_MOSA_CV.200908060400.gif", "q3max_file": "2009080300.f7600.q3max.png"}, {"lst": "2009-08-06 13:00", "radar_file": "Radar_MOSA_CV.200908060500.gif", "q3max_file": "2009080300.f7700.q3max.png"}, {"lst": "2009-08-06 14:00", "radar_file": "Radar_MOSA_CV.200908060600.gif", "q3max_file": "2009080300.f7800.q3max.png"}, {"lst": "2009-08-06 15:00", "radar_file": "Radar_MOSA_CV.200908060700.gif", "q3max_file": "2009080300.f7900.q3max.png"}, {"lst": "2009-08-06 16:00", "radar_file": "Radar_MOSA_CV.200908060800.gif", "q3max_file": "2009080300.f8000.q3max.png"}, {"lst": "2009-08-06 17:00", "radar_file": "Radar_MOSA_CV.200908060900.gif", "q3max_file": "2009080300.f8100.q3max.png"}, {"lst": "2009-08-06 18:00", "radar_file": "Radar_MOSA_CV.200908061000.gif", "q3max_file": "2009080300.f8200.q3max.png"}, {"lst": "2009-08-06 19:00", "radar_file": "Radar_MOSA_CV.200908061100.gif", "q3max_file": "2009080300.f8300.q3max.png"}, {"lst": "2009-08-06 20:00", "radar_file": "Radar_MOSA_CV.200908061200.gif", "q3max_file": "2009080300.f8400.q3max.png"}, {"lst": "2009-08-06 21:00", "radar_file": "Radar_MOSA_CV.200908061300.gif", "q3max_file": "2009080300.f8500.q3max.png"}, {"lst": "2009-08-06 22:00", "radar_file": "Radar_MOSA_CV.200908061400.gif", "q3max_file": "2009080300.f8600.q3max.png"}, {"lst": "2009-08-06 23:00", "radar_file": "Radar_MOSA_CV.200908061500.gif", "q3max_file": "2009080300.f8700.q3max.png"}, {"lst": "2009-08-07 00:00", "radar_file": "Radar_MOSA_CV.200908061600.gif", "q3max_file": "2009080300.f8800.q3max.png"}, {"lst": "2009-08-07 01:00", "radar_file": "Radar_MOSA_CV.200908061700.gif", "q3max_file": "2009080300.f8900.q3max.png"}, {"lst": "2009-08-07 02:00", "radar_file": "Radar_MOSA_CV.200908061800.gif", "q3max_file": "2009080300.f9000.q3max.png"}, {"lst": "2009-08-07 03:00", "radar_file": "Radar_MOSA_CV.200908061900.gif", "q3max_file": "2009080300.f9100.q3max.png"}, {"lst": "2009-08-07 04:00", "radar_file": "Radar_MOSA_CV.200908062000.gif", "q3max_file": "2009080300.f9200.q3max.png"}, {"lst": "2009-08-07 05:00", "radar_file": "Radar_MOSA_CV.200908062100.gif", "q3max_file": "2009080300.f9300.q3max.png"}, {"lst": "2009-08-07 06:00", "radar_file": "Radar_MOSA_CV.200908062200.gif", "q3max_file": "2009080300.f9400.q3max.png"}, {"lst": "2009-08-07 07:00", "radar_file": "Radar_MOSA_CV.200908062300.gif", "q3max_file": "2009080300.f9500.q3max.png"}, {"lst": "2009-08-07 08:00", "radar_file": "Radar_MOSA_CV.200908070000.gif", "q3max_file": "2009080300.f9600.q3max.png"}, {"lst": "2009-08-07 09:00", "radar_file": "Radar_MOSA_CV.200908070100.gif", "q3max_file": "2009080300.f9700.q3max.png"}, {"lst": "2009-08-07 10:00", "radar_file": "Radar_MOSA_CV.200908070200.gif", "q3max_file": "2009080300.f9800.q3max.png"}, {"lst": "2009-08-07 11:00", "radar_file": "Radar_MOSA_CV.200908070300.gif", "q3max_file": "2009080300.f9900.q3max.png"}, {"lst": "2009-08-07 12:00", "radar_file": "Radar_MOSA_CV.200908070400.gif", "q3max_file": "2009080300.f10000.q3max.png"}, {"lst": "2009-08-07 13:00", "radar_file": "Radar_MOSA_CV.200908070500.gif", "q3max_file": "2009080300.f10100.q3max.png"}, {"lst": "2009-08-07 14:00", "radar_file": "Radar_MOSA_CV.200908070600.gif", "q3max_file": "2009080300.f10200.q3max.png"}, {"lst": "2009-08-07 15:00", "radar_file": "Radar_MOSA_CV.200908070700.gif", "q3max_file": "2009080300.f10300.q3max.png"}, {"lst": "2009-08-07 16:00", "radar_file": "Radar_MOSA_CV.200908070800.gif", "q3max_file": "2009080300.f10400.q3max.png"}, {"lst": "2009-08-07 17:00", "radar_file": "Radar_MOSA_CV.200908070900.gif", "q3max_file": "2009080300.f10500.q3max.png"}, {"lst": "2009-08-07 18:00", "radar_file": "Radar_MOSA_CV.200908071000.gif", "q3max_file": "2009080300.f10600.q3max.png"}, {"lst": "2009-08-07 19:00", "radar_file": "Radar_MOSA_CV.200908071100.gif", "q3max_file": "2009080300.f10700.q3max.png"}, {"lst": "2009-08-07 20:00", "radar_file": "Radar_MOSA_CV.200908071200.gif", "q3max_file": "2009080300.f10800.q3max.png"}, {"lst": "2009-08-07 21:00", "radar_file": "Radar_MOSA_CV.200908071300.gif", "q3max_file": "2009080300.f10900.q3max.png"}, {"lst": "2009-08-07 22:00", "radar_file": "Radar_MOSA_CV.200908071400.gif", "q3max_file": "2009080300.f11000.q3max.png"}, {"lst": "2009-08-07 23:00", "radar_file": "Radar_MOSA_CV.200908071500.gif", "q3max_file": "2009080300.f11100.q3max.png"}, {"lst": "2009-08-08 00:00", "radar_file": "Radar_MOSA_CV.200908071600.gif", "q3max_file": "2009080300.f11200.q3max.png"}, {"lst": "2009-08-08 01:00", "radar_file": "Radar_MOSA_CV.200908071700.gif", "q3max_file": "2009080300.f11300.q3max.png"}, {"lst": "2009-08-08 02:00", "radar_file": "Radar_MOSA_CV.200908071800.gif", "q3max_file": "2009080300.f11400.q3max.png"}, {"lst": "2009-08-08 03:00", "radar_file": "Radar_MOSA_CV.200908071900.gif", "q3max_file": "2009080300.f11500.q3max.png"}, {"lst": "2009-08-08 04:00", "radar_file": "Radar_MOSA_CV.200908072000.gif", "q3max_file": "2009080300.f11600.q3max.png"}, {"lst": "2009-08-08 05:00", "radar_file": "Radar_MOSA_CV.200908072100.gif", "q3max_file": "2009080300.f11700.q3max.png"}, {"lst": "2009-08-08 06:00", "radar_file": "Radar_MOSA_CV.200908072200.gif", "q3max_file": "2009080300.f11800.q3max.png"}, {"lst": "2009-08-08 07:00", "radar_file": "Radar_MOSA_CV.200908072300.gif", "q3max_file": "2009080300.f11900.q3max.png"}, {"lst": "2009-08-08 08:00", "radar_file": "Radar_MOSA_CV.200908080000.gif", "q3max_file": "2009080300.f12000.q3max.png"}, {"lst": "2009-08-08 09:00", "radar_file": "Radar_MOSA_CV.200908080100.gif", "q3max_file": "2009080300.f12100.q3max.png"}, {"lst": "2009-08-08 10:00", "radar_file": "Radar_MOSA_CV.200908080200.gif", "q3max_file": "2009080300.f12200.q3max.png"}, {"lst": "2009-08-08 11:00", "radar_file": "Radar_MOSA_CV.200908080300.gif", "q3max_file": "2009080300.f12300.q3max.png"}, {"lst": "2009-08-08 12:00", "radar_file": "Radar_MOSA_CV.200908080400.gif", "q3max_file": "2009080300.f12400.q3max.png"}, {"lst": "2009-08-08 13:00", "radar_file": "Radar_MOSA_CV.200908080500.gif", "q3max_file": "2009080300.f12500.q3max.png"}, {"lst": "2009-08-08 14:00", "radar_file": "Radar_MOSA_CV.200908080600.gif", "q3max_file": "2009080300.f12600.q3max.png"}, {"lst": "2009-08-08 15:00", "radar_file": "Radar_MOSA_CV.200908080700.gif", "q3max_file": "2009080300.f12700.q3max.png"}, {"lst": "2009-08-08 16:00", "radar_file": "Radar_MOSA_CV.200908080800.gif", "q3max_file": "2009080300.f12800.q3max.png"}, {"lst": "2009-08-08 17:00", "radar_file": "Radar_MOSA_CV.200908080900.gif", "q3max_file": "2009080300.f12900.q3max.png"}, {"lst": "2009-08-08 18:00", "radar_file": "Radar_MOSA_CV.200908081000.gif", "q3max_file": "2009080300.f13000.q3max.png"}, {"lst": "2009-08-08 19:00", "radar_file": "Radar_MOSA_CV.200908081100.gif", "q3max_file": "2009080300.f13100.q3max.png"}, {"lst": "2009-08-08 20:00", "radar_file": "Radar_MOSA_CV.200908081200.gif", "q3max_file": "2009080300.f13200.q3max.png"}, {"lst": "2009-08-08 21:00", "radar_file": "Radar_MOSA_CV.200908081300.gif", "q3max_file": "2009080300.f13300.q3max.png"}, {"lst": "2009-08-08 22:00", "radar_file": "Radar_MOSA_CV.200908081400.gif", "q3max_file": "2009080300.f13400.q3max.png"}, {"lst": "2009-08-08 23:00", "radar_file": "Radar_MOSA_CV.200908081500.gif", "q3max_file": "2009080300.f13500.q3max.png"}, {"lst": "2009-08-09 00:00", "radar_file": "Radar_MOSA_CV.200908081600.gif", "q3max_file": "2009080300.f13600.q3max.png"}, {"lst": "2009-08-09 01:00", "radar_file": "Radar_MOSA_CV.200908081700.gif", "q3max_file": "2009080300.f13700.q3max.png"}, {"lst": "2009-08-09 02:00", "radar_file": "Radar_MOSA_CV.200908081800.gif", "q3max_file": "2009080300.f13800.q3max.png"}, {"lst": "2009-08-09 03:00", "radar_file": "Radar_MOSA_CV.200908081900.gif", "q3max_file": "2009080300.f13900.q3max.png"}, {"lst": "2009-08-09 04:00", "radar_file": "Radar_MOSA_CV.200908082000.gif", "q3max_file": "2009080300.f14000.q3max.png"}, {"lst": "2009-08-09 05:00", "radar_file": "Radar_MOSA_CV.200908082100.gif", "q3max_file": "2009080300.f14100.q3max.png"}, {"lst": "2009-08-09 06:00", "radar_file": "Radar_MOSA_CV.200908082200.gif", "q3max_file": "2009080300.f14200.q3max.png"}, {"lst": "2009-08-09 07:00", "radar_file": "Radar_MOSA_CV.200908082300.gif", "q3max_file": "2009080300.f14300.q3max.png"}, {"lst": "2009-08-09 08:00", "radar_file": "Radar_MOSA_CV.200908090000.gif", "q3max_file": "2009080300.f14400.q3max.png"}, {"lst": "2009-08-09 09:00", "radar_file": "Radar_MOSA_CV.200908090100.gif", "q3max_file": "2009080300.f14500.q3max.png"}, {"lst": "2009-08-09 10:00", "radar_file": "Radar_MOSA_CV.200908090200.gif", "q3max_file": "2009080300.f14600.q3max.png"}, {"lst": "2009-08-09 11:00", "radar_file": "Radar_MOSA_CV.200908090300.gif", "q3max_file": "2009080300.f14700.q3max.png"}, {"lst": "2009-08-09 12:00", "radar_file": "Radar_MOSA_CV.200908090400.gif", "q3max_file": "2009080300.f14800.q3max.png"}, {"lst": "2009-08-09 13:00", "radar_file": "Radar_MOSA_CV.200908090500.gif", "q3max_file": "2009080300.f14900.q3max.png"}, {"lst": "2009-08-09 14:00", "radar_file": "Radar_MOSA_CV.200908090600.gif", "q3max_file": "2009080300.f15000.q3max.png"}, {"lst": "2009-08-09 15:00", "radar_file": "Radar_MOSA_CV.200908090700.gif", "q3max_file": "2009080300.f15100.q3max.png"}, {"lst": "2009-08-09 16:00", "radar_file": "Radar_MOSA_CV.200908090800.gif", "q3max_file": "2009080300.f15200.q3max.png"}, {"lst": "2009-08-09 17:00", "radar_file": "Radar_MOSA_CV.200908090900.gif", "q3max_file": "2009080300.f15300.q3max.png"}, {"lst": "2009-08-09 18:00", "radar_file": "Radar_MOSA_CV.200908091000.gif", "q3max_file": "2009080300.f15400.q3max.png"}, {"lst": "2009-08-09 19:00", "radar_file": "Radar_MOSA_CV.200908091100.gif", "q3max_file": "2009080300.f15500.q3max.png"}, {"lst": "2009-08-09 20:00", "radar_file": "Radar_MOSA_CV.200908091200.gif", "q3max_file": "2009080300.f15600.q3max.png"}, {"lst": "2009-08-09 21:00", "radar_file": "Radar_MOSA_CV.200908091300.gif", "q3max_file": "2009080300.f15700.q3max.png"}, {"lst": "2009-08-09 22:00", "radar_file": "Radar_MOSA_CV.200908091400.gif", "q3max_file": "2009080300.f15800.q3max.png"}, {"lst": "2009-08-09 23:00", "radar_file": "Radar_MOSA_CV.200908091500.gif", "q3max_file": "2009080300.f15900.q3max.png"}, {"lst": "2009-08-10 00:00", "radar_file": "Radar_MOSA_CV.200908091600.gif", "q3max_file": "2009080300.f16000.q3max.png"}, {"lst": "2009-08-10 01:00", "radar_file": "Radar_MOSA_CV.200908091700.gif", "q3max_file": "2009080300.f16100.q3max.png"}, {"lst": "2009-08-10 02:00", "radar_file": "Radar_MOSA_CV.200908091800.gif", "q3max_file": "2009080300.f16200.q3max.png"}, {"lst": "2009-08-10 03:00", "radar_file": "Radar_MOSA_CV.200908091900.gif", "q3max_file": "2009080300.f16300.q3max.png"}, {"lst": "2009-08-10 04:00", "radar_file": "Radar_MOSA_CV.200908092000.gif", "q3max_file": "2009080300.f16400.q3max.png"}, {"lst": "2009-08-10 05:00", "radar_file": "Radar_MOSA_CV.200908092100.gif", "q3max_file": "2009080300.f16500.q3max.png"}, {"lst": "2009-08-10 06:00", "radar_file": "Radar_MOSA_CV.200908092200.gif", "q3max_file": "2009080300.f16600.q3max.png"}, {"lst": "2009-08-10 07:00", "radar_file": "Radar_MOSA_CV.200908092300.gif", "q3max_file": "2009080300.f16700.q3max.png"}, {"lst": "2009-08-10 08:00", "radar_file": "Radar_MOSA_CV.200908100000.gif", "q3max_file": "2009080300.f16800.q3max.png"}, {"lst": "2009-08-10 09:00", "radar_file": "Radar_MOSA_CV.200908100100.gif", "q3max_file": "2009080300.f16900.q3max.png"}, {"lst": "2009-08-10 10:00", "radar_file": "Radar_MOSA_CV.200908100200.gif", "q3max_file": "2009080300.f17000.q3max.png"}, {"lst": "2009-08-10 11:00", "radar_file": "Radar_MOSA_CV.200908100300.gif", "q3max_file": "2009080300.f17100.q3max.png"}, {"lst": "2009-08-10 12:00", "radar_file": "Radar_MOSA_CV.200908100400.gif", "q3max_file": "2009080300.f17200.q3max.png"}, {"lst": "2009-08-10 13:00", "radar_file": "Radar_MOSA_CV.200908100500.gif", "q3max_file": "2009080300.f17300.q3max.png"}, {"lst": "2009-08-10 14:00", "radar_file": "Radar_MOSA_CV.200908100600.gif", "q3max_file": "2009080300.f17400.q3max.png"}, {"lst": "2009-08-10 15:00", "radar_file": "Radar_MOSA_CV.200908100700.gif", "q3max_file": "2009080300.f17500.q3max.png"}, {"lst": "2009-08-10 16:00", "radar_file": "Radar_MOSA_CV.200908100800.gif", "q3max_file": "2009080300.f17600.q3max.png"}, {"lst": "2009-08-10 17:00", "radar_file": "Radar_MOSA_CV.200908100900.gif", "q3max_file": "2009080300.f17700.q3max.png"}, {"lst": "2009-08-10 18:00", "radar_file": "Radar_MOSA_CV.200908101000.gif", "q3max_file": "2009080300.f17800.q3max.png"}, {"lst": "2009-08-10 19:00", "radar_file": "Radar_MOSA_CV.200908101100.gif", "q3max_file": "2009080300.f17900.q3max.png"}, {"lst": "2009-08-10 20:00", "radar_file": "Radar_MOSA_CV.200908101200.gif", "q3max_file": "2009080300.f18000.q3max.png"}, {"lst": "2009-08-10 21:00", "radar_file": "Radar_MOSA_CV.200908101300.gif", "q3max_file": "2009080300.f18100.q3max.png"}, {"lst": "2009-08-10 22:00", "radar_file": "Radar_MOSA_CV.200908101400.gif", "q3max_file": "2009080300.f18200.q3max.png"}, {"lst": "2009-08-10 23:00", "radar_file": "Radar_MOSA_CV.200908101500.gif", "q3max_file": "2009080300.f18300.q3max.png"}, {"lst": "2009-08-11 00:00", "radar_file": "Radar_MOSA_CV.200908101600.gif", "q3max_file": "2009080300.f18400.q3max.png"}, {"lst": "2009-08-11 01:00", "radar_file": "Radar_MOSA_CV.200908101700.gif", "q3max_file": "2009080300.f18500.q3max.png"}, {"lst": "2009-08-11 02:00", "radar_file": "Radar_MOSA_CV.200908101800.gif", "q3max_file": "2009080300.f18600.q3max.png"}, {"lst": "2009-08-11 03:00", "radar_file": "Radar_MOSA_CV.200908101900.gif", "q3max_file": "2009080300.f18700.q3max.png"}, {"lst": "2009-08-11 04:00", "radar_file": "Radar_MOSA_CV.200908102000.gif", "q3max_file": "2009080300.f18800.q3max.png"}, {"lst": "2009-08-11 05:00", "radar_file": "Radar_MOSA_CV.200908102100.gif", "q3max_file": "2009080300.f18900.q3max.png"}, {"lst": "2009-08-11 06:00", "radar_file": "Radar_MOSA_CV.200908102200.gif", "q3max_file": "2009080300.f19000.q3max.png"}, {"lst": "2009-08-11 07:00", "radar_file": "Radar_MOSA_CV.200908102300.gif", "q3max_file": "2009080300.f19100.q3max.png"}];
+
+const slider = document.getElementById('slider');
+const q3maxImg = document.getElementById('q3maxImg');
+const radarImg = document.getElementById('radarImg');
+const timestampEl = document.getElementById('timestamp');
+const frameCountEl = document.getElementById('frameCount');
+const q3maxFileEl = document.getElementById('q3maxFile');
+const radarFileEl = document.getElementById('radarFile');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const speedSelect = document.getElementById('speedSelect');
+
+slider.max = manifest.length - 1;
+
+let playing = false;
+let timer = null;
+
+function render(idx) {
+  const item = manifest[idx];
+  q3maxImg.src = './data/q3max/' + item.q3max_file;
+  radarImg.src = './data/radar/' + item.radar_file;
+  timestampEl.textContent = item.lst + ' (LST)';
+  frameCountEl.textContent = (idx + 1) + ' / ' + manifest.length;
+  q3maxFileEl.textContent = item.q3max_file;
+  radarFileEl.textContent = item.radar_file;
+  slider.value = idx;
+}
+
+function step(delta) {
+  let idx = parseInt(slider.value, 10) + delta;
+  if (idx < 0) idx = manifest.length - 1;
+  if (idx >= manifest.length) idx = 0;
+  render(idx);
+}
+
+function play() {
+  playing = true;
+  playBtn.textContent = '⏸ 暫停';
+  timer = setInterval(() => step(1), parseInt(speedSelect.value, 10));
+}
+function pause() {
+  playing = false;
+  playBtn.textContent = '▶ 播放';
+  clearInterval(timer);
+}
+
+playBtn.addEventListener('click', () => playing ? pause() : play());
+prevBtn.addEventListener('click', () => { pause(); step(-1); });
+nextBtn.addEventListener('click', () => { pause(); step(1); });
+slider.addEventListener('input', () => { pause(); render(parseInt(slider.value, 10)); });
+speedSelect.addEventListener('change', () => { if (playing) { pause(); play(); } });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { pause(); step(-1); }
+  if (e.key === 'ArrowRight') { pause(); step(1); }
+  if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); }
+});
+
+render(0);
+</script>
+</body>
+</html>

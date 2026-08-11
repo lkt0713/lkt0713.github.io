@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+__pycache__/
+.vscode/
+.idea/
+
+# 原始照片保留在本機，網站實際使用 assets/photo.jpg
+Photo.jpg

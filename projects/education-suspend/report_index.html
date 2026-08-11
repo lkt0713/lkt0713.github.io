@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臺灣大專校院休學分析報告</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/theme.css">
+  <script src="../../assets/site.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Portfolio palette (Typhoon tokens) — light default */
+    :root {
+      --bg:            #eef2f7;
+      --surface:       #ffffff;
+      --surface-2:     #f4f7fb;
+      --surface-3:     #eaeff7;
+      --border:        #d4dce8;
+      --text:          #0c1a2e;
+      --text-2:        #4a5a72;
+      --text-3:        #8898aa;
+      --muted:         #4a5a72;
+      --accent:        #1558d6;
+      --accent-2:      #0891b2;
+      --accent2:       #0891b2;
+      --accent-lo:     rgba(21,88,214,.1);
+      --link:          #1558d6;
+      --nav-bg:        rgba(255,255,255,0.92);
+      --hover-surface: #eaeff7;
+      --toggle-bg:     #f4f7fb;
+      --toggle-color:  #4a5a72;
+      --btn-bg:        linear-gradient(135deg,#1558d6,#0891b2);
+      --shadow:        0 2px 12px rgba(12,26,46,.07);
+      --shadow-md:     0 8px 32px rgba(12,26,46,.10);
+      --shadow-lg:     0 20px 60px rgba(12,26,46,.13);
+      --radius:        14px;
+    }
+    [data-theme="dark"] {
+      --bg:            #020c18;
+      --surface:       #091524;
+      --surface-2:     #0e1f33;
+      --surface-3:     #132840;
+      --border:        rgba(56,189,248,.14);
+      --text:          #dde8f4;
+      --text-2:        #8ba0ba;
+      --text-3:        #516078;
+      --muted:         #8ba0ba;
+      --accent:        #38bdf8;
+      --accent-2:      #2dd4bf;
+      --accent2:       #2dd4bf;
+      --accent-lo:     rgba(56,189,248,.10);
+      --link:          #38bdf8;
+      --nav-bg:        rgba(9,21,36,0.90);
+      --hover-surface: #132840;
+      --toggle-bg:     #0e1f33;
+      --toggle-color:  #8ba0ba;
+      --shadow:        0 2px 12px rgba(0,0,0,.30);
+      --shadow-md:     0 8px 32px rgba(0,0,0,.40);
+      --shadow-lg:     0 20px 60px rgba(0,0,0,.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Noto Sans TC", 'Segoe UI', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background .35s, color .35s;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; gap: 2rem;
+      height: 56px;
+    }
+    nav .brand { font-weight: 800; font-size: 1rem; color: var(--accent); white-space: nowrap; }
+    nav .back-link {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text-2); border-radius: 8px;
+      padding: 6px 13px; font-size: .78rem; font-weight: 700;
+      text-decoration: none; white-space: nowrap; transition: all .2s;
+    }
+    nav .back-link:hover {
+      background: var(--accent-lo); color: var(--accent); border-color: var(--accent);
+    }
+    nav .nav-links { display: flex; gap: 1.5rem; margin-left: auto; }
+    nav .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      transition: color .2s;
+    }
+    nav .nav-links a:hover { color: var(--text); }
+    #theme-toggle {
+      background: var(--toggle-bg);
+      border: 1px solid var(--border);
+      color: var(--toggle-color);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    #theme-toggle:hover { background: var(--hover-surface); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 4.5rem 2rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: background .35s, border .35s;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(720px 340px at 12% -10%, var(--accent-lo), transparent 65%),
+        radial-gradient(620px 300px at 88% 110%, rgba(8,145,178,.10), transparent 62%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 15px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-2);
+      margin-bottom: 1.25rem;
+      background: var(--surface-2);
+      letter-spacing: .05em;
+    }
+    .hero h1 {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: .75rem;
+      background: var(--btn-bg);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero .subtitle {
+      font-size: 1rem; color: var(--muted); margin-bottom: .5rem;
+    }
+    .hero .author {
+      font-size: 0.875rem; color: var(--text-3);
+      margin-bottom: 3rem;
+    }
+
+    /* ── STAT STRIP ── */
+    .stats-strip {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .stat-item {
+      flex: 1; min-width: 120px;
+      background: var(--surface);
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      transition: background .2s;
+    }
+    .stat-item:hover { background: var(--hover-surface); }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── SECTION ── */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+    .section-title {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -.5px;
+      margin-bottom: .5rem;
+    }
+    .section-subtitle {
+      font-size: 0.875rem; color: var(--text-3);
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── RESEARCH CARDS ── */
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .research-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .research-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .q-badge {
+      display: inline-block;
+      width: 32px; height: 32px; line-height: 32px;
+      text-align: center; border-radius: 8px;
+      font-weight: 700; font-size: .875rem;
+      background: var(--accent-lo);
+      color: var(--accent);
+      margin-bottom: .75rem;
+    }
+    .research-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
+    .research-card p  { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── CHART GRID ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex; flex-direction: column; gap: .5rem;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .chart-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    .card-tag {
+      display: inline-block; width: fit-content;
+      padding: 2px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: .05em;
+    }
+    .card-title { font-size: 1rem; font-weight: 600; }
+    .card-desc  { font-size: 0.8rem; color: var(--muted); line-height: 1.55; flex: 1; }
+    .card-cta   { font-size: 0.8rem; color: var(--accent); font-weight: 700; margin-top: .25rem; }
+
+    /* ── DATA TABLE ── */
+    .data-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    thead th {
+      background: var(--surface-3);
+      color: var(--accent);
+      font-weight: 700;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
+    .pill {
+      display: inline-block; padding: 2px 10px;
+      border-radius: 999px; font-size: 0.75rem;
+      white-space: nowrap;
+    }
+    .pill-ok  { background: rgba(16,185,129,0.15); color: #34d399; }
+    .pill-no  { background: rgba(239,68,68,0.15);  color: #f87171; }
+
+    /* ── ANSWER CARDS ── */
+    .answers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .answer-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+    .answer-header {
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .verdict {
+      display: inline-block; padding: 3px 12px;
+      border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    }
+    .verdict.sig   { background: rgba(16,185,129,0.15); color: #34d399; }
+    .verdict.nosig { background: rgba(245,158,11,0.15);  color: #fbbf24; }
+    .answer-card h3 { font-size: 1rem; font-weight: 600; }
+    .ans-stats {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+    }
+    .ans-stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .5rem .85rem;
+      text-align: center; min-width: 90px;
+    }
+    .ans-val { font-size: .9rem; font-weight: 700; color: var(--accent2); }
+    .ans-lbl { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+    .answer-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+    .ans-inference {
+      font-size: 0.8rem; color: rgba(139,148,158,0.7);
+      border-left: 2px solid rgba(59,130,246,0.3);
+      padding-left: .75rem; line-height: 1.65;
+    }
+
+    /* ── FILE LIST ── */
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: .75rem;
+    }
+    .file-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      text-decoration: none; color: inherit;
+      display: flex; align-items: center; gap: .75rem;
+      transition: border-color .2s;
+    }
+    .file-item:hover { border-color: rgba(59,130,246,0.4); color: var(--accent2); }
+    .file-icon { font-size: 1.25rem; flex-shrink: 0; }
+    .file-name { font-size: 0.85rem; font-weight: 500; word-break: break-all; }
+    .file-desc { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2.5rem 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── LINKS ── */
+    a { color: var(--link); }
+    a:hover { opacity: .8; }
+    .nav-links a, .chart-card, .file-item { color: inherit; }
+    .file-item:hover { color: var(--accent2); }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); opacity: 1; }
+
+    /* ── RESPONSIVE ── */
+    /* ── BONUS / NTNU ── */
+    .bonus-header {
+      display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem;
+    }
+    .bonus-badge {
+      display: inline-block;
+      padding: 3px 14px;
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+      color: #fff; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: .05em;
+    }
+    .ntnu-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: .75rem; margin-bottom: .5rem;
+    }
+    .ntnu-info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      text-align: center;
+      transition: border-color .2s, transform .2s;
+    }
+    .ntnu-info-card:hover {
+      border-color: rgba(59,130,246,0.4); transform: translateY(-2px);
+    }
+    .ntnu-info-val { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+    .ntnu-info-lbl { font-size: 0.72rem; color: var(--muted); }
+
+    @media (max-width: 640px) {
+      /* Nav：隱藏錨點連結，保留品牌 + 切換鈕 */
+      nav {
+        padding: 0 1rem;
+        gap: 1rem;
+      }
+      nav .nav-links { display: none; }
+      nav .brand { font-size: 0.875rem; }
+
+      /* Hero */
+      .hero { padding: 3rem 1.25rem 2.5rem; }
+      .hero h1 { font-size: 1.6rem; }
+      .hero .subtitle { font-size: 0.9rem; }
+      .stats-strip { border-radius: 10px; }
+      .stat-item { min-width: 90px; padding: 1rem; }
+      .stat-value { font-size: 1.4rem; }
+
+      /* Sections */
+      section { padding: 2.5rem 1.25rem; }
+      .section-title { font-size: 1.15rem; }
+
+      /* 所有卡片格線：強制單欄 */
+      .research-grid,
+      .chart-grid,
+      .answers-grid,
+      .file-list {
+        grid-template-columns: 1fr;
+      }
+
+      .ntnu-info-grid { grid-template-columns: repeat(2, 1fr); }
+
+      /* 研究結論卡片內數字列允許換行 */
+      .ans-stats { gap: .375rem; }
+      .ans-stat { min-width: 75px; }
+
+      /* 表格：水平捲動 */
+      .data-table-wrap { border-radius: 8px; }
+      table { font-size: 0.8rem; }
+      thead th, tbody td { padding: 8px 12px; }
+
+      /* 檔案項目：圖示縮小 */
+      .file-icon { font-size: 1rem; }
+      .file-name { font-size: 0.8rem; }
+
+      /* Footer */
+      footer { padding: 2rem 1.25rem; font-size: 0.75rem; }
+    }
+
+    @media (max-width: 400px) {
+      .hero h1 { font-size: 1.35rem; }
+      .stat-item { min-width: 70px; padding: .75rem .5rem; }
+      .stat-value { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="back-link" href="../../index.html" title="回作品集">← 作品集</a>
+  <span class="brand">臺灣大專校院休學分析</span>
+  <div class="nav-links">
+    <a href="#overview">資料概況</a>
+    <a href="#questions">研究問題</a>
+    <a href="#charts">互動圖表</a>
+    <a href="#answers">研究結論</a>
+    <a href="#bonus">Bonus：師大</a>
+    <a href="#files">資料下載</a>
+  </div>
+  <button id="theme-toggle" title="切換深淺模式">☀️</button>
+</nav>
+
+<div class="hero">
+  <h1>臺灣大專校院<br>休學率分析報告</h1>
+  <p class="subtitle">Taiwan University Leave-of-Absence Analysis</p>
+  <p class="author">作者：李冠廷</p>
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-value">165</div>
+      <div class="stat-label">分析院校數</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">3</div>
+      <div class="stat-label">涵蓋學年度</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">0.083</div>
+      <div class="stat-label">全國平均休學率</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <p class="section-title">資料概況</p>
+  <p class="section-subtitle">本研究使用政府開放資料，整合多個教育部統計資料集進行分析</p>
+  <div class="data-table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>內容</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>資料來源</td><td>教育部統計處 <a href="https://stats.moe.gov.tw" target="_blank" rel="noopener">stats.moe.gov.tw</a> 及 <a href="https://udb.moe.edu.tw" target="_blank" rel="noopener">udb.moe.edu.tw</a></td><td><span class="pill pill-ok">已取得</span></td></tr>
+        <tr><td>分析學校數</td><td>165 所大專院校</td><td><span class="pill pill-ok">完整</span></td></tr>
+        <tr><td>分析學年度</td><td>111–113 學年（3 個學年）</td><td><span class="pill pill-ok">完整</span></td></tr>
+        <tr><td>休學率資料</td><td>111–113 學年，校別休學人數與在學人數</td>
+            <td><span class="pill pill-ok">已取得</span></td></tr>
+        <tr><td>生師比資料</td><td>校別學生數 ÷ 專任教師數</td>
+            <td><span class="pill pill-ok">已取得</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- RESEARCH QUESTIONS -->
+<section id="questions">
+  <p class="section-title">研究問題</p>
+  <p class="section-subtitle">本報告針對三個核心研究問題進行統計分析與機器學習建模</p>
+  <div class="research-grid">
+    <div class="research-card">
+      <div class="q-badge">Q1</div>
+      <h3>公立 vs 私立 — 休學率差異</h3>
+      <p>公立與私立大專院校的平均休學率是否存在統計上的顯著差異？以 Welch t 檢定（雙尾）進行假設檢定，顯著水準 α = 0.05。</p>
+    </div>
+    <div class="research-card">
+      <div class="q-badge">Q2</div>
+      <h3>生師比 — 與休學率的相關性</h3>
+      <p>各校生師比（在校生總數 ÷ 專任教師數）是否與休學率呈正相關？以 Pearson 積差相關係數量化線性關聯，並附 OLS 趨勢線。</p>
+    </div>
+    <div class="research-card">
+      <div class="q-badge">Q3</div>
+      <h3>地理區域 — 北中南東的影響</h3>
+      <p>學校所在地理區域（北部、中部、南部、東部）是否影響休學率的高低？以單因子 ANOVA 檢驗組間差異，並以箱型圖呈現分布。</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CHARTS -->
+<section id="charts">
+  <p class="section-title">互動式圖表</p>
+  <p class="section-subtitle">點擊卡片於新分頁開啟 Plotly 互動圖表，支援縮放、懸停查看數值</p>
+  <div class="chart-grid">
+    
+        <a class="chart-card" href="Q1_public_vs_private.html" target="_blank">
+          <div class="card-tag" style="background:#3b82f622; color:#3b82f6;">Q1</div>
+          <div class="card-title">公立 vs 私立</div>
+          <div class="card-desc">比較公私立院校的平均休學率，以 Welch t 檢定驗證差異顯著性</div>
+          <div class="card-cta">開啟互動圖表 →</div>
+        </a>
+        <a class="chart-card" href="Q2_student_teacher_ratio.html" target="_blank">
+          <div class="card-tag" style="background:#8b5cf622; color:#8b5cf6;">Q2</div>
+          <div class="card-title">生師比分析</div>
+          <div class="card-desc">探討各校生師比與休學率的 Pearson 積差相關係數，附 OLS 趨勢線</div>
+          <div class="card-cta">開啟互動圖表 →</div>
+        </a>
+        <a class="chart-card" href="Q3_region_suspend.html" target="_blank">
+          <div class="card-tag" style="background:#10b98122; color:#10b981;">Q3</div>
+          <div class="card-title">地理區域分布</div>
+          <div class="card-desc">比較北中南東各區域的休學率差異，以 ANOVA 檢驗</div>
+          <div class="card-cta">開啟互動圖表 →</div>
+        </a>
+        <a class="chart-card" href="city_suspend_rate.html" target="_blank">
+          <div class="card-tag" style="background:#f59e0b22; color:#f59e0b;">市</div>
+          <div class="card-title">縣市熱力圖</div>
+          <div class="card-desc">全臺各縣市大專院校的平均休學率排行</div>
+          <div class="card-cta">開啟互動圖表 →</div>
+        </a>
+        <a class="chart-card" href="trend_national.html" target="_blank">
+          <div class="card-tag" style="background:#ef444422; color:#ef4444;">趨</div>
+          <div class="card-title">歷年趨勢</div>
+          <div class="card-desc">全國休學率 111–113 學年度的時序變化</div>
+          <div class="card-cta">開啟互動圖表 →</div>
+        </a>
+        <a class="chart-card" href="ML_feature_importance.html" target="_blank">
+          <div class="card-tag" style="background:#06b6d422; color:#06b6d4;">AI</div>
+          <div class="card-title">機器學習</div>
+          <div class="card-desc">隨機森林特徵重要性：哪些因素最能預測休學率？</div>
+          <div class="card-cta">開啟互動圖表 →</div>
+        </a>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ANSWERS -->
+<section id="answers">
+  <p class="section-title">研究結論</p>
+  <p class="section-subtitle">各研究問題之統計分析結果摘要</p>
+  <div class="answers-grid">
+    
+    <div class="answer-card">
+      <div class="answer-header">
+        <span class="q-badge">Q1</span>
+        <span class="verdict sig">差異顯著</span>
+      </div>
+      <h3>公立 vs 私立 — 休學率差異</h3>
+      <div class="ans-stats">
+        <div class="ans-stat"><div class="ans-val">0.090</div><div class="ans-lbl">公立平均休學率</div></div>
+        <div class="ans-stat"><div class="ans-val">0.077</div><div class="ans-lbl">私立平均休學率</div></div>
+        <div class="ans-stat"><div class="ans-val">t = 3.021</div><div class="ans-lbl">Welch t 統計量</div></div>
+        <div class="ans-stat"><div class="ans-val">p = 0.003</div><div class="ans-lbl">顯著水準</div></div>
+      </div>
+      <p>公立院校的平均休學率（0.090）顯著高於私立院校（0.077）。Welch t 檢定結果 p = 0.003，差異在統計上具有顯著意義（α = 0.05）。</p>
+      <p class="ans-inference">可能原因：公立院校入學門檻較高，學生在遭遇課業壓力或生涯轉換時，傾向以休學作為暫緩選擇；而私立院校學費較高，學生可能更傾向持續就讀以回收教育投資，但在面臨困境時也可能因此承受更大壓力。</p>
+    </div>
+    
+    <div class="answer-card">
+      <div class="answer-header">
+        <span class="q-badge">Q2</span>
+        <span class="verdict nosig">方向相反，無正向關聯</span>
+      </div>
+      <h3>生師比 — 與休學率的相關性</h3>
+      <div class="ans-stats">
+        <div class="ans-stat"><div class="ans-val">r = -0.205</div><div class="ans-lbl">Pearson 相關係數</div></div>
+        <div class="ans-stat"><div class="ans-val">p = 0.035</div><div class="ans-lbl">顯著水準</div></div>
+        <div class="ans-stat"><div class="ans-val">n = 106</div><div class="ans-lbl">學校樣本數</div></div>
+      </div>
+      <p>生師比與休學率之間的 Pearson 相關係數為 r = -0.205（p = 0.035），方向與理論預期相反（生師比越高，休學率反而越低）。統計上的顯著性可能來自樣本特性，不宜解讀為生師比對休學率有實質正向影響。</p>
+      <p class="ans-inference">理論預期生師比高時教學資源稀缺，學生壓力增加，休學率應上升；然而實際資料呈負相關，顯示生師比與休學率之間並無實質正向關聯。影響休學決策的因素可能更多來自個人身心狀況、經濟壓力或生涯規劃，與師資配置關係有限。</p>
+    </div>
+    
+    <div class="answer-card">
+      <div class="answer-header">
+        <span class="q-badge">Q3</span>
+        <span class="verdict sig">差異顯著</span>
+      </div>
+      <h3>地理區域 — 北中南東的影響</h3>
+      <div class="ans-stats">
+        <div class="ans-stat"><div class="ans-val">0.098</div><div class="ans-lbl">東部</div></div><div class="ans-stat"><div class="ans-val">0.085</div><div class="ans-lbl">北部</div></div><div class="ans-stat"><div class="ans-val">0.084</div><div class="ans-lbl">南部</div></div><div class="ans-stat"><div class="ans-val">0.080</div><div class="ans-lbl">離島</div></div><div class="ans-stat"><div class="ans-val">0.072</div><div class="ans-lbl">中部</div></div>
+        <div class='ans-stat'><div class='ans-val'>F = 2.479</div><div class='ans-lbl'>ANOVA F 值</div></div><div class='ans-stat'><div class='ans-val'>p = 0.044</div><div class='ans-lbl'>顯著水準</div></div>
+      </div>
+      <p>單因子 ANOVA 顯示各地理區域間的休學率存在顯著差異（F = 2.479, p = 0.044）。休學率最高為東部（0.098），最低為中部（0.072）。</p>
+      <p class="ans-inference">可能原因：東部院校數量少、外縣市學生比例高，交通不便與生活適應困難可能提高休學意願；中部地區院校多位於都會周邊，生活機能完善，學生就讀穩定性相對較高。</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="bonus">
+  <div class="bonus-header">
+    <span class="bonus-badge">★ Bonus</span>
+    <span style="font-size:0.875rem; color:var(--muted);">個案深度分析</span>
+  </div>
+  <p class="section-title">國立臺灣師範大學 — 個案分析</p>
+  <p class="section-subtitle">從全國資料中單獨抽取師大各學年數據，與全國平均及公立院校進行對照比較</p>
+  <div class="ntnu-info-grid">
+    <div class="ntnu-info-card"><div class="ntnu-info-val" style="color:var(--muted);">臺北市</div><div class="ntnu-info-lbl">所在縣市</div></div><div class="ntnu-info-card"><div class="ntnu-info-val" style="color:var(--muted);">公立</div><div class="ntnu-info-lbl">學校性質</div></div><div class="ntnu-info-card"><div class="ntnu-info-val" style="color:#60a5fa;">16,808 人</div><div class="ntnu-info-lbl">在校生數（114 學年）</div></div><div class="ntnu-info-card"><div class="ntnu-info-val" style="color:#f87171;">0.122</div><div class="ntnu-info-lbl">111–113 平均休學率</div></div><div class="ntnu-info-card"><div class="ntnu-info-val" style="color:#fbbf24;">20.4</div><div class="ntnu-info-lbl">最新學年生師比</div></div><div class="ntnu-info-card"><div class="ntnu-info-val" style="color:#34d399;">42 / 47</div><div class="ntnu-info-lbl">公立院校排名（低→高）</div></div>
+  </div>
+  <div class="chart-grid" style="margin-top:1.5rem;">
+    <a class="chart-card" href="NTNU_suspend_trend.html" target="_blank"><div class="card-tag" style="background:#3b82f622; color:#3b82f6;">趨</div><div class="card-title">師大休學率趨勢</div><div class="card-desc">111–113學年師大休學率與全國公立平均、全國平均對照</div><div class="card-cta">開啟互動圖表 →</div></a><a class="chart-card" href="NTNU_rank_public.html" target="_blank"><div class="card-tag" style="background:#8b5cf622; color:#8b5cf6;">排</div><div class="card-title">公立院校排名</div><div class="card-desc">師大在全國公立院校中的休學率排名位置</div><div class="card-cta">開啟互動圖表 →</div></a>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FILES -->
+<section id="files">
+  <p class="section-title">資料下載</p>
+  <p class="section-subtitle">分析過程中產生的中間資料集與模型結果，均以 UTF-8 BOM 編碼儲存</p>
+  <div class="file-list">
+    <a class="file-item" href="panel_school_year.csv">
+      <span class="file-icon">📋</span>
+      <div><div class="file-name">panel_school_year.csv</div><div class="file-desc">校別 × 學年度面板資料（主資料集）</div></div>
+    </a>
+    <a class="file-item" href="Q1_stats.csv">
+      <span class="file-icon">📊</span>
+      <div><div class="file-name">Q1_stats.csv</div><div class="file-desc">公私立統計摘要（平均值、中位數）</div></div>
+    </a>
+    <a class="file-item" href="Q3_region_stats.csv">
+      <span class="file-icon">🗺️</span>
+      <div><div class="file-name">Q3_region_stats.csv</div><div class="file-desc">各地理區域休學率統計</div></div>
+    </a>
+    <a class="file-item" href="city_suspend_rate.csv">
+      <span class="file-icon">🏙️</span>
+      <div><div class="file-name">city_suspend_rate.csv</div><div class="file-desc">縣市別平均休學率排行</div></div>
+    </a>
+    <a class="file-item" href="ML_feature_importance.csv">
+      <span class="file-icon">🤖</span>
+      <div><div class="file-name">ML_feature_importance.csv</div><div class="file-desc">隨機森林特徵重要性分數</div></div>
+    </a>
+    <a class="file-item" href="ML_model_comparison.csv">
+      <span class="file-icon">📈</span>
+      <div><div class="file-name">ML_model_comparison.csv</div><div class="file-desc">RF vs XGBoost 模型效能比較</div></div>
+    </a>
+  </div>
+
+  <p class="section-subtitle" style="margin-top:2rem;">原始資料來源（教育部開放資料）</p>
+  <div class="file-list">
+    <a class="file-item" href="https://stats.moe.gov.tw/files/opendata/106-112_students.csv" target="_blank" rel="noopener">
+      <span class="file-icon">🎓</span>
+      <div><div class="file-name">students_106_112.csv</div><div class="file-desc">大專院校各校科系別學生數 106–112 學年（stats.moe.gov.tw）</div></div>
+    </a>
+    <a class="file-item" href="https://stats.moe.gov.tw/files/opendata/students.csv" target="_blank" rel="noopener">
+      <span class="file-icon">🎓</span>
+      <div><div class="file-name">students_latest.csv</div><div class="file-desc">大專院校各校科系別學生數（最新學年度）（stats.moe.gov.tw）</div></div>
+    </a>
+    <a class="file-item" href="https://udb.moe.edu.tw" target="_blank" rel="noopener">
+      <span class="file-icon">📂</span>
+      <div><div class="file-name">休學 ／ 教師資料</div><div class="file-desc">休學人數、各系所及各校專任教師數（udb.moe.edu.tw）</div></div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>資料來源：教育部統計處：
+    <a href="https://stats.moe.gov.tw" target="_blank" rel="noopener">stats.moe.gov.tw</a> ／
+    <a href="https://udb.moe.edu.tw" target="_blank" rel="noopener">udb.moe.edu.tw</a>
+  </p>
+</footer>
+
+<script>
+(function() {
+  var html = document.documentElement;
+  var btn  = document.getElementById('theme-toggle');
+  var stored = localStorage.getItem('theme');
+  if (stored) { html.setAttribute('data-theme', stored); }
+  function sync() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  sync();
+  btn.addEventListener('click', function() {
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    sync();
+  });
+})();
+</script>
+
+</body>
+</html>

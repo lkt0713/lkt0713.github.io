@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Bandpass 動畫檢視器</title>
+<link rel="stylesheet" href="../../assets/theme.css">
+<script src="../../assets/site.js"></script>
+<style>
+  main { max-width: 1060px; margin: 0 auto; padding: 24px 20px 40px;
+         animation: fadeUp .5s ease-out .1s both; }
+
+  .page-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .page-intro h1 {
+    font-size: 1.35em; font-weight: 800; letter-spacing: -.4px;
+    line-height: 1.35; color: var(--text);
+    margin: 0 0 12px; padding-bottom: 13px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .page-intro .sub { color: var(--text-2); font-size: .88rem; line-height: 1.75; }
+  .page-intro .sub b { color: var(--text); font-weight: 700; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tabs button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 9px 20px; border-radius: 10px;
+    font-size: .88rem; font-weight: 700; letter-spacing: .3px;
+    cursor: pointer; transition: all .18s;
+    box-shadow: var(--shadow); font-family: inherit;
+  }
+  .tabs button:hover { border-color: var(--accent); color: var(--accent); }
+  .tabs button.active {
+    background: var(--btn-bg); color: #fff; border-color: transparent;
+    box-shadow: 0 4px 14px rgba(21,88,214,.3);
+  }
+
+  .panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 22px 24px;
+    transition: background .35s, border .35s;
+  }
+  .panel.active { display: block; }
+
+  .imgwrap {
+    position: relative; width: 100%; aspect-ratio: 1600 / 1236;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 11px; overflow: hidden; touch-action: none;
+  }
+  .imgwrap img {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+    user-select: none; -webkit-user-drag: none;
+  }
+  .hint {
+    position: absolute; top: 10px; right: 12px;
+    font-size: .72rem; font-weight: 600; color: #fff;
+    background: rgba(12,26,46,.62); backdrop-filter: blur(4px);
+    padding: 5px 11px; border-radius: 7px;
+  }
+  .controls { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
+  .row label {
+    font-size: .69rem; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-3); font-weight: 700; width: 76px; flex-shrink: 0;
+  }
+  input[type=range] { flex: 1; min-width: 160px; accent-color: var(--accent); }
+  .datebox {
+    font-variant-numeric: tabular-nums; font-weight: 700;
+    min-width: 118px; text-align: center;
+    font-family: 'Courier New', monospace; color: var(--text);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 9px; padding: 7px 12px;
+  }
+  .framebox {
+    font-size: .75rem; color: var(--text-3); font-weight: 700;
+    letter-spacing: .5px; min-width: 70px; text-align: right;
+  }
+  button.playbtn {
+    padding: 9px 20px; border: 1px solid transparent; border-radius: 10px;
+    background: var(--btn-bg); color: #fff; cursor: pointer;
+    font-size: .88rem; font-weight: 700; letter-spacing: .3px;
+    font-family: inherit; box-shadow: 0 4px 14px rgba(21,88,214,.3);
+    transition: all .18s;
+  }
+  button.playbtn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,88,214,.4); }
+  .speedval {
+    min-width: 56px; text-align: right; font-size: .78rem;
+    color: var(--text-3); font-weight: 700;
+  }
+</style>
+</head>
+<body data-page-title="Bandpass 動畫檢視器"
+      data-page-subtitle="莫拉克颱風 · 10–30 天 vs 30–90 天濾波動畫"
+      data-page-icon="🎞️">
+
+<main>
+<div class="page-intro">
+  <h1>Bandpass 動畫檢視器 — 滾輪 / 拖曳調整時間與速度</h1>
+  <div class="sub">
+    直接在圖片上<b>滾動滑鼠滾輪</b>或<b>左右拖曳</b>即可刷過時間軸，也可用下方播放鍵自動播放並調整速度。<br>
+    切換上方頁籤可比較 <b>10–30 天</b>與 <b>30–90 天</b>兩種帶通濾波尺度下的訊號演變。
+  </div>
+</div>
+<div class="tabs">
+  <button data-target="panel-1030" class="active">10-30 天濾波</button>
+  <button data-target="panel-3090">30-90 天濾波</button>
+</div>
+
+<div class="panel active" id="panel-1030">
+  <div class="imgwrap">
+    <img src="" alt="10-30 天濾波 (bp13)">
+    <div class="hint">滾輪或拖曳圖片可切換影格</div>
+  </div>
+  <div class="controls">
+    <div class="row">
+      <label>時間軸</label>
+      <input type="range" class="frame-slider" min="0" max="50" value="0" step="1">
+      <span class="datebox"></span>
+      <span class="framebox"></span>
+    </div>
+    <div class="row">
+      <button class="playbtn">播放</button>
+      <label style="width:auto;">速度</label>
+      <input type="range" class="speed-slider" min="1" max="30" value="6" step="1">
+      <span class="speedval">6 fps</span>
+    </div>
+  </div>
+</div>
+<div class="panel " id="panel-3090">
+  <div class="imgwrap">
+    <img src="" alt="30-90 天濾波 (bp39)">
+    <div class="hint">滾輪或拖曳圖片可切換影格</div>
+  </div>
+  <div class="controls">
+    <div class="row">
+      <label>時間軸</label>
+      <input type="range" class="frame-slider" min="0" max="153" value="0" step="1">
+      <span class="datebox"></span>
+      <span class="framebox"></span>
+    </div>
+    <div class="row">
+      <button class="playbtn">播放</button>
+      <label style="width:auto;">速度</label>
+      <input type="range" class="speed-slider" min="1" max="30" value="6" step="1">
+      <span class="speedval">6 fps</span>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+const DATASETS = {"1030": {"dir": "10-30days", "files": ["bp13_ERA5_wind_spfh_850hPa_10-30_20090701.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090702.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090703.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090704.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090705.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090706.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090707.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090708.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090709.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090710.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090711.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090712.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090713.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090714.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090715.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090716.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090717.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090718.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090719.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090720.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090721.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090722.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090723.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090724.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090725.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090726.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090727.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090728.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090729.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090730.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090731.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090801.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090802.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090803.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090804.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090805.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090806.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090807.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090808.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090809.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090810.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090811.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090812.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090813.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090814.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090815.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090816.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090817.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090818.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090819.png", "bp13_ERA5_wind_spfh_850hPa_10-30_20090820.png"], "dates": ["2009-07-01", "2009-07-02", "2009-07-03", "2009-07-04", "2009-07-05", "2009-07-06", "2009-07-07", "2009-07-08", "2009-07-09", "2009-07-10", "2009-07-11", "2009-07-12", "2009-07-13", "2009-07-14", "2009-07-15", "2009-07-16", "2009-07-17", "2009-07-18", "2009-07-19", "2009-07-20", "2009-07-21", "2009-07-22", "2009-07-23", "2009-07-24", "2009-07-25", "2009-07-26", "2009-07-27", "2009-07-28", "2009-07-29", "2009-07-30", "2009-07-31", "2009-08-01", "2009-08-02", "2009-08-03", "2009-08-04", "2009-08-05", "2009-08-06", "2009-08-07", "2009-08-08", "2009-08-09", "2009-08-10", "2009-08-11", "2009-08-12", "2009-08-13", "2009-08-14", "2009-08-15", "2009-08-16", "2009-08-17", "2009-08-18", "2009-08-19", "2009-08-20"]}, "3090": {"dir": "30-90days", "files": ["bp39_ERA5_wind_spfh_850hPa_30-90_20090501.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090502.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090503.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090504.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090505.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090506.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090507.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090508.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090509.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090510.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090511.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090512.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090513.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090514.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090515.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090516.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090517.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090518.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090519.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090520.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090521.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090522.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090523.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090524.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090525.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090526.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090527.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090528.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090529.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090530.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090531.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090601.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090602.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090603.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090604.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090605.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090606.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090607.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090608.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090609.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090610.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090611.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090612.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090613.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090614.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090615.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090616.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090617.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090618.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090619.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090620.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090621.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090622.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090623.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090624.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090625.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090626.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090627.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090628.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090629.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090630.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090701.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090702.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090703.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090704.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090705.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090706.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090707.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090708.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090709.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090710.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090711.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090712.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090713.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090714.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090715.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090716.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090717.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090718.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090719.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090720.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090721.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090722.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090723.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090724.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090725.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090726.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090727.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090728.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090729.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090730.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090731.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090801.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090802.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090803.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090804.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090805.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090806.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090807.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090808.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090809.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090810.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090811.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090812.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090813.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090814.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090815.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090816.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090817.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090818.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090819.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090820.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090821.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090822.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090823.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090824.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090825.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090826.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090827.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090828.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090829.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090830.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090831.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090901.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090902.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090903.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090904.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090905.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090906.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090907.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090908.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090909.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090910.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090911.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090912.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090913.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090914.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090915.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090916.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090917.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090918.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090919.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090920.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090921.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090922.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090923.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090924.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090925.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090926.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090927.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090928.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090929.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20090930.png", "bp39_ERA5_wind_spfh_850hPa_30-90_20091001.png"], "dates": ["2009-05-01", "2009-05-02", "2009-05-03", "2009-05-04", "2009-05-05", "2009-05-06", "2009-05-07", "2009-05-08", "2009-05-09", "2009-05-10", "2009-05-11", "2009-05-12", "2009-05-13", "2009-05-14", "2009-05-15", "2009-05-16", "2009-05-17", "2009-05-18", "2009-05-19", "2009-05-20", "2009-05-21", "2009-05-22", "2009-05-23", "2009-05-24", "2009-05-25", "2009-05-26", "2009-05-27", "2009-05-28", "2009-05-29", "2009-05-30", "2009-05-31", "2009-06-01", "2009-06-02", "2009-06-03", "2009-06-04", "2009-06-05", "2009-06-06", "2009-06-07", "2009-06-08", "2009-06-09", "2009-06-10", "2009-06-11", "2009-06-12", "2009-06-13", "2009-06-14", "2009-06-15", "2009-06-16", "2009-06-17", "2009-06-18", "2009-06-19", "2009-06-20", "2009-06-21", "2009-06-22", "2009-06-23", "2009-06-24", "2009-06-25", "2009-06-26", "2009-06-27", "2009-06-28", "2009-06-29", "2009-06-30", "2009-07-01", "2009-07-02", "2009-07-03", "2009-07-04", "2009-07-05", "2009-07-06", "2009-07-07", "2009-07-08", "2009-07-09", "2009-07-10", "2009-07-11", "2009-07-12", "2009-07-13", "2009-07-14", "2009-07-15", "2009-07-16", "2009-07-17", "2009-07-18", "2009-07-19", "2009-07-20", "2009-07-21", "2009-07-22", "2009-07-23", "2009-07-24", "2009-07-25", "2009-07-26", "2009-07-27", "2009-07-28", "2009-07-29", "2009-07-30", "2009-07-31", "2009-08-01", "2009-08-02", "2009-08-03", "2009-08-04", "2009-08-05", "2009-08-06", "2009-08-07", "2009-08-08", "2009-08-09", "2009-08-10", "2009-08-11", "2009-08-12", "2009-08-13", "2009-08-14", "2009-08-15", "2009-08-16", "2009-08-17", "2009-08-18", "2009-08-19", "2009-08-20", "2009-08-21", "2009-08-22", "2009-08-23", "2009-08-24", "2009-08-25", "2009-08-26", "2009-08-27", "2009-08-28", "2009-08-29", "2009-08-30", "2009-08-31", "2009-09-01", "2009-09-02", "2009-09-03", "2009-09-04", "2009-09-05", "2009-09-06", "2009-09-07", "2009-09-08", "2009-09-09", "2009-09-10", "2009-09-11", "2009-09-12", "2009-09-13", "2009-09-14", "2009-09-15", "2009-09-16", "2009-09-17", "2009-09-18", "2009-09-19", "2009-09-20", "2009-09-21", "2009-09-22", "2009-09-23", "2009-09-24", "2009-09-25", "2009-09-26", "2009-09-27", "2009-09-28", "2009-09-29", "2009-09-30", "2009-10-01"]}};
+
+function initPanel(key) {
+  const d = DATASETS[key];
+  const panel = document.getElementById('panel-' + key);
+  const img = panel.querySelector('img');
+  const slider = panel.querySelector('.frame-slider');
+  const dateBox = panel.querySelector('.datebox');
+  const frameBox = panel.querySelector('.framebox');
+  const playBtn = panel.querySelector('.playbtn');
+  const speedSlider = panel.querySelector('.speed-slider');
+  const speedVal = panel.querySelector('.speedval');
+  const wrap = panel.querySelector('.imgwrap');
+
+  let idx = 0;
+  let playing = false;
+  let timer = null;
+
+  function render() {
+    img.src = d.dir + '/' + d.files[idx];
+    dateBox.textContent = d.dates[idx];
+    frameBox.textContent = (idx + 1) + ' / ' + d.files.length;
+    slider.value = idx;
+  }
+
+  function setIdx(newIdx) {
+    idx = ((newIdx % d.files.length) + d.files.length) % d.files.length;
+    render();
+  }
+
+  function fps() { return Number(speedSlider.value); }
+
+  function play() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => setIdx(idx + 1), 1000 / fps());
+    playing = true;
+    playBtn.textContent = '暫停';
+  }
+  function pause() {
+    if (timer) clearInterval(timer);
+    playing = false;
+    playBtn.textContent = '播放';
+  }
+
+  playBtn.addEventListener('click', () => playing ? pause() : play());
+
+  slider.addEventListener('input', () => {
+    pause();
+    setIdx(Number(slider.value));
+  });
+
+  speedSlider.addEventListener('input', () => {
+    speedVal.textContent = fps() + ' fps';
+    if (playing) play();
+  });
+
+  wrap.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    pause();
+    setIdx(idx + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+
+  // drag to scrub
+  let dragging = false;
+  let dragStartX = 0;
+  let dragStartIdx = 0;
+  wrap.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    pause();
+    dragStartX = e.clientX;
+    dragStartIdx = idx;
+    wrap.setPointerCapture(e.pointerId);
+  });
+  wrap.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - dragStartX;
+    const framesPerPixel = 1 / 8;
+    setIdx(dragStartIdx + Math.round(dx * framesPerPixel));
+  });
+  wrap.addEventListener('pointerup', () => dragging = false);
+  wrap.addEventListener('pointercancel', () => dragging = false);
+
+  render();
+}
+
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+
+Object.keys(DATASETS).forEach(initPanel);
+</script>
+</body>
+</html>

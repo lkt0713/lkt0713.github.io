@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026第四屆小地盃</title>
+    <link rel="stylesheet" href="../../assets/theme.css">
+    <script src="../../assets/site.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', 'Segoe UI', 'Arial', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 0;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 24px auto 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-in;
+            transition: background .35s, border .35s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            padding: 46px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(620px 300px at 15% -20%, var(--accent-lo), transparent 65%),
+                radial-gradient(520px 260px at 85% 120%, rgba(8,145,178,.10), transparent 62%);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: var(--btn-bg);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.05em;
+            color: var(--text-2);
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+        }
+
+        /* 導航標籤 */
+        .nav-tabs {
+            display: flex;
+            background: var(--surface-2);
+            border-bottom: 2px solid var(--accent);
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .nav-tab {
+            padding: 18px 38px;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--text-2);
+            border: none;
+            background: transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tab:hover {
+            color: var(--accent);
+            background: var(--accent-lo);
+        }
+
+        .nav-tab.active {
+            color: var(--accent);
+            background: var(--surface);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        /* 內容區域 */
+        .content-section {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 賽程表樣式 */
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--btn-bg);
+            color: white;
+        }
+
+        th {
+            padding: 20px 15px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: var(--surface-2);
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: var(--surface);
+        }
+
+        tbody tr:hover {
+            background-color: var(--accent-lo);
+            box-shadow: var(--shadow);
+        }
+
+        td {
+            padding: 16px 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            font-size: 0.92em;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        td:first-child {
+            background-color: var(--surface-3);
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 1em;
+            border-right: 2px solid var(--border);
+            font-family: 'Courier New', monospace;
+        }
+
+        td:last-child {
+            border-right: none;
+        }
+
+        /* 循環賽樣式 */
+        .tournament-area {
+            padding: 50px 30px;
+            background: var(--surface-2);
+        }
+
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 60px;
+            max-width: 1600px;
+            margin: 0 auto;
+            justify-items: center;
+        }
+
+        .group-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .group-title {
+            font-size: 1.5em;
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        svg {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .team-label {
+            font-size: 16px;
+            fill: var(--text);
+            font-weight: 600;
+        }
+
+        .shape-line {
+            stroke: var(--accent);
+            stroke-width: 2.5;
+            fill: none;
+        }
+
+        .match-line {
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .center-label {
+            font-size: 28px;
+            fill: var(--accent);
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            background-color: var(--surface-2);
+            border-top: 1px solid var(--border);
+            color: var(--text-3);
+            font-size: 0.85em;
+            line-height: 1.7;
+        }
+
+        /* 注意事項樣式 */
+        .notice-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-left: 5px solid #f59e0b;
+            margin: 20px 30px;
+            padding: 20px 24px;
+            color: var(--text-2);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            line-height: 1.75;
+        }
+        .notice-box h2 {
+            font-size: 1.25em;
+            margin-bottom: 10px;
+            color: var(--text);
+            font-weight: 800;
+        }
+        .notice-box ol {
+            margin-left: 22px;
+            line-height: 1.7;
+        }
+        .notice-box li {
+            margin: 6px 0;
+        }
+        .notice-box .contact {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: var(--text-3);
+        }
+
+        /* 場地圖區塊 */
+        .venue-section {
+            margin: 10px 30px 25px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .venue-title {
+            font-size: 1.3em;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .venue-figure {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .venue-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .venue-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(21,88,214,.9);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-size: 0.95em;
+        }
+        .venue-caption {
+            margin-top: 10px;
+            color: var(--text-2);
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        /* 文件分頁區塊 */
+        .doc-section {
+            padding: 30px;
+            background: var(--surface-2);
+        }
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .doc-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid #e6ecf5;
+        }
+        .doc-card header {
+            padding: 16px 18px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .doc-frame {
+            width: 100%;
+            height: 520px;
+            border: none;
+            display: block;
+            background: #0d1321;
+        }
+        .doc-footer {
+            padding: 12px 16px;
+            background: #fafbff;
+            border-top: 1px solid #eef2f7;
+            color: #445;
+            font-size: 0.95em;
+        }
+        .doc-footer a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .doc-footer a:hover { text-decoration: underline; }
+
+        /* 響應式設計 */
+        @media (max-width: 1200px) {
+            .groups-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .nav-tab {
+                padding: 15px 20px;
+                font-size: 1em;
+            }
+
+            .nav-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                gap: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-tab { flex: 0 0 auto; }
+
+            .table-container, .tournament-area {
+                padding: 15px;
+            }
+
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.85em;
+            }
+
+            /* 手機版表格：轉為卡片式堆疊 */
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tbody tr {
+                background: #fff;
+                margin: 0 0 12px;
+                border: 1px solid #eee;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 14px;
+                border: none;
+                border-bottom: 1px solid #f0f0f0;
+                text-align: left;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--accent);
+                margin-right: 10px;
+                flex: 0 0 48%;
+            }
+            td:last-child { border-bottom: none; }
+            td:first-child {
+                background-color: transparent;
+                border-right: none;
+                font-weight: 700;
+                color: var(--accent);
+            }
+        }
+
+        /* 滾動條美化 */
+        .table-container::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #1E4080;
+        }
+    </style>
+</head>
+<body data-page-title="2026 第四屆小地盃"
+      data-page-subtitle="羽球賽事賽程表 · 分組圖 · 章程"
+      data-page-icon="🏸">
+    <div class="container">
+        <div class="header">
+            <h1>2026第四屆小地盃</h1>
+            <p class="subtitle">ES Cup 4th 2026</p>
+        </div>
+
+        <div class="notice-box">
+            <h2>注意事項</h2>
+            <ol>
+                <li>比賽時間與檢錄：首場比賽於 08:40 準時開始，全體選手於 08:25-08:35 到紀錄台檢錄（能證明身分之證件皆可）。由於場地與時間有限，請大家務必準時報到，逾時不候。檢錄時會發下選手證，請妥善保管。</li>
+                <li>比賽流程與選手證：選手依照賽程表時間，提前 5 分鐘至比賽場地旁等候。比賽前，請將選手證交予裁判確認。裁判要向紀錄台領取計分表及比賽用球，比賽結束後，裁判需將計分表及比賽用球送回紀錄台。</li>
+                <li>裁判安排：賽程表中已列出各場次裁判（由輪空選手擔任），大家皆需輪流擔任裁判，請務必協助執法並留意整體賽程！請先詳閱電子檔，開賽前會再次簡單說明並發下紙本裁判手冊供參考。（會有多寡問題是賽程所致，因有些人比賽場次較多）</li>
+                <li>由於本次排球、籃球及羽球的女單、女雙報名人數不足，故取消辦理。</li>
+                <li>由於蠻多人同時報名兩項比賽，所以會有連續出賽的情況，敬請見諒（每場比賽間都有休息時間5到10分鐘）。</li>
+                <li>僅男單、混雙會有複賽（男雙在預賽中取前2進決賽）。</li>
+                <li>中午最後一場賽程結束後（約12:00），要先留下來進行大合照，謝謝！。</li>
+            </ol>
+            <p class="contact">有任何問題歡迎聯繫小地盃總籌：李冠廷（aa0936332377@gmail.com）</p>
+        </div>
+
+        <div class="venue-section">
+            <div class="venue-title">場地配置圖（中間場地供練習）</div>
+            <div class="venue-figure">
+                <img class="venue-img" src="venue.jpg" alt="場地配置圖：中央場地為練習區" />
+            </div>
+            <p class="venue-caption">溫馨提醒：中間場地保留作為練習與熱身使用，請依賽程安排使用各場地。</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('schedule')">詳細賽程表</button>
+            <button class="nav-tab" onclick="showTab('bracket')">分組圖</button>
+            <button class="nav-tab" onclick="showTab('docs')">裁判手冊與章程</button>
+            <a class="nav-tab" href="game1.html" style="text-decoration:none">🏸 即時計分系統 →</a>
+        </div>
+
+        <!-- 詳細賽程表 -->
+        <div id="schedule" class="content-section active">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>場地 1</th>
+                            <th>場地 2</th>
+                            <th>場地 3</th>
+                            <th>場地 4</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="時間">08:40 - 09:00</td>
+                            <td data-label="場地 1">混雙A：詹宇崴/蔡依宸 vs 楊舒心/簡家浩（裁：陳冠岳）</td>
+                            <td data-label="場地 2">混雙A：李長融/蔡仲元 vs 蕭人豪/顏語緗（裁：游承晏）</td>
+                            <td data-label="場地 3">混雙B：江宜達/陳雅玲 vs 曹嘉修/劉怡伶（裁：陳冠曄）</td>
+                            <td data-label="場地 4">混雙B：徐子鈞/許寧珊 vs 邱詠恬/潘昌志（裁：李佳翰）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">09:10 - 09:30</td>
+                            <td data-label="場地 1">男單A：潘昌志 vs 黃振嘉（裁：顏語緗）</td>
+                            <td data-label="場地 2">男單A：李承恩 vs 王昱文（裁：蔡依宸）</td>
+                            <td data-label="場地 3">男單B：曹嘉修 vs 李長融（裁：林星辰）</td>
+                            <td data-label="場地 4">混雙B：曾瑀婕/許淏丞 vs 江宜達/陳雅玲（裁：許寧珊）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">09:40 - 10:00</td>
+                            <td data-label="場地 1">混雙A：林星辰/陳予禮 vs 詹宇崴/蔡依宸（裁：蕭人豪）</td>
+                            <td data-label="場地 2">男雙：陳冠曄/李佳翰 vs 王昱文/黃振嘉（裁：江宜達）</td>
+                            <td data-label="場地 3">混雙B：邱詠恬/潘昌志 vs 曾瑀婕/許淏丞（裁：李長融）</td>
+                            <td data-label="場地 4">混雙B：曹嘉修/劉怡伶 vs 徐子鈞/許寧珊（裁：陳冠岳）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">10:10 - 10:30</td>
+                            <td data-label="場地 1">男單A：潘昌志 vs 李承恩（裁：李錦坤）</td>
+                            <td data-label="場地 2">男單A：黃振嘉 vs 王昱文（裁：陳冠曄）</td>
+                            <td data-label="場地 3">男雙：詹宇崴/許淏丞 vs 陳冠岳/游承晏（裁：曹嘉修）</td>
+                            <td data-label="場地 4">混雙B：江宜達/陳雅玲 vs 徐子鈞/許寧珊（裁：陳予禮）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">10:40 - 11:00</td>
+                            <td data-label="場地 1">男雙：徐子鈞/李錦坤 vs 詹宇崴/許淏丞（裁：王昱文）</td>
+                            <td data-label="場地 2">男雙：陳冠岳/游承晏 vs 陳冠曄/李佳翰（裁：黃振嘉）</td>
+                            <td data-label="場地 3">混雙A：蕭人豪/顏語緗 vs 林星辰/陳予禮（裁：楊舒心）</td>
+                            <td data-label="場地 4">男單B：江宜達 vs 李長融（裁：簡家浩）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">11:10 - 11:30</td>
+                            <td data-label="場地 1">混雙B：曹嘉修/劉怡伶 vs 邱詠恬/潘昌志（裁：陳予禮）</td>
+                            <td data-label="場地 2">混雙B：徐子鈞/許寧珊 vs 曾瑀婕/許淏丞（裁：楊舒心）</td>
+                            <td data-label="場地 3">男雙：陳冠岳/游承晏 vs 王昱文/黃振嘉（裁：林星辰）</td>
+                            <td data-label="場地 4">混雙A：詹宇崴/蔡依宸 vs 李長融/蔡仲元（裁：顏語緗）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">11:40 - 12:00</td>
+                            <td data-label="場地 1">男單A：潘昌志 vs 王昱文（裁：蔡仲元）</td>
+                            <td data-label="場地 2">男單A：黃振嘉 vs 李承恩（裁：徐子鈞）</td>
+                            <td data-label="場地 3">混雙A：楊舒心/簡家浩 vs 蕭人豪/顏語緗（裁：許寧珊）</td>
+                            <td data-label="場地 4">混雙B：曹嘉修/劉怡伶 vs 曾瑀婕/許淏丞（裁：邱詠恬）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">12:00 - 13:00</td>
+                            <td data-label="場地 1">吃飯+休息時間</td>
+                            <td data-label="場地 2">吃飯+休息時間</td>
+                            <td data-label="場地 3">吃飯+休息時間</td>
+                            <td data-label="場地 4">吃飯+休息時間</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">13:05 - 13:25</td>
+                            <td data-label="場地 1">男雙：詹宇崴/許淏丞 vs 陳冠曄/李佳翰（裁：蔡依宸）</td>
+                            <td data-label="場地 2">男雙：陳冠岳/游承晏 vs 徐子鈞/李錦坤（裁：楊舒心）</td>
+                            <td data-label="場地 3">混雙A：李長融/蔡仲元 vs 林星辰/陳予禮（裁：陳雅玲）</td>
+                            <td data-label="場地 4">男單B：江宜達 vs 曹嘉修（裁：曾瑀婕）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">13:30 - 13:50</td>
+                            <td data-label="場地 1">混雙A：詹宇崴/蔡依宸 vs 蕭人豪/顏語緗（裁：游承晏）</td>
+                            <td data-label="場地 2">混雙A：楊舒心/簡家浩 vs 林星辰/陳予禮（裁：許淏丞）</td>
+                            <td data-label="場地 3">混雙B：江宜達/陳雅玲 vs 邱詠恬/潘昌志（裁：李承恩）</td>
+                            <td data-label="場地 4">男雙：王昱文/黃振嘉 vs 徐子鈞/李錦坤（裁：陳冠曄）</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">13:55 - 14:15</td>
+                            <td data-label="場地 1">男雙：詹宇崴/許淏丞 vs 王昱文/黃振嘉（裁：陳予禮）</td>
+                            <td data-label="場地 2">男雙：陳冠曄/李佳翰 vs 徐子鈞/李錦坤（裁：顏語緗）</td>
+                            <td data-label="場地 3">混雙A：楊舒心/簡家浩 vs 李長融/蔡仲元（裁：曾瑀婕）</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">14:20 - 14:40</td>
+                            <td data-label="場地 1">男單準決賽（1）A1 vs B2（裁：詹宇崴）</td>
+                            <td data-label="場地 2">男單準決賽（2）A2 vs B1（裁：許淏丞）</td>
+                            <td data-label="場地 3">場地整理</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">14:45 - 15:05</td>
+                            <td data-label="場地 1">混雙準決賽（3）A1 vs B2（裁：李佳翰）</td>
+                            <td data-label="場地 2">混雙準決賽（4）A2 vs B1（裁：王昱文）</td>
+                            <td data-label="場地 3">場地整理</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">15:10 - 15:30</td>
+                            <td data-label="場地 1">男單決賽（1）勝 vs（2）勝（裁：劉怡伶）</td>
+                            <td data-label="場地 2">場地整理</td>
+                            <td data-label="場地 3">場地整理</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">15:30 - 15:50</td>
+                            <td data-label="場地 1">男雙決賽（循環賽前2名）（裁：陳雅玲）</td>
+                            <td data-label="場地 2">場地整理</td>
+                            <td data-label="場地 3">場地整理</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">15:55 - 16:15</td>
+                            <td data-label="場地 1">混雙決賽（3）勝 vs（4）勝（裁：李承恩）</td>
+                            <td data-label="場地 2">場地整理</td>
+                            <td data-label="場地 3">場地整理</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                        <tr>
+                            <td data-label="時間">16:20 - 16:50</td>
+                            <td data-label="場地 1">頒獎+場復</td>
+                            <td data-label="場地 2">場地整理</td>
+                            <td data-label="場地 3">場地整理</td>
+                            <td data-label="場地 4">場地整理</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 分組圖 -->
+        <div id="bracket" class="content-section">
+            <div class="tournament-area">
+                <div class="groups-container">
+
+                    <div class="group-wrapper">
+                        <div class="group-title">混雙A - 循環賽程圖</div>
+                        <img src="chart_MIXDA.png" alt="混雙A循環賽程圖" style="width: 100%; max-width: 800px; height: auto;">
+                    </div>
+
+                    <div class="group-wrapper">
+                        <div class="group-title">混雙B - 循環賽程圖</div>
+                        <img src="chart_MIXDB.png" alt="混雙B循環賽程圖" style="width: 100%; max-width: 800px; height: auto;">
+                    </div>
+
+                    <div class="group-wrapper">
+                        <div class="group-title">男單A - 循環賽程圖</div>
+                        <img src="chart_MSA.png" alt="男單A循環賽程圖" style="width: 100%; max-width: 800px; height: auto;">
+                    </div>
+
+                    <div class="group-wrapper">
+                        <div class="group-title">男單B - 循環賽程圖</div>
+                        <img src="chart_MSB.png" alt="男單B循環賽程圖" style="width: 100%; max-width: 800px; height: auto;">
+                    </div>
+
+                    <div class="group-wrapper">
+                        <div class="group-title">男雙 - 循環賽程圖</div>
+                        <img src="chart_MD.png" alt="男雙循環賽程圖" style="width: 100%; max-width: 800px; height: auto;">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 裁判手冊與比賽章程 -->
+        <div id="docs" class="content-section">
+            <div class="doc-section">
+                <div class="doc-grid">
+
+                    <div class="doc-card">
+                        <header>裁判手冊</header>
+                        <iframe class="doc-frame" src="https://drive.google.com/file/d/1jkckqgeOReue-vSL0OmNY0oRHfqFrNKA/preview" allow="autoplay"></iframe>
+                        <div class="doc-footer">若無法預覽，請改用連結：<a href="https://drive.google.com/file/d/1jkckqgeOReue-vSL0OmNY0oRHfqFrNKA/view?usp=drive_link" target="_blank" rel="noopener">開啟裁判手冊</a></div>
+                    </div>
+
+                    <div class="doc-card">
+                        <header>比賽章程</header>
+                        <iframe class="doc-frame" src="https://drive.google.com/file/d/1mgyM5OwAnRl6Fuu1hmXkmiELyBuv7KnV/preview" allow="autoplay"></iframe>
+                        <div class="doc-footer">若無法預覽，請改用連結：<a href="https://drive.google.com/file/d/1mgyM5OwAnRl6Fuu1hmXkmiELyBuv7KnV/view?usp=drive_link" target="_blank" rel="noopener">開啟比賽章程</a></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>2026第四屆小地盃 | 祝各隊比賽順利！</p>
+            <p>最後更新時間：2026年1月23日</p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

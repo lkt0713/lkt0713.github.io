@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>莫拉克颱風前後 850hPa 風場/比濕 帶通濾波（10-30天 vs 30-90天）</title>
+<link rel="stylesheet" href="../../assets/theme.css">
+<script src="../../assets/site.js"></script>
+<style>
+  /* Legacy variable names remapped onto the shared portfolio tokens */
+  :root {
+    --panel:        var(--surface);
+    --panel-border: var(--border);
+    --muted:        var(--text-2);
+    --accent2:      var(--accent-2);
+  }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+    animation: fadeUp .5s ease-out .1s both;
+  }
+
+  /* Intro block (was the old page <header>) */
+  .page-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .page-intro h1 {
+    font-size: 1.35em; font-weight: 800; letter-spacing: -.4px;
+    line-height: 1.35; color: var(--text);
+    margin: 0 0 12px; padding-bottom: 13px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .sub {
+    color: var(--text-2);
+    font-size: 0.88rem;
+    line-height: 1.75;
+  }
+  .sub b { color: var(--text); font-weight: 700; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .controls button {
+    background: var(--btn-bg);
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(21,88,214,.3);
+    transition: all .18s;
+  }
+  .controls button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,88,214,.4); }
+  .controls button.secondary {
+    background: var(--surface);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .controls button.secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .controls button:active { transform: translateY(1px); }
+  .timeline-wrap { flex: 1 1 320px; display: flex; align-items: center; gap: 10px; min-width: 240px; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  .timestamp {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 130px;
+    text-align: center;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 12px;
+    font-family: 'Courier New', monospace;
+    color: var(--text);
+  }
+  .frame-count {
+    color: var(--text-3); font-size: 0.75rem; min-width: 70px;
+    font-weight: 700; letter-spacing: .5px;
+  }
+
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 860px) {
+    .panels { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: background .35s, border .35s;
+  }
+  .panel-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px; flex-wrap: wrap;
+  }
+  .panel-head h2 {
+    font-size: 0.95rem; margin: 0; font-weight: 800; letter-spacing: -.2px;
+  }
+  .panel-head .tag {
+    font-size: 0.7rem;
+    color: var(--text-3);
+    font-family: 'Courier New', monospace;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+  }
+  .panel.left  .panel-head { border-bottom: 2px solid var(--accent); }
+  .panel.right .panel-head { border-bottom: 2px solid var(--accent-2); }
+  .panel.left  .panel-head h2 { color: var(--accent); }
+  .panel.right .panel-head h2 { color: var(--accent-2); }
+  .img-wrap {
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+  }
+  .img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .img-wrap .no-data {
+    padding: 60px 20px;
+    color: var(--text-3);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .panel-foot {
+    padding: 10px 18px;
+    font-size: 0.74rem;
+    color: var(--text-3);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .legend-note {
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 18px 22px;
+    font-size: 0.83rem;
+    color: var(--text-2);
+    line-height: 1.8;
+  }
+  .legend-note b { color: var(--text); font-weight: 700; }
+  code {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body data-page-title="莫拉克颱風 850hPa 帶通濾波比對"
+      data-page-subtitle="ERA5 · 10–30 天 vs 30–90 天季內振盪訊號"
+      data-page-icon="🌊">
+
+<main>
+  <div class="page-intro">
+    <h1>ERA5 850hPa 風場 &amp; 比濕 帶通濾波：10–30 天（BSISO/MJO 次季節）vs 30–90 天（季內振盪）逐日比對</h1>
+    <div class="sub">
+      左：<b>bp13</b>（10–30 天帶通濾波，2009/07/01–08/20）　|
+      右：<b>bp39</b>（30–90 天帶通濾波，2009/05/01–10/01）<br>
+      用來檢視不同時間尺度的季內振盪（Intraseasonal Oscillation）訊號在莫拉克颱風（2009/08/05–08/09 侵台）前後的 850hPa 風場與比濕異常分布與演變。
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="playBtn">▶ 播放</button>
+    <button class="secondary" id="prevBtn">◀ 前一天</button>
+    <button class="secondary" id="nextBtn">後一天 ▶</button>
+    <div class="timeline-wrap">
+      <input type="range" id="slider" min="0" max="153" value="61" step="1">
+    </div>
+    <div class="timestamp" id="timestamp">2009-07-01</div>
+    <div class="frame-count" id="frameCount">1 / 154</div>
+    <select id="speedSelect">
+      <option value="400">快 (0.4s)</option>
+      <option value="800" selected>中 (0.8s)</option>
+      <option value="1500">慢 (1.5s)</option>
+    </select>
+  </div>
+
+  <div class="panels">
+    <div class="panel left">
+      <div class="panel-head">
+        <h2>bp13：10–30 天帶通濾波</h2>
+        <span class="tag" id="bp13File"></span>
+      </div>
+      <div class="img-wrap" id="bp13Wrap"><img id="bp13Img" alt="bp13"></div>
+      <div class="panel-foot">來源檔案：<code>data/bp13/</code>，僅 2009/07/01–08/20 有資料</div>
+    </div>
+    <div class="panel right">
+      <div class="panel-head">
+        <h2>bp39：30–90 天帶通濾波</h2>
+        <span class="tag" id="bp39File"></span>
+      </div>
+      <div class="img-wrap" id="bp39Wrap"><img id="bp39Img" alt="bp39"></div>
+      <div class="panel-foot">來源檔案：<code>data/bp39/</code>，2009/05/01–10/01 全期涵蓋</div>
+    </div>
+  </div>
+
+  <div class="legend-note">
+    <b>使用說明：</b>拖曳時間軸或按播放鍵，逐日比較兩個時間尺度的季內振盪訊號如何配置、增強或抑制颱風生成環境。
+    莫拉克颱風於 2009/08/05–08/09 侵襲台灣，可觀察侵台前後兩帶通訊號在西北太平洋至南海一帶的相位變化。<br>
+    <b>注意：</b>10–30 天濾波（bp13）僅提供颱風警報前後約一個月的資料（07/01–08/20），
+    30–90 天濾波（bp39）則涵蓋較長期（05/01–10/01）以呈現季內振盪的完整週期；
+    時間軸上若某一側顯示「無資料」，代表該濾波在此日期沒有對應圖檔，並非誤植。
+  </div>
+</main>
+
+<script>
+const manifest = [{"date": "2009-05-01", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090501.png"}, {"date": "2009-05-02", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090502.png"}, {"date": "2009-05-03", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090503.png"}, {"date": "2009-05-04", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090504.png"}, {"date": "2009-05-05", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090505.png"}, {"date": "2009-05-06", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090506.png"}, {"date": "2009-05-07", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090507.png"}, {"date": "2009-05-08", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090508.png"}, {"date": "2009-05-09", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090509.png"}, {"date": "2009-05-10", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090510.png"}, {"date": "2009-05-11", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090511.png"}, {"date": "2009-05-12", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090512.png"}, {"date": "2009-05-13", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090513.png"}, {"date": "2009-05-14", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090514.png"}, {"date": "2009-05-15", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090515.png"}, {"date": "2009-05-16", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090516.png"}, {"date": "2009-05-17", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090517.png"}, {"date": "2009-05-18", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090518.png"}, {"date": "2009-05-19", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090519.png"}, {"date": "2009-05-20", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090520.png"}, {"date": "2009-05-21", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090521.png"}, {"date": "2009-05-22", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090522.png"}, {"date": "2009-05-23", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090523.png"}, {"date": "2009-05-24", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090524.png"}, {"date": "2009-05-25", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090525.png"}, {"date": "2009-05-26", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090526.png"}, {"date": "2009-05-27", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090527.png"}, {"date": "2009-05-28", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090528.png"}, {"date": "2009-05-29", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090529.png"}, {"date": "2009-05-30", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090530.png"}, {"date": "2009-05-31", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090531.png"}, {"date": "2009-06-01", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090601.png"}, {"date": "2009-06-02", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090602.png"}, {"date": "2009-06-03", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090603.png"}, {"date": "2009-06-04", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090604.png"}, {"date": "2009-06-05", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090605.png"}, {"date": "2009-06-06", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090606.png"}, {"date": "2009-06-07", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090607.png"}, {"date": "2009-06-08", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090608.png"}, {"date": "2009-06-09", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090609.png"}, {"date": "2009-06-10", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090610.png"}, {"date": "2009-06-11", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090611.png"}, {"date": "2009-06-12", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090612.png"}, {"date": "2009-06-13", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090613.png"}, {"date": "2009-06-14", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090614.png"}, {"date": "2009-06-15", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090615.png"}, {"date": "2009-06-16", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090616.png"}, {"date": "2009-06-17", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090617.png"}, {"date": "2009-06-18", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090618.png"}, {"date": "2009-06-19", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090619.png"}, {"date": "2009-06-20", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090620.png"}, {"date": "2009-06-21", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090621.png"}, {"date": "2009-06-22", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090622.png"}, {"date": "2009-06-23", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090623.png"}, {"date": "2009-06-24", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090624.png"}, {"date": "2009-06-25", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090625.png"}, {"date": "2009-06-26", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090626.png"}, {"date": "2009-06-27", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090627.png"}, {"date": "2009-06-28", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090628.png"}, {"date": "2009-06-29", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090629.png"}, {"date": "2009-06-30", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090630.png"}, {"date": "2009-07-01", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090701.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090701.png"}, {"date": "2009-07-02", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090702.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090702.png"}, {"date": "2009-07-03", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090703.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090703.png"}, {"date": "2009-07-04", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090704.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090704.png"}, {"date": "2009-07-05", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090705.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090705.png"}, {"date": "2009-07-06", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090706.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090706.png"}, {"date": "2009-07-07", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090707.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090707.png"}, {"date": "2009-07-08", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090708.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090708.png"}, {"date": "2009-07-09", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090709.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090709.png"}, {"date": "2009-07-10", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090710.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090710.png"}, {"date": "2009-07-11", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090711.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090711.png"}, {"date": "2009-07-12", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090712.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090712.png"}, {"date": "2009-07-13", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090713.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090713.png"}, {"date": "2009-07-14", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090714.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090714.png"}, {"date": "2009-07-15", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090715.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090715.png"}, {"date": "2009-07-16", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090716.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090716.png"}, {"date": "2009-07-17", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090717.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090717.png"}, {"date": "2009-07-18", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090718.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090718.png"}, {"date": "2009-07-19", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090719.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090719.png"}, {"date": "2009-07-20", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090720.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090720.png"}, {"date": "2009-07-21", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090721.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090721.png"}, {"date": "2009-07-22", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090722.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090722.png"}, {"date": "2009-07-23", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090723.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090723.png"}, {"date": "2009-07-24", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090724.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090724.png"}, {"date": "2009-07-25", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090725.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090725.png"}, {"date": "2009-07-26", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090726.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090726.png"}, {"date": "2009-07-27", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090727.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090727.png"}, {"date": "2009-07-28", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090728.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090728.png"}, {"date": "2009-07-29", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090729.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090729.png"}, {"date": "2009-07-30", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090730.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090730.png"}, {"date": "2009-07-31", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090731.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090731.png"}, {"date": "2009-08-01", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090801.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090801.png"}, {"date": "2009-08-02", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090802.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090802.png"}, {"date": "2009-08-03", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090803.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090803.png"}, {"date": "2009-08-04", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090804.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090804.png"}, {"date": "2009-08-05", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090805.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090805.png"}, {"date": "2009-08-06", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090806.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090806.png"}, {"date": "2009-08-07", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090807.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090807.png"}, {"date": "2009-08-08", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090808.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090808.png"}, {"date": "2009-08-09", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090809.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090809.png"}, {"date": "2009-08-10", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090810.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090810.png"}, {"date": "2009-08-11", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090811.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090811.png"}, {"date": "2009-08-12", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090812.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090812.png"}, {"date": "2009-08-13", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090813.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090813.png"}, {"date": "2009-08-14", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090814.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090814.png"}, {"date": "2009-08-15", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090815.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090815.png"}, {"date": "2009-08-16", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090816.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090816.png"}, {"date": "2009-08-17", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090817.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090817.png"}, {"date": "2009-08-18", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090818.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090818.png"}, {"date": "2009-08-19", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090819.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090819.png"}, {"date": "2009-08-20", "bp13": "bp13_ERA5_wind_spfh_850hPa_10-30_20090820.png", "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090820.png"}, {"date": "2009-08-21", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090821.png"}, {"date": "2009-08-22", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090822.png"}, {"date": "2009-08-23", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090823.png"}, {"date": "2009-08-24", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090824.png"}, {"date": "2009-08-25", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090825.png"}, {"date": "2009-08-26", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090826.png"}, {"date": "2009-08-27", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090827.png"}, {"date": "2009-08-28", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090828.png"}, {"date": "2009-08-29", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090829.png"}, {"date": "2009-08-30", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090830.png"}, {"date": "2009-08-31", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090831.png"}, {"date": "2009-09-01", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090901.png"}, {"date": "2009-09-02", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090902.png"}, {"date": "2009-09-03", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090903.png"}, {"date": "2009-09-04", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090904.png"}, {"date": "2009-09-05", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090905.png"}, {"date": "2009-09-06", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090906.png"}, {"date": "2009-09-07", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090907.png"}, {"date": "2009-09-08", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090908.png"}, {"date": "2009-09-09", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090909.png"}, {"date": "2009-09-10", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090910.png"}, {"date": "2009-09-11", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090911.png"}, {"date": "2009-09-12", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090912.png"}, {"date": "2009-09-13", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090913.png"}, {"date": "2009-09-14", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090914.png"}, {"date": "2009-09-15", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090915.png"}, {"date": "2009-09-16", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090916.png"}, {"date": "2009-09-17", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090917.png"}, {"date": "2009-09-18", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090918.png"}, {"date": "2009-09-19", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090919.png"}, {"date": "2009-09-20", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090920.png"}, {"date": "2009-09-21", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090921.png"}, {"date": "2009-09-22", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090922.png"}, {"date": "2009-09-23", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090923.png"}, {"date": "2009-09-24", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090924.png"}, {"date": "2009-09-25", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090925.png"}, {"date": "2009-09-26", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090926.png"}, {"date": "2009-09-27", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090927.png"}, {"date": "2009-09-28", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090928.png"}, {"date": "2009-09-29", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090929.png"}, {"date": "2009-09-30", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20090930.png"}, {"date": "2009-10-01", "bp13": null, "bp39": "bp39_ERA5_wind_spfh_850hPa_30-90_20091001.png"}];
+
+const slider = document.getElementById('slider');
+const bp13Img = document.getElementById('bp13Img');
+const bp39Img = document.getElementById('bp39Img');
+const bp13Wrap = document.getElementById('bp13Wrap');
+const bp39Wrap = document.getElementById('bp39Wrap');
+const timestampEl = document.getElementById('timestamp');
+const frameCountEl = document.getElementById('frameCount');
+const bp13FileEl = document.getElementById('bp13File');
+const bp39FileEl = document.getElementById('bp39File');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const speedSelect = document.getElementById('speedSelect');
+
+slider.max = manifest.length - 1;
+
+let playing = false;
+let timer = null;
+
+function setPanel(wrap, imgEl, fileEl, path, filename) {
+  if (filename) {
+    wrap.innerHTML = '';
+    wrap.appendChild(imgEl);
+    imgEl.src = path + filename;
+    fileEl.textContent = filename;
+  } else {
+    wrap.innerHTML = '<div class="no-data">此日期無資料</div>';
+    fileEl.textContent = '(無資料)';
+  }
+}
+
+function render(idx) {
+  const item = manifest[idx];
+  setPanel(bp13Wrap, bp13Img, bp13FileEl, './data/bp13/', item.bp13);
+  setPanel(bp39Wrap, bp39Img, bp39FileEl, './data/bp39/', item.bp39);
+  timestampEl.textContent = item.date;
+  frameCountEl.textContent = (idx + 1) + ' / ' + manifest.length;
+  slider.value = idx;
+}
+
+function step(delta) {
+  let idx = parseInt(slider.value, 10) + delta;
+  if (idx < 0) idx = manifest.length - 1;
+  if (idx >= manifest.length) idx = 0;
+  render(idx);
+}
+
+function play() {
+  playing = true;
+  playBtn.textContent = '⏸ 暫停';
+  timer = setInterval(() => step(1), parseInt(speedSelect.value, 10));
+}
+function pause() {
+  playing = false;
+  playBtn.textContent = '▶ 播放';
+  clearInterval(timer);
+}
+
+playBtn.addEventListener('click', () => playing ? pause() : play());
+prevBtn.addEventListener('click', () => { pause(); step(-1); });
+nextBtn.addEventListener('click', () => { pause(); step(1); });
+slider.addEventListener('input', () => { pause(); render(parseInt(slider.value, 10)); });
+speedSelect.addEventListener('change', () => { if (playing) { pause(); play(); } });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { pause(); step(-1); }
+  if (e.key === 'ArrowRight') { pause(); step(1); }
+  if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); }
+});
+
+// start at 2009-08-05 (typhoon landfall date) if present, else 0
+const startIdx = manifest.findIndex(m => m.date === '2009-08-05');
+render(startIdx >= 0 ? startIdx : 0);
+</script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>李冠廷 | 地球科學 × 資料分析</title>
+<link rel="stylesheet" href="assets/theme.css">
+<script src="assets/site.js"></script>
+<style>
+    /* ── Blog nav ───────────────────────────────────────────── */
+    .nav-links { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+    .nav-links a {
+        color: var(--text-2); text-decoration: none;
+        font-size: .84em; font-weight: 700;
+        padding: 7px 13px; border-radius: 8px;
+        transition: all .2s;
+    }
+    .nav-links a:hover { background: var(--accent-lo); color: var(--accent); }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero {
+        position: relative; overflow: hidden;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 68px 20px 60px;
+        transition: background .35s, border .35s;
+    }
+    .hero::before {
+        content: ''; position: absolute; inset: 0;
+        background:
+            radial-gradient(720px 340px at 10% -10%, var(--accent-lo), transparent 65%),
+            radial-gradient(620px 300px at 90% 110%, rgba(8,145,178,.10), transparent 62%);
+        pointer-events: none;
+    }
+    .hero-inner {
+        max-width: 1000px; margin: 0 auto; position: relative;
+        display: grid; grid-template-columns: 280px 1fr; gap: 46px; align-items: center;
+    }
+
+    /* photo: full-body shot, so framed as a portrait card (not a circle) */
+    .photo-frame {
+        position: relative;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        transform: rotate(-2deg);
+        transition: transform .35s ease, box-shadow .35s ease;
+        animation: fadeUp .6s ease-out both;
+        background: var(--surface-2);
+    }
+    .photo-frame:hover { transform: rotate(0deg) translateY(-4px); }
+    .photo-frame img { width: 100%; display: block; aspect-ratio: 791/1018; object-fit: cover; }
+    .photo-tag {
+        position: absolute; left: 12px; bottom: 12px;
+        background: rgba(12,26,46,.72); backdrop-filter: blur(6px);
+        color: #fff; font-size: .72em; font-weight: 700;
+        padding: 6px 12px; border-radius: 999px;
+    }
+
+    .hero-text { animation: fadeUp .6s ease-out .08s both; min-width: 0; }
+    .greeting {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--surface-2); border: 1px solid var(--border);
+        border-radius: 999px; padding: 7px 16px;
+        font-size: .8em; font-weight: 700; color: var(--text-2);
+        margin-bottom: 18px;
+    }
+    .wave { display: inline-block; animation: wave 2.4s ease-in-out infinite; transform-origin: 70% 70%; }
+    @keyframes wave {
+        0%,60%,100% { transform: rotate(0deg); }
+        10%,30%     { transform: rotate(14deg); }
+        20%,40%     { transform: rotate(-8deg); }
+    }
+    .hero h1 {
+        font-size: 3em; font-weight: 800; letter-spacing: -1.4px;
+        line-height: 1.08; color: var(--text); margin-bottom: 10px;
+    }
+    .hero .role {
+        font-size: 1.02em; font-weight: 700; margin-bottom: 20px;
+        background: var(--btn-bg);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero .bio {
+        font-size: 1em; line-height: 1.9; color: var(--text-2);
+        max-width: 56ch; margin-bottom: 24px;
+    }
+    .hero .bio strong { color: var(--text); font-weight: 700; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .link-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: var(--surface-2); border: 1px solid var(--border);
+        color: var(--text-2); border-radius: 10px;
+        padding: 10px 18px; font-size: .85em; font-weight: 700;
+        text-decoration: none; transition: all .2s;
+    }
+    .link-btn:hover {
+        background: var(--accent-lo); color: var(--accent);
+        border-color: var(--accent); transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    .link-btn.primary {
+        background: var(--btn-bg); color: #fff; border-color: transparent;
+        box-shadow: 0 4px 16px rgba(21,88,214,.32);
+    }
+    .link-btn.primary:hover { color: #fff; box-shadow: 0 8px 26px rgba(21,88,214,.42); }
+
+    /* ── About (blog-style prose) ──────────────────────────── */
+    .about { max-width: 1000px; margin: 0 auto; padding: 56px 20px 8px; }
+    .about-grid {
+        display: grid; grid-template-columns: 1.35fr 1fr; gap: 40px; align-items: start;
+    }
+    .prose p {
+        font-size: .96em; line-height: 1.95; color: var(--text-2); margin-bottom: 16px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+    .prose em {
+        font-style: normal; color: var(--accent); font-weight: 700;
+    }
+
+    .side-stack { display: flex; flex-direction: column; gap: 18px; }
+    .now-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--radius); box-shadow: var(--shadow-md);
+        padding: 22px 24px;
+    }
+    /* the off-the-field card gets the Monkeys' crimson as its rule */
+    .now-card.offfield h3 { border-bottom-color: #c8102e; }
+    .now-card h3 {
+        font-size: .72em; text-transform: uppercase; letter-spacing: 1.2px;
+        color: var(--text-3); font-weight: 800; margin-bottom: 16px;
+        padding-bottom: 12px; border-bottom: 2px solid var(--accent);
+    }
+    .now-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .now-list li {
+        display: grid; grid-template-columns: 22px 1fr; gap: 11px;
+        font-size: .88em; line-height: 1.65; color: var(--text-2);
+    }
+    .now-list .ico { font-size: 1.05em; line-height: 1.4; }
+    .now-list b { color: var(--text); font-weight: 700; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .tag {
+        background: var(--surface-2); border: 1px solid var(--border);
+        border-radius: 8px; padding: 6px 13px;
+        font-size: .78em; font-weight: 600; color: var(--text-2);
+        transition: all .18s;
+    }
+    .tag:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ── Section heading ───────────────────────────────────── */
+    .section-head {
+        display: flex; align-items: baseline; gap: 14px;
+        margin-bottom: 6px; flex-wrap: wrap;
+    }
+    .section-head h2 {
+        font-size: 1.55em; font-weight: 800; letter-spacing: -.5px; color: var(--text);
+    }
+    .section-head .count {
+        font-size: .8em; font-weight: 700; color: var(--text-3);
+        font-family: 'Courier New', monospace;
+    }
+    .section-sub { color: var(--text-3); font-size: .88em; margin-bottom: 26px; }
+
+    /* ── Project grid ──────────────────────────────────────── */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 22px;
+    }
+    .card {
+        display: flex; flex-direction: column;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        overflow: hidden; text-decoration: none;
+        transition: transform .22s, box-shadow .22s, border-color .22s, background .35s;
+        animation: fadeUp .5s ease-out both;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent);
+    }
+    .card-stripe { height: 5px; flex-shrink: 0; }
+    .card-body { padding: 22px 23px 20px; flex: 1; display: flex; flex-direction: column; }
+    .card-top {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: 12px; margin-bottom: 13px;
+    }
+    .card-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        background: var(--surface-2); border: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4em; flex-shrink: 0;
+    }
+    .card-kind {
+        font-size: .66em; font-weight: 800; letter-spacing: 1px;
+        text-transform: uppercase; color: var(--text-3);
+        background: var(--surface-3); border: 1px solid var(--border);
+        border-radius: 7px; padding: 5px 10px; white-space: nowrap;
+    }
+    /* the one card that points at a self-updating external site */
+    .card-kind.live {
+        color: #ef4444; background: rgba(239,68,68,.1);
+        border-color: rgba(239,68,68,.3); letter-spacing: .4px;
+    }
+    .card h3 {
+        font-size: 1.12em; font-weight: 800; color: var(--text);
+        line-height: 1.32; margin-bottom: 9px; letter-spacing: -.3px;
+    }
+    .card p {
+        font-size: .87em; line-height: 1.72; color: var(--text-2);
+        flex: 1; margin-bottom: 16px;
+    }
+    .card-meta {
+        display: flex; flex-wrap: wrap; gap: 6px;
+        padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .chip {
+        font-size: .71em; font-weight: 700; color: var(--text-3);
+        background: var(--surface-2); border: 1px solid var(--border);
+        border-radius: 6px; padding: 4px 9px;
+    }
+    .card-go {
+        margin-top: 14px; font-size: .82em; font-weight: 800;
+        color: var(--accent); display: flex; align-items: center; gap: 6px;
+    }
+    .card:hover .card-go .arrow { transform: translateX(4px); }
+    .card-go .arrow { transition: transform .2s; display: inline-block; }
+
+    /* ── Contact ───────────────────────────────────────────── */
+    .contact {
+        max-width: 1000px; margin: 56px auto 0; padding: 0 20px;
+    }
+    .contact-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--radius); box-shadow: var(--shadow-md);
+        padding: 38px 34px; text-align: center;
+        position: relative; overflow: hidden;
+    }
+    .contact-card::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(520px 240px at 50% -30%, var(--accent-lo), transparent 68%);
+        pointer-events: none;
+    }
+    .contact-card > * { position: relative; }
+    .contact-card h2 {
+        font-size: 1.5em; font-weight: 800; letter-spacing: -.5px;
+        color: var(--text); margin-bottom: 10px;
+    }
+    .contact-card p {
+        color: var(--text-2); font-size: .92em; line-height: 1.8;
+        max-width: 46ch; margin: 0 auto 22px;
+    }
+
+    @media (max-width: 860px) {
+        .hero { padding: 44px 20px 44px; }
+        .hero-inner { grid-template-columns: 1fr; gap: 28px; }
+        .photo-frame { max-width: 240px; transform: rotate(-1.5deg); }
+        .hero h1 { font-size: 2.2em; }
+        .about-grid { grid-template-columns: 1fr; gap: 26px; }
+        .grid { grid-template-columns: 1fr; }
+        .nav-links { display: none; }
+    }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-brand">
+        <div class="brand-icon">🌏</div>
+        <div class="brand-text">
+            <div class="bt-title">李冠廷</div>
+            <small>地球科學 × 資料分析</small>
+        </div>
+    </div>
+    <div class="site-actions">
+        <nav class="nav-links">
+            <a href="#about">關於我</a>
+            <a href="#projects">專案</a>
+            <a href="#contact">聯絡</a>
+        </nav>
+        <button class="hdr-btn" id="theme-btn" type="button" onclick="toggleTheme()">🌙 Dark</button>
+    </div>
+</header>
+
+<!-- ═══════════════ 封面 ═══════════════ -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="photo-frame">
+            <img src="assets/photo.jpg" alt="李冠廷">
+            <span class="photo-tag">⚾ 師大乙組棒球隊</span>
+        </div>
+        <div class="hero-text">
+            <div class="greeting"><span class="wave">👋</span> 嗨，歡迎來到我的作品集</div>
+            <h1>李冠廷</h1>
+            <div class="role">國立臺灣師範大學　地球科學系　大三</div>
+            <p class="bio">
+                我對「天氣為什麼會變成這樣」這件事一直很好奇。從颱風怎麼走、季內振盪如何醞釀出一場致災降雨，
+                到模式預報究竟準不準——我習慣把這些問題丟進資料裡找答案，
+                再用 Python 把整段流程從下載、處理、分析一路做到互動式網頁，讓結果自己說話。
+                離開螢幕之後，我大多在球場上：<strong>師大乙組棒球隊</strong>隊員、系隊舉球員，
+                以及一個會為了看球直接衝進場的 Rakuten Monkeys 球迷。
+            </p>
+            <div class="links">
+                <a class="link-btn primary" href="#projects">↓ 看看我的專案</a>
+                <a class="link-btn" href="https://github.com/llen0713" target="_blank" rel="noopener">
+                    <span>⚙</span> GitHub
+                </a>
+                <a class="link-btn" href="https://www.instagram.com/lkt_0713/" target="_blank" rel="noopener">
+                    <span>📷</span> Instagram
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 關於我 ═══════════════ -->
+<section class="about" id="about">
+    <div class="section-head"><h2>關於我</h2></div>
+    <p class="section-sub">一點點關於我在做什麼、以及為什麼在做。</p>
+
+    <div class="about-grid">
+        <div class="prose">
+            <p>
+                我目前就讀<strong>國立臺灣師範大學地球科學系三年級</strong>。
+                真正把我拉進大氣科學的，是那種「同一個系統，換個角度看就完全不一樣」的感覺——
+                颱風在天氣圖上是一個渦旋，在雷達回波裡是一片對流，在濾波後的場裡又變成季內振盪的一個相位。
+                把這些視角疊在一起，才慢慢看出它為什麼會這樣走、為什麼會下那麼多雨。
+            </p>
+            <p>
+                所以我做的東西大多圍繞著<em>熱帶氣旋</em>、<em>季內振盪與極端降水</em>，
+                以及<em>模式預報的驗證</em>。我特別喜歡把分析做成「可以動的」——
+                拉一下時間軸就能看到系統怎麼演變，比一張靜態圖能講的故事多太多了。
+            </p>
+            <p>
+                寫程式對我來說比較像是工具而不是目的：能把 ERA5 抓下來、濾波、畫圖、
+                再包成一個網頁丟給別人看，這整條路能自己走完，研究才跑得快。
+                偶爾也會把這套習慣用在完全不相干的題目上，像是分析全國大專校院的休學率，
+                或是幫系上的羽球賽寫一套即時計分系統。
+            </p>
+            <p>
+                不在電腦桌前的時候，我不是在運動，就是在球場邊看球。
+                我是<strong>師大乙組棒球隊</strong>的一員，同時也擔任<strong>系隊舉球員</strong>；
+                只要有空，我會直接進場看比賽——是死忠的 <strong>Rakuten Monkeys</strong> 球迷。
+                說起來，追球隊跟追颱風其實有點像：一樣是盯著局勢變化，一樣永遠有變數。
+            </p>
+        </div>
+
+        <div class="side-stack">
+            <aside class="now-card">
+                <h3>最近在做</h3>
+                <ul class="now-list">
+                    <li><span class="ico">🌀</span>
+                        <span>維護一套<b>每日自動更新</b>的西北太平洋颱風路徑預報網站，串接 AI 天氣模型與 JTWC 觀測。</span></li>
+                    <li><span class="ico">📊</span>
+                        <span>整理 2023–2025 年<b>模式路徑誤差</b>的系統性比較，涵蓋 50 個以上颱風個案。</span></li>
+                    <li><span class="ico">🌊</span>
+                        <span>研究<b>莫拉克颱風</b>前後的季內振盪訊號，看不同時間尺度如何堆疊出那場豪雨。</span></li>
+                    <li><span class="ico">📚</span>
+                        <span>地科系大三修課中，持續補強動力氣象與資料同化的底子。</span></li>
+                </ul>
+                <div class="tags">
+                    <span class="tag">Python</span>
+                    <span class="tag">ERA5</span>
+                    <span class="tag">Xarray</span>
+                    <span class="tag">Matplotlib</span>
+                    <span class="tag">Plotly</span>
+                    <span class="tag">機器學習</span>
+                </div>
+            </aside>
+
+            <aside class="now-card offfield">
+                <h3>場外的我</h3>
+                <ul class="now-list">
+                    <li><span class="ico">⚾</span>
+                        <span><b>師大乙組棒球隊</b>隊員。</span></li>
+                    <li><span class="ico">🏐</span>
+                        <span>系隊<b>舉球員</b>。</span></li>
+                    <li><span class="ico">🔴</span>
+                        <span><b>Rakuten Monkeys</b> 球迷，有空就進場看球。</span></li>
+                </ul>
+                <div class="tags">
+                    <span class="tag">⚾ 棒球</span>
+                    <span class="tag">🏐 排球</span>
+                    <span class="tag">🏟️ 現場看球</span>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 專案 ═══════════════ -->
+<main class="page" id="projects">
+    <div class="section-head">
+        <h2>專案作品</h2>
+        <span class="count">08 PROJECTS</span>
+    </div>
+    <p class="section-sub">點擊任一張卡片即可開啟該專案的互動式網頁。</p>
+
+    <div class="grid">
+
+        <a class="card" href="https://llen0713.github.io/Typhoon-Forecast/" target="_blank" rel="noopener" style="animation-delay:.04s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#ef4444,#f59e0b)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">🌀</div>
+                    <span class="card-kind live">● Live · 每日更新</span>
+                </div>
+                <h3>西北太平洋熱帶氣旋路徑預測</h3>
+                <p>結合 DeepMind 天氣模型（WNC-R1 / GENC）與 JTWC 觀測，自動產生現存颱風的路徑預報圖、動畫與生成潛勢分析。這個站每天自動重新產生，點進去看到的一定是最新的。</p>
+                <div class="card-meta">
+                    <span class="chip">AI 天氣模型</span>
+                    <span class="chip">路徑預報</span>
+                    <span class="chip">自動化</span>
+                </div>
+                <div class="card-go">開啟即時預報站 <span class="arrow">↗</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/track-error-analysis/index.html" style="animation-delay:.08s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#1558d6,#0891b2)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">📊</div>
+                    <span class="card-kind">Verification</span>
+                </div>
+                <h3>2023–2025 颱風路徑與誤差分析總覽</h3>
+                <p>系統性比較 FNV3、JMA、CWA 三家模式於 2023–2025 年各個颱風個案的路徑誤差，含逐個案誤差圖與季節性誤差統計。</p>
+                <div class="card-meta">
+                    <span class="chip">模式驗證</span>
+                    <span class="chip">誤差統計</span>
+                    <span class="chip">50+ 個案</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/morakot-bandpass/index.html" style="animation-delay:.12s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#0891b2,#2dd4bf)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">🌊</div>
+                    <span class="card-kind">Interactive</span>
+                </div>
+                <h3>莫拉克颱風 850hPa 帶通濾波比對</h3>
+                <p>以 ERA5 資料對 850hPa 風場與比濕做 10–30 天與 30–90 天帶通濾波，逐日並列檢視季內振盪訊號在莫拉克侵台前後的演變。</p>
+                <div class="card-meta">
+                    <span class="chip">ERA5</span>
+                    <span class="chip">帶通濾波</span>
+                    <span class="chip">BSISO / MJO</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/morakot-bandpass-anim/viewer.html" style="animation-delay:.16s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#2dd4bf,#22c55e)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">🎞️</div>
+                    <span class="card-kind">Animation</span>
+                </div>
+                <h3>Bandpass 動畫檢視器</h3>
+                <p>輕量化的濾波動畫播放器，支援滾輪與拖曳直接刷過時間軸、自訂播放速度，快速掃視 10–30 天與 30–90 天兩種尺度的訊號。</p>
+                <div class="card-meta">
+                    <span class="chip">動畫播放</span>
+                    <span class="chip">互動控制</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/morakot-q3max-radar/index.html" style="animation-delay:.20s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#7c3aed,#1558d6)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">📡</div>
+                    <span class="card-kind">Comparison</span>
+                </div>
+                <h3>莫拉克 q3max vs 氣象署雷達回波</h3>
+                <p>將診斷量 q3max 與中央氣象署雷達回波觀測逐時對照，檢驗其在莫拉克強降水期間對對流發展的代表性。</p>
+                <div class="card-meta">
+                    <span class="chip">雷達回波</span>
+                    <span class="chip">q3max</span>
+                    <span class="chip">逐時比對</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/education-suspend/report_index.html" style="animation-delay:.24s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#f59e0b,#ef4444)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">🎓</div>
+                    <span class="card-kind">Data Science</span>
+                </div>
+                <h3>臺灣大專校院休學分析報告</h3>
+                <p>跨領域練習：以全國校務資料分析休學率的公私立差異、生師比關聯與區域分布，並用機器學習模型比較各特徵的重要性。</p>
+                <div class="card-meta">
+                    <span class="chip">Plotly</span>
+                    <span class="chip">機器學習</span>
+                    <span class="chip">教育統計</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/badminton/index.html" style="animation-delay:.28s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#16a34a,#0891b2)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">🏸</div>
+                    <span class="card-kind">Event Site</span>
+                </div>
+                <h3>2026 第四屆小地盃 賽事網站</h3>
+                <p>羽球賽事的完整賽程表、分組循環圖、場地配置與裁判章程，含分頁切換與響應式表格，供選手賽前查詢。</p>
+                <div class="card-meta">
+                    <span class="chip">賽程表</span>
+                    <span class="chip">分組圖</span>
+                    <span class="chip">場地配置</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+        <a class="card" href="projects/badminton/game1.html" style="animation-delay:.32s">
+            <div class="card-stripe" style="background:linear-gradient(90deg,#0891b2,#16a34a)"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-icon">⏱️</div>
+                    <span class="card-kind">Live App</span>
+                </div>
+                <h3>小地盃 即時計分與計時系統</h3>
+                <p>比賽當天實際使用的控台：即時比分、賽事計時、裁判輪值與戰績統計，並具投影模式可直接投放到會場螢幕。</p>
+                <div class="card-meta">
+                    <span class="chip">即時計分</span>
+                    <span class="chip">計時器</span>
+                    <span class="chip">投影模式</span>
+                </div>
+                <div class="card-go">開啟專案 <span class="arrow">→</span></div>
+            </div>
+        </a>
+
+    </div>
+</main>
+
+<!-- ═══════════════ 聯絡 ═══════════════ -->
+<section class="contact" id="contact">
+    <div class="contact-card">
+        <h2>聊聊天氣，或任何事</h2>
+        <p>
+            如果你對這些專案有興趣、想討論研究，或單純想聊聊颱風、
+            聊聊這季的 Monkeys，歡迎在 IG 上找我，或直接寄封信給我。
+        </p>
+        <div class="links" style="justify-content:center">
+            <a class="link-btn primary" href="https://www.instagram.com/lkt_0713/" target="_blank" rel="noopener">
+                <span>📷</span> @lkt_0713
+            </a>
+            <a class="link-btn" href="https://github.com/llen0713" target="_blank" rel="noopener">
+                <span>⚙</span> github.com/llen0713
+            </a>
+            <a class="link-btn" href="mailto:aa0936332377@gmail.com">
+                <span>✉</span> aa0936332377@gmail.com
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div>© 2026 李冠廷 · 國立臺灣師範大學 地球科學系</div>
+    <div style="margin-top:6px">以 Python 建立資料處理與視覺化流程，網頁自動產生</div>
+</footer>
+
+</body>
+</html>
