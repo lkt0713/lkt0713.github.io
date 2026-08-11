@@ -40,4 +40,4 @@ projects/           各專案頁面與資料
 ## 聯絡
 
 - Instagram [@lkt_0713](https://www.instagram.com/lkt_0713/)
-- GitHub [@llen0713](https://github.com/llen0713)
+- GitHub [@llen0713](https://github.com/lkt0713)
