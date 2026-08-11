@@ -2,6 +2,7 @@
 <html lang="zh-Hant" data-theme="light">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bandpass 動畫檢視器</title>
 <link rel="stylesheet" href="../../assets/theme.css">
 <script src="../../assets/site.js"></script>
@@ -57,7 +58,9 @@
     position: relative; width: 100%; aspect-ratio: 1600 / 1236;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 11px; overflow: hidden; touch-action: none;
+    /* pan-y（而非 none）：直向滑動交還瀏覽器捲頁，橫向滑動才拿來刷影格。
+       用 none 的話手機在圖片上根本捲不動頁面。 */
+    border-radius: 11px; overflow: hidden; touch-action: pan-y;
   }
   .imgwrap img {
     width: 100%; height: 100%; object-fit: contain; display: block;
@@ -99,6 +102,32 @@
     min-width: 56px; text-align: right; font-size: .78rem;
     color: var(--text-3); font-weight: 700;
   }
+
+  /* 提示文字依輸入裝置切換用詞（滑鼠 vs 觸控） */
+  .hint-touch { display: none; }
+  @media (pointer: coarse) {
+    .hint-mouse { display: none; }
+    .hint-touch { display: inline; }
+  }
+
+  /* ══════════ 手機版 ══════════ */
+  @media (max-width: 640px) {
+    main { padding: 18px 12px 36px; }
+    .page-intro, .panel { padding: 16px 14px; }
+    .page-intro h1 { font-size: 1.12em; line-height: 1.4; }
+    .page-intro .sub { font-size: .85rem; }
+    .tabs { gap: 6px; }
+    .tabs button { flex: 1; padding: 9px 8px; font-size: .82rem; }
+    .hint { font-size: .66rem; top: 8px; right: 8px; padding: 4px 8px; }
+    .controls { gap: 14px; }
+    .row { gap: 8px; }
+    .row label { width: 100%; }
+    .frame-slider { flex: 1 1 100%; min-width: 0; }
+    .speed-slider { flex: 1 1 55%; min-width: 110px; }
+    .datebox { flex: 1; min-width: 0; padding: 7px 8px; font-size: .85rem; }
+    .framebox { min-width: 0; }
+    button.playbtn { flex: 1 1 100%; padding: 12px 20px; }
+  }
 </style>
 </head>
 <body data-page-title="Bandpass 動畫檢視器"
@@ -121,7 +150,7 @@
 <div class="panel active" id="panel-1030">
   <div class="imgwrap">
     <img src="" alt="10-30 天濾波 (bp13)">
-    <div class="hint">滾輪或拖曳圖片可切換影格</div>
+    <div class="hint"><span class="hint-mouse">滾輪或拖曳圖片可切換影格</span><span class="hint-touch">左右滑動圖片可切換影格</span></div>
   </div>
   <div class="controls">
     <div class="row">
@@ -141,7 +170,7 @@
 <div class="panel " id="panel-3090">
   <div class="imgwrap">
     <img src="" alt="30-90 天濾波 (bp39)">
-    <div class="hint">滾輪或拖曳圖片可切換影格</div>
+    <div class="hint"><span class="hint-mouse">滾輪或拖曳圖片可切換影格</span><span class="hint-touch">左右滑動圖片可切換影格</span></div>
   </div>
   <div class="controls">
     <div class="row">

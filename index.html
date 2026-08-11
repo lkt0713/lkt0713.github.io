@@ -271,6 +271,31 @@
         .grid { grid-template-columns: 1fr; }
         .nav-links { display: none; }
     }
+
+    /* 小螢幕再收一次留白與字級，避免長段落被擠成細長條 */
+    @media (max-width: 480px) {
+        .hero { padding: 34px 16px 36px; }
+        .hero-inner { gap: 22px; }
+        .photo-frame { max-width: 190px; }
+        .greeting { font-size: .75em; padding: 6px 13px; margin-bottom: 14px; }
+        .hero h1 { font-size: 1.9em; letter-spacing: -.8px; }
+        .name-en { font-size: .86em; letter-spacing: 1.6px; }
+        .hero .role { font-size: .95em; }
+        .hero .bio { font-size: .93em; line-height: 1.85; }
+        .link-btn { padding: 10px 14px; font-size: .8em; }
+
+        .about { padding: 40px 16px 8px; }
+        .section-head h2 { font-size: 1.32em; }
+        .prose p { font-size: .92em; line-height: 1.85; }
+        .now-card { padding: 18px 16px; }
+
+        .card-body { padding: 18px 16px 16px; }
+        .card h3 { font-size: 1.05em; }
+
+        .contact { margin-top: 44px; padding: 0 16px; }
+        .contact-card { padding: 30px 18px; }
+        .contact-card h2 { font-size: 1.28em; }
+    }
 </style>
 </head>
 <body>

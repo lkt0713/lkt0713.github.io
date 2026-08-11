@@ -132,6 +132,8 @@
 
   .note{font-size:0.78rem;color:var(--text-3);text-align:center;margin-top:8px;}
 
+  /* 投影模式只在較寬的螢幕生效；手機／平板一律用一般尺寸 */
+  @media (min-width: 901px){
   body.projector{font-size:20px;}
   body.projector .topbar{padding:16px 28px;}
   body.projector .topbar h1{font-size:2rem;}
@@ -172,6 +174,95 @@
   body.projector #score-summary-detail table{font-size:1.05rem !important;}
   body.projector #score-summary-detail th,
   body.projector #score-summary-detail td{padding:10px 10px !important;}
+  }
+
+  /* 深色模式：這幾處原本寫死淺綠底，配上淺色文字會看不清楚 */
+  .rank-top{background:#f0fdf4;font-weight:700;}
+  [data-theme="dark"] .match-item:hover{background:rgba(22,163,74,.16);}
+  [data-theme="dark"] .match-item.active{background:rgba(22,163,74,.26);}
+  [data-theme="dark"] .team-block.winning{background:rgba(22,163,74,.18);}
+  [data-theme="dark"] .rank-top{background:rgba(22,163,74,.18);}
+
+  /* 寬表格的橫向捲動容器（戰績表用） */
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .scroll-hint{display:none;font-size:0.72rem;color:var(--text-3);text-align:center;padding:0 10px 8px;}
+  /* 設定面板的欄位包裝：桌機時視為透明，直接落入原本的格線 */
+  .edit-field{display:contents;}
+  .edit-field label{display:none;}
+
+  /* 投影模式在窄螢幕沒有作用，直接隱藏切換鈕 */
+  @media (max-width: 900px){
+    #mode-normal-btn,#mode-projector-btn{display:none;}
+  }
+
+  /* ══════════ 手機版（≤768px）══════════ */
+  @media (max-width: 768px){
+    html{-webkit-text-size-adjust:100%;}
+
+    /* 頂部工具列：標題獨立一行、按鈕自動換行，且不吸頂以省下畫面高度 */
+    .topbar{position:static;flex-wrap:wrap;gap:8px;padding:10px 12px;}
+    .topbar h1{font-size:1.1rem;width:100%;letter-spacing:0;}
+    .topbar .info{width:100%;gap:6px;font-size:0.78rem;}
+    .topbar .btn{padding:6px 10px;font-size:0.75rem;}
+
+    .page-tabs{padding:0;}
+    .page-tab{flex:1;padding:12px 6px;font-size:1rem;}
+
+    .main{padding:12px;gap:14px;}
+    .standings-wrap{padding:12px;gap:12px;}
+    .timer-card,.card{padding:14px;}
+    .courts-grid{gap:12px;}
+
+    .match-header{gap:8px;}
+    .match-label{font-size:0.72rem;letter-spacing:1px;}
+    .match-name{font-size:1.15rem;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;}
+    .status-badge{font-size:0.75rem;padding:4px 10px;}
+    .timer-main{font-size:2.2rem;}
+    .timer-ms{font-size:1rem;}
+
+    /* 比分區：隊名可換行、加減分按鈕加大好按 */
+    .scoreboard{gap:6px;}
+    .team-block{padding:10px 6px;}
+    .team-name{font-size:0.92rem;word-break:normal;overflow-wrap:anywhere;line-height:1.35;}
+    .team-score{font-size:2.6rem;}
+    .team-wins{font-size:0.72rem;}
+    .vs-label{font-size:0.95rem;}
+    .score-btns{gap:8px;}
+    .score-btns .btn{flex:1;min-height:40px;padding:8px 0;font-size:0.9rem;}
+    .match-actions{gap:6px;}
+    .match-actions .btn{flex:1 1 45%;min-height:40px;padding:9px 8px;font-size:0.8rem;}
+    .referee-line{font-size:0.95rem;}
+
+    .match-list{max-height:320px;}
+    .match-item{grid-template-columns:26px 1fr auto;gap:6px;padding:9px 10px;}
+    .match-teams-txt{font-size:0.85rem;}
+    .match-time-tag{font-size:0.72rem;}
+
+    /* 戰績表：字級縮小並允許橫向捲動 */
+    .scroll-hint{display:block;}
+    #score-summary-compact{font-size:0.9rem !important;}
+    #score-summary-detail{font-size:0.9rem !important;}
+    #score-summary-detail table{font-size:0.82rem !important;}
+    #score-summary-detail th,#score-summary-detail td{padding:6px 5px !important;}
+    .detail-tab{min-width:auto;padding:10px 14px;font-size:0.95rem;}
+    .knockout-actions{flex-wrap:wrap;gap:8px;}
+    .knockout-actions .btn{flex:1 1 45%;}
+
+    /* 設定面板：每個場次改成直式卡片，欄位加上標籤 */
+    .settings-panel{align-items:flex-start;padding:12px 0;overflow-y:auto;}
+    .settings-box{padding:18px 14px;max-height:none;}
+    .form-row{grid-template-columns:1fr;}
+    .col-headers{display:none;}
+    .match-edit-row{display:block;position:relative;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);padding:10px 12px 4px;margin-bottom:10px;}
+    .match-edit-row .row-num{display:block;text-align:left;color:var(--accent);font-size:0.85rem;margin-bottom:6px;}
+    .match-edit-row .row-num::before{content:'第 ';}
+    .match-edit-row .row-num::after{content:' 場';}
+    .edit-field{display:block;margin-bottom:8px;}
+    .edit-field label{display:block;font-size:0.72rem;font-weight:700;color:var(--text-3);margin-bottom:3px;}
+    .match-edit-row input{width:100%;text-align:left;padding:9px 10px;font-size:0.9rem;}
+    .del-btn{position:absolute;top:8px;right:8px;font-size:0.8rem;}
+    .settings-footer .btn{flex:1;}
+  }
 </style>
 </head>
 <body class="projector">
@@ -1054,7 +1145,8 @@ function renderScoreSummary() {
     return `
       <div class="detail-pane" id="detail-pane-${group}" style="margin-bottom:12px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
         <div style="background:#f8fafc;color:#334155;font-weight:700;padding:6px 10px;">${group}（取前2名晉級）</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+        <div class="table-scroll">
+        <table style="width:100%;min-width:560px;border-collapse:collapse;font-size:0.82rem;">
           <tr style="color:#94a3b8;border-bottom:1px solid #e2e8f0;">
             <th style="text-align:left;padding:5px 6px;font-weight:700;">隊伍</th>
             <th style="padding:5px 6px;font-weight:700;">出賽</th>
@@ -1067,7 +1159,7 @@ function renderScoreSummary() {
             <th style="padding:5px 6px;font-weight:700;">得失分</th>
           </tr>
           ${sorted.length ? sorted.map(([name, s], i) => `
-            <tr style="border-bottom:1px solid #f1f5f9;${i===0&&s.w>0?'background:#f0fdf4;font-weight:700;':''}">
+            <tr class="${i===0&&s.w>0?'rank-top':''}" style="border-bottom:1px solid #f1f5f9;">
               <td style="padding:6px;">${name}${i<2?' <span style="color:#2563eb;font-weight:700;">(晉級)</span>':''}</td>
               <td style="text-align:center;padding:6px;">${s.played}</td>
               <td style="text-align:center;padding:6px;color:#1e3a8a;font-weight:700;">${s.points}</td>
@@ -1079,9 +1171,11 @@ function renderScoreSummary() {
               <td style="text-align:center;padding:6px;">${(s.pf-s.pa)>=0?'+':''}${s.pf-s.pa}</td>
             </tr>`).join('') : `<tr><td colspan="9" style="padding:8px;color:#94a3b8;text-align:center;">尚無資料</td></tr>`}
         </table>
+        </div>
+        ${sorted.length ? `<div class="scroll-hint">← 可左右滑動查看完整欄位 →</div>` : ''}
         ${sorted.length ? `
         <div style="padding:8px 10px 4px;color:#64748b;font-weight:700;">對戰成績紀錄表</div>
-        <div style="padding:0 10px 10px;overflow:auto;">
+        <div class="table-scroll" style="padding:0 10px 10px;">
           <table style="width:100%;border-collapse:collapse;font-size:0.8rem;min-width:520px;">
             <tr style="background:#f8fafc;color:#475569;">
               <th style="border:1px solid #e2e8f0;padding:6px;text-align:left;white-space:nowrap;">隊伍</th>
@@ -1099,7 +1193,8 @@ function renderScoreSummary() {
                 }).join('')}
               </tr>`).join('')}
           </table>
-        </div>` : ''}
+        </div>
+        <div class="scroll-hint">← 可左右滑動查看完整對戰表 →</div>` : ''}
       </div>`;
   }).join('');
 
@@ -1197,11 +1292,11 @@ function closeSettings() {
 function renderMatchesEditor() {
   document.getElementById('matches-editor').innerHTML = matches.map((m,i)=>`
     <div class="match-edit-row">
-      <span>${i+1}</span>
-      <input type="text" value="${m.teamA}" id="ea-${i}" placeholder="隊伍A">
-      <input type="text" value="${m.teamB}" id="eb-${i}" placeholder="隊伍B">
-      <input type="text" value="${m.startTime}" id="et-${i}" placeholder="0900" maxlength="4">
-      <input type="text" value="${m.referee || ''}" id="er-${i}" placeholder="裁判姓名">
+      <span class="row-num">${i+1}</span>
+      <div class="edit-field"><label for="ea-${i}">隊伍A</label><input type="text" value="${m.teamA}" id="ea-${i}" placeholder="隊伍A"></div>
+      <div class="edit-field"><label for="eb-${i}">隊伍B</label><input type="text" value="${m.teamB}" id="eb-${i}" placeholder="隊伍B"></div>
+      <div class="edit-field"><label for="et-${i}">開始時間（HHMM）</label><input type="text" inputmode="numeric" value="${m.startTime}" id="et-${i}" placeholder="0900" maxlength="4"></div>
+      <div class="edit-field"><label for="er-${i}">裁判</label><input type="text" value="${m.referee || ''}" id="er-${i}" placeholder="裁判姓名"></div>
       <button class="del-btn" onclick="deleteMatchRow(${i})">刪除</button>
     </div>`).join('');
 }

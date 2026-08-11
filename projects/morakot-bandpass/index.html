@@ -2,6 +2,7 @@
 <html lang="zh-Hant" data-theme="light">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>莫拉克颱風前後 850hPa 風場/比濕 帶通濾波（10-30天 vs 30-90天）</title>
 <link rel="stylesheet" href="../../assets/theme.css">
 <script src="../../assets/site.js"></script>
@@ -188,6 +189,33 @@
     font-size: 0.85em;
     font-family: 'Courier New', monospace;
     color: var(--accent);
+  }
+
+  /* ══════════ 手機版 ══════════ */
+  @media (max-width: 640px) {
+    main { padding: 18px 12px 36px; }
+    .page-intro { padding: 16px 14px; }
+    .page-intro h1 { font-size: 1.1em; line-height: 1.45; }
+    .sub { font-size: 0.85rem; line-height: 1.7; }
+
+    /* 控制列：按鈕平分一行好按，時間軸獨佔一行 */
+    .controls { padding: 14px 12px; gap: 10px; }
+    .controls button { flex: 1 1 auto; padding: 11px 10px; font-size: 0.82rem; }
+    .timeline-wrap { flex: 1 1 100%; min-width: 0; }
+    .timestamp { flex: 1 1 auto; min-width: 0; font-size: 0.92rem; padding: 7px 8px; }
+    .frame-count { min-width: 0; }
+    .controls select { flex: 1 1 100%; padding: 9px 10px; }
+
+    .panels { gap: 14px; }
+    .panel-head { padding: 12px 14px; }
+    .panel-head h2 { font-size: 0.88rem; }
+    .panel-head .tag { font-size: 0.65rem; }
+    /* 手機上圖片本來就比 320px 矮，留著 min-height 只會多出灰邊 */
+    .img-wrap { min-height: 0; }
+    .img-wrap .no-data { padding: 36px 16px; }
+    .panel-foot { padding: 9px 14px; font-size: 0.7rem; }
+
+    .legend-note { padding: 15px 14px; font-size: 0.8rem; line-height: 1.75; }
   }
 </style>
 </head>
