@@ -221,9 +221,11 @@
     .work:hover .work-kind::before { background: #0a0a0a; }
     .work-go { color: var(--c); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
     /* 箭頭原本和填色同色，hover 時改深色才看得到 */
-    .work:hover .work-go { transform: rotate(-45deg); color: #0a0a0a; }
-    /* 外部連結的 ↗ 本來就是斜的，不旋轉，改成往右上滑出一點 */
-    .work:hover .work-go.ext { transform: translate(4px, -4px); }
+    /* hover 時方框轉成菱形；同時縮小，菱形的對角才不會超出列的右緣被裁掉 */
+    .work:hover .work-go { transform: rotate(-45deg) scale(.78); color: #0a0a0a; }
+    /* 外部連結：方框一樣轉，裡面的 ↗ 反向轉回來，維持指向右上 */
+    .work-go i { font-style: normal; display: inline-block; transition: transform .6s var(--ease-out); }
+    .work:hover .work-go.ext i { transform: rotate(45deg); }
 
     /* ── Contact ───────────────────────────────────────────── */
     .contact { padding-top: clamp(90px, 14vh, 160px); padding-bottom: 20px; }
@@ -273,7 +275,7 @@
         .about-grid { grid-template-columns: 1fr; border-left: 0; }
         .prose { padding: 0 0 32px; border-right: 0; border-bottom: 1px solid var(--border); }
         .now-card { padding: 32px 0; }
-        .work { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 16px; padding: 28px 8px 28px 18px; }
+        .work { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 16px; padding: 28px 16px 28px 18px; }
         .work-meta { grid-column: 2 / 3; justify-content: flex-start; }
         .work-go { grid-row: 1; grid-column: 3; width: 40px; height: 40px; }
         .contact-links { grid-template-columns: 1fr; }
@@ -295,7 +297,7 @@
         .statement { padding: 72px 16px; }
         .wrap { padding-left: 16px; padding-right: 16px; }
         .section-head { margin-top: 44px; }
-        .work { grid-template-columns: minmax(0, 1fr) 40px; padding: 26px 4px 26px 20px; }
+        .work { grid-template-columns: minmax(0, 1fr) 40px; padding: 26px 16px 26px 20px; }
         .work-no { display: none; }
         .work-meta { grid-column: 1 / 2; }
         .work-go { grid-column: 2; }
@@ -455,7 +457,7 @@
                 <p>串接 DeepMind WeatherNext（WNC3 / WNC2 / GENC）與 ECMWF（IFS、AIFS）共六個系集模式，結合 JTWC 觀測，自動產生多模式比較圖、系集路徑圖、動畫與生成潛勢分析。</p>
             </div>
             <div class="work-meta"><span class="chip">AI 天氣模型</span><span class="chip">多模式系集</span><span class="chip">路徑預報</span><span class="chip">自動化</span></div>
-            <span class="work-go ext" aria-hidden="true">↗</span>
+            <span class="work-go ext" aria-hidden="true"><i>↗</i></span>
         </a>
 
         <a class="work fill reveal" href="projects/track-error-analysis/index.html" style="--c:#2E86C8">
