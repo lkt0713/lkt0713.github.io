@@ -903,7 +903,7 @@ async function init() {
             if (b > a) globeX = ((a + b) / 2 / w * 2 - 1) * halfW;
         }
         // 垂直方向：置中在封面看得到的範圍內；封面較矮（筆電）時地球跟著縮小，不頂到頁首
-        // 直式平板（寬 600 以上但未達電腦版）也用同一套，手機維持原位
+        // 直式平板（寬 600 以上但未達電腦版）：取封面置中與手機位置的中間，手機維持原位
         const tablet = !wide && w >= 600;
         let globeY = 0.55;
         const hero = document.querySelector('.hero');
@@ -917,7 +917,7 @@ async function init() {
             }
         }
         offX = wide ? [globeX, 0, 1.4, 1.6, halfW * 0.45] : [0, 0, 0, 0, 0];
-        offY = wide ? [globeY, -0.4, 0, 0, 0.9] : [tablet ? globeY : 1.1, -0.2, 0, 0, 1.4];
+        offY = wide ? [globeY, -0.4, 0, 0, 0.9] : [tablet ? (globeY + 1.1) / 2 : 1.1, -0.2, 0, 0, 1.4];
         measure();
     }
     resize();
