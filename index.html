@@ -578,7 +578,7 @@
      封面：有大陸輪廓的地球（臺灣朝向鏡頭、會閃爍）
      標語：自由流動的大氣氣流
      關於：3D 颱風（颱風眼、螺旋雨帶，越靠近中心轉越快）
-     專案：環面扭結
+     專案：多雲時晴的天氣圖示
      聯絡：粒子拼出名字
    形狀之間轉換時粒子會先被亂流打散再聚合；滑鼠靠近會推開粒子，點一下會炸開。
    深色主題時粒子固定在整頁背景；淺色主題只在黑色封面範圍內出現。
@@ -690,16 +690,40 @@ async function init() {
         P2.set([r, h, th], i * 3);
     }
 
-    // ── 3. 環面扭結 (2,3)，沿著管子隨機撒點 ──
-    const P3 = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-        const t = Math.random() * Math.PI * 2, rr = Math.cos(3 * t) + 2;
-        const tube = 0.28 * Math.cbrt(Math.random()), a = Math.random() * Math.PI * 2, b = Math.acos(2 * Math.random() - 1);
-        P3.set([
-            0.78 * rr * Math.cos(2 * t) + tube * Math.sin(b) * Math.cos(a),
-            0.78 * rr * Math.sin(2 * t) + tube * Math.sin(b) * Math.sin(a),
-            -0.78 * Math.sin(3 * t) + tube * Math.cos(b)
-        ], i * 3);
+    // ── 3. 多雲時晴：幾顆球疊成的雲（只取外殼），右上方探出太陽與光芒 ──
+    //    aSun：0 雲、1 太陽本體、2 光芒（shader 用來上色、讓光芒繞著太陽轉）
+    const P3 = new Float32Array(N * 3), sun = new Float32Array(N);
+    {
+        const puffs = [[-1.15, -0.2, 0, 0.85], [-0.25, 0.3, 0.05, 1.1], [0.85, -0.05, 0, 0.9],
+                       [0.3, -0.45, 0.25, 0.8], [-0.7, -0.5, 0.2, 0.75], [1.5, -0.45, 0, 0.6]];
+        const S = [1.0, 0.95, 0], SR = 0.85;       // 太陽中心在雲的右上、稍微在後面
+        const inCloud = (x, y, z, skip) => puffs.some((c, j) => j !== skip &&
+            (x - c[0]) ** 2 + (y - c[1]) ** 2 + (z - c[2]) ** 2 < c[3] * c[3] * 0.98);
+        const inCloudXY = (x, y) => puffs.some(c => (x - c[0]) ** 2 + (y - c[1]) ** 2 < c[3] * c[3]);
+        const sph = () => { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, q = Math.sqrt(1 - u * u); return [q * Math.cos(a), u, q * Math.sin(a)]; };
+        const nSun = Math.round(N * 0.2), nRay = Math.round(N * 0.1);
+        for (let i = 0; i < N; i++) {
+            let p, kd = 0, guard = 0;
+            if (i < nSun) {                         // 太陽：被雲擋住的那一塊不畫，看起來才像躲在雲後
+                do { const d = sph(); p = [S[0] + d[0] * SR, S[1] + d[1] * SR, S[2] + d[2] * SR * 0.4]; }
+                while (inCloudXY(p[0], p[1]) && ++guard < 50);
+                kd = 1;
+            } else if (i < nSun + nRay) {           // 光芒：12 道
+                let a, r0;
+                do { a = (Math.floor(Math.random() * 12) + 0.5) / 12 * Math.PI * 2; r0 = SR + 0.25 + Math.random() * 0.55;
+                     p = [S[0] + Math.cos(a) * r0, S[1] + Math.sin(a) * r0, S[2]]; } while (inCloudXY(p[0], p[1]) && ++guard < 50);
+                p[0] += (Math.random() - .5) * 0.05; p[1] += (Math.random() - .5) * 0.05;
+                kd = 2;
+            } else {                                // 雲：隨機挑一顆球取表面點，落在別顆球裡面的不要，底部削平
+                do {
+                    const j = Math.random() * puffs.length | 0, c = puffs[j], d = sph();
+                    p = [c[0] + d[0] * c[3], c[1] + d[1] * c[3], c[2] + d[2] * c[3] * 0.8];
+                    if (p[1] < -0.95) p[1] = -0.95;
+                    if (!inCloud(p[0], p[1], p[2], j)) break;
+                } while (++guard < 50);
+            }
+            P3.set(p, i * 3); sun[i] = kd;
+        }
     }
 
     // ── 4. 名字：字型載入後再填；先用一個圈佔位 ──
@@ -716,6 +740,7 @@ async function init() {
     geo.setAttribute('aP4', aP4);
     geo.setAttribute('aRnd', new THREE.BufferAttribute(rnd, 1));
     geo.setAttribute('aKind', new THREE.BufferAttribute(kind, 1));
+    geo.setAttribute('aSun', new THREE.BufferAttribute(sun, 1));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 50);   // shader 會移動粒子，別讓它被裁掉
 
     const text = small ? ['李冠廷', '800 300px "Noto Sans TC"'] : ['LI KUAN-TING', '600 300px Oswald'];
@@ -730,7 +755,7 @@ async function init() {
         transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: uni,
         vertexShader: `
             attribute vec3 aP0, aP1, aP2, aP3, aP4;
-            attribute float aRnd, aKind;
+            attribute float aRnd, aKind, aSun;
             uniform float uTime, uStage, uPR, uSize, uBurst, uMouseF, uAspect, uGlobeRot;
             uniform float uS[5];
             uniform vec2 uMouse;
@@ -776,7 +801,13 @@ async function init() {
                 vec3 fw = fb + 1.25 * noise3(fb * .32 + vec3(0., 0., uTime * .12));
                 float r = aP2.x, th = aP2.z + uTime * (1.1 / (r + .35));
                 vec3 ty = vec3(r * cos(th), aP2.y, r * sin(th)) * uS[2];
-                vec3 kn = aP3 * uS[3];
+                // 雲輕輕飄；光芒繞著太陽中心慢慢轉
+                vec3 kn = aP3;
+                if (aSun > 1.5) {
+                    vec2 q = kn.xy - vec2(1., .95); float ra = uTime * .25, c = cos(ra), sn = sin(ra);
+                    kn.xy = vec2(1., .95) + vec2(c * q.x - sn * q.y, sn * q.x + c * q.y);
+                } else if (aSun < .5) kn.x += .08 * sin(uTime * .6 + kn.y);
+                kn *= uS[3];
                 vec3 tx = aP4 * uS[4];
                 vec3 p = g * w0 + fw * w1 + ty * w2 + kn * w3 + tx * w4;
 
@@ -805,7 +836,8 @@ async function init() {
                 vec3 cG = aKind > 1.5 ? vec3(1.) : (aKind > .5 ? mix(vec3(.45,.78,1.), light, aRnd) : deep * .8);
                 vec3 cF = mix(deep, light, aRnd);
                 vec3 cT = mix(vec3(.9, .97, 1.), deep, clamp((r - .5) / 3.5, 0., 1.));
-                vec3 cK = mix(deep, light, .3 + .7 * aRnd);
+                vec3 cK = aSun > .5 ? mix(vec3(1., .72, .28), vec3(1., .9, .55), aRnd)
+                                    : mix(mix(deep, light, .55), vec3(.95, .98, 1.), clamp(aP3.y * .6 + .55, 0., 1.));
                 vec3 cX = mix(vec3(.6, .85, 1.), vec3(1.), aRnd);
                 vColor = cG * w0 + cF * w1 + cT * w2 + cK * w3 + cX * w4 + push * .4;
                 float aG = aKind > 1.5 ? .9 : (aKind > .5 ? 1.15 : .3);
@@ -845,7 +877,7 @@ async function init() {
     const ease = t => t * t * (3 - 2 * t);
 
     // 各形狀的群組傾角與位置（桌機時地球放在右上，避開左下的標題）
-    const tilt = [0.25, 0.5, 0.95, 0.35, 0];
+    const tilt = [0.25, 0.5, 0.95, 0, 0];
     let offX = [0, 0, 0, 0, 0], offY = [0, 0, 0, 0, 0];
     function resize() {
         const w = innerWidth, h = innerHeight;
@@ -861,7 +893,7 @@ async function init() {
         const fit = r => Math.min(1, m * z * k / (r * (1 + m * k)));
         const halfW = z * k;                        // 名字所在平面（z=0）的可見半寬
         const wide = w >= 900;
-        uni.uS.value = [fit(2.35), 1, fit(4.4), fit(2.6), halfW * (wide ? 0.42 : 0.82)];
+        uni.uS.value = [fit(2.35), 1, fit(4.4), fit(3.0), halfW * (wide ? 0.42 : 0.82)];
         // 電腦版地球放在「李冠廷」字尾與照片左緣的正中間（依實際版面量）
         let globeX = 1.1;
         const h1 = document.querySelector('.hero-title'), ph = document.querySelector('.photo-frame');
@@ -920,8 +952,8 @@ async function init() {
 
         const k0 = Math.min(4, Math.floor(stSm)), k1 = Math.min(4, k0 + 1), g = ease(stSm - Math.floor(stSm));
         const mix = arr => arr[k0] + (arr[k1] - arr[k0]) * g;
-        // 只有氣流與扭結跟著整群自轉；地球有自己的自轉、颱風有差速旋轉、名字要正對鏡頭
-        const spinW = Math.max(0, 1 - Math.abs(stSm - 1)) + Math.max(0, 1 - Math.abs(stSm - 3));
+        // 只有氣流跟著整群自轉；地球有自己的自轉、颱風有差速旋轉、天氣圖示與名字要正對鏡頭
+        const spinW = Math.max(0, 1 - Math.abs(stSm - 1));
         spin += dt * 0.15;
         rx += (mix(tilt) + my * 0.25 - rx) * (reduced ? 1 : 0.05);
         ry += (mx * 0.4 - ry) * 0.05;
