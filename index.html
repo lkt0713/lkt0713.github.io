@@ -574,9 +574,14 @@
 
 <script type="module">
 /* ══════════════════════════════════════════════════════════════
-   背景粒子（參考 usta.agency 的 three.js 粒子變形）：
-   同一群粒子隨捲動在四種形狀間變形 ——
-   地球（封面）→ 海面波浪（標語）→ 資料格點立方體（專案）→ 星空（聯絡）。
+   背景粒子（參考 usta.agency 的 three.js 粒子變形）
+   同一群粒子隨捲動在五種形狀間變形，全部在 GPU shader 裡計算：
+     封面：有大陸輪廓的地球（臺灣朝向鏡頭、會閃爍）
+     標語：自由流動的大氣氣流
+     關於：3D 颱風（颱風眼、螺旋雨帶，越靠近中心轉越快）
+     專案：環面扭結
+     聯絡：粒子拼出名字
+   形狀之間轉換時粒子會先被亂流打散再聚合；滑鼠靠近會推開粒子，點一下會炸開。
    深色主題時粒子固定在整頁背景；淺色主題只在黑色封面範圍內出現。
    WebGL 或 CDN 載入失敗時什麼都不做，封面維持原本的黑底。
    ══════════════════════════════════════════════════════════════ */
@@ -588,104 +593,246 @@ try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/thr
 catch (e) { console.warn('[particles]', e); }
 if (THREE && cv) init();
 
-function init() {
+async function loadLand() {
+    try {
+        const r = await fetch('assets/land.bin?v=1');
+        return r.ok ? new Uint8Array(await r.arrayBuffer()) : null;
+    } catch (e) { return null; }
+}
+
+// 用 2D canvas 把文字畫出來，再從有墨的像素取點（回傳 [-1,1] 寬度的座標）
+async function textPoints(text, font, count) {
+    try { await document.fonts.load(font); } catch (e) {}
+    const W = 1400, H = 420, c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = font;
+    let size = parseInt(font.match(/(\d+)px/)[1], 10);
+    while (g.measureText(text).width > W * 0.94 && size > 40) { size -= 10; g.font = font.replace(/\d+px/, size + 'px'); }
+    g.fillText(text, W / 2, H / 2);
+    const d = g.getImageData(0, 0, W, H).data, pts = [];
+    for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) if (d[(y * W + x) * 4 + 3] > 140) pts.push(x, y);
+    if (!pts.length) return null;
+    let minX = W, maxX = 0;
+    for (let i = 0; i < pts.length; i += 2) { minX = Math.min(minX, pts[i]); maxX = Math.max(maxX, pts[i]); }
+    const cx = (minX + maxX) / 2, half = (maxX - minX) / 2 || 1, out = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+        const j = (Math.random() * (pts.length / 2) | 0) * 2;
+        out[i * 3]     = (pts[j] - cx + Math.random() * 2) / half;
+        out[i * 3 + 1] = -(pts[j + 1] - H / 2 + Math.random() * 2) / half;
+        out[i * 3 + 2] = (Math.random() - 0.5) * 0.08;
+    }
+    return out;
+}
+
+async function init() {
     let renderer;
-    try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false, alpha: true, powerPreference: 'low-power' }); }
+    try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false, alpha: true, powerPreference: 'high-performance' }); }
     catch (e) { console.warn('[particles]', e); return; }
     const small = Math.min(innerWidth, innerHeight) < 700;
-    const side = small ? 17 : 21;                 // 立方體每邊的格點數
-    const N = side * side * side;
+    const N = small ? 9000 : 18000;
+    const land = await loadLand();
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     const group = new THREE.Group();
     scene.add(group);
 
-    // ── 四種形狀的目標座標 ──
-    const rnd = new Float32Array(N);
+    const rnd = new Float32Array(N), kind = new Float32Array(N);
     for (let i = 0; i < N; i++) rnd[i] = Math.random();
 
-    const sphere = new Float32Array(N * 3);        // 費氏球面：均勻分布的地球
-    const golden = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < N; i++) {
-        const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = golden * i;
-        const R = 2.3 + (rnd[i] - 0.5) * 0.06;
-        sphere.set([Math.cos(th) * r * R, y * R, Math.sin(th) * r * R], i * 3);
+    // ── 0. 地球：陸地粒子較密較亮、海洋稀疏；臺灣一小撮會閃爍 ──
+    const P0 = new Float32Array(N * 3);
+    {
+        const R = 2.3, D2R = Math.PI / 180, GA = Math.PI * (3 - Math.sqrt(5));
+        const isLand = (lat, lon) => {
+            if (!land) return false;
+            const k = Math.min(359, Math.floor((90 - lat) * 2)) * 720 + Math.min(719, Math.floor((lon + 180) * 2));
+            return !!(land[k >> 3] & (128 >> (k & 7)));
+        };
+        const M = N * 4, landPts = [], seaPts = [];
+        for (let i = 0; i < M; i++) {
+            const y = 1 - (i + .5) / M * 2, r = Math.sqrt(1 - y * y), th = GA * i;
+            const x = r * Math.cos(th), z = r * Math.sin(th);
+            (isLand(Math.asin(y) / D2R, Math.atan2(x, z) / D2R) ? landPts : seaPts).push(x, y, z);
+        }
+        const nTw = Math.round(N * 0.006);
+        const nLand = land ? Math.min(landPts.length / 3, Math.round(N * 0.62)) : 0;
+        const pick = (arr) => { const j = (Math.random() * (arr.length / 3) | 0) * 3; return [arr[j], arr[j + 1], arr[j + 2]]; };
+        for (let i = 0; i < N; i++) {
+            let p, kd;
+            if (i < nTw) {                          // 臺灣（23.7N, 121E）
+                const lat = (23.7 + (Math.random() - .5) * 2.6) * D2R, lon = (121 + (Math.random() - .5) * 1.2) * D2R;
+                p = [Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon)]; kd = 2;
+            } else if (i < nTw + nLand) { p = pick(landPts); kd = 1; }
+            else { p = pick(seaPts.length ? seaPts : landPts); kd = 0; }
+            const rr = R * (kd === 2 ? 1.02 : 1 + (rnd[i] - .5) * 0.02);
+            P0.set([p[0] * rr, p[1] * rr, p[2] * rr], i * 3); kind[i] = kd;
+        }
     }
 
-    const cols = Math.ceil(Math.sqrt(N * 1.7)), rows = Math.ceil(N / cols);
-    const waveXZ = new Float32Array(N * 2);        // 波浪面：y 每一格依時間計算
-    const wave = new Float32Array(N * 3);
+    // ── 1. 氣流：寬扁的一層，位移在 shader 裡用隨時間變化的噪聲算 ──
+    const P1 = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) P1.set([(Math.random() - .5) * 13, (Math.random() - .5) * 3.2, (Math.random() - .5) * 6], i * 3);
+
+    // ── 2. 颱風：存極座標 (r, 高度, 角度)，shader 依半徑做差速旋轉 ──
+    const P2 = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
-        waveXZ[i * 2] = ((i % cols) / (cols - 1) - 0.5) * 11;
-        waveXZ[i * 2 + 1] = (Math.floor(i / cols) / (rows - 1) - 0.5) * 6.5;
+        const u = Math.random();
+        let r, th, h;
+        if (u < 0.22) {                             // 眼牆：緊密的環，較高
+            r = 0.55 + Math.random() * 0.3; th = Math.random() * Math.PI * 2; h = (Math.random() - .5) * 0.9;
+        } else {                                    // 四條對數螺旋雨帶
+            r = 0.8 + Math.pow(Math.random(), 0.8) * 3.6;
+            const arm = (Math.random() * 4 | 0) * Math.PI / 2;
+            th = arm + Math.log(r) * 2.4 + (Math.random() - .5) * 0.9 * (0.5 + r / 4);
+            h = (Math.random() - .5) * 0.35 * Math.max(0.2, 1 - r / 4.4);
+        }
+        P2.set([r, h, th], i * 3);
     }
 
-    const cube = new Float32Array(N * 3);          // 資料格點
-    const step = 3.4 / (side - 1);
+    // ── 3. 環面扭結 (2,3)，沿著管子隨機撒點 ──
+    const P3 = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
-        const x = i % side, y = Math.floor(i / side) % side, z = Math.floor(i / (side * side));
-        cube.set([x * step - 1.7, y * step - 1.7, z * step - 1.7], i * 3);
+        const t = Math.random() * Math.PI * 2, rr = Math.cos(3 * t) + 2;
+        const tube = 0.28 * Math.cbrt(Math.random()), a = Math.random() * Math.PI * 2, b = Math.acos(2 * Math.random() - 1);
+        P3.set([
+            0.78 * rr * Math.cos(2 * t) + tube * Math.sin(b) * Math.cos(a),
+            0.78 * rr * Math.sin(2 * t) + tube * Math.sin(b) * Math.sin(a),
+            -0.78 * Math.sin(3 * t) + tube * Math.cos(b)
+        ], i * 3);
     }
 
-    const stars = new Float32Array(N * 3);         // 散開成星空
-    for (let i = 0; i < N; i++) {
-        const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, r = 4 + Math.pow(Math.random(), 0.6) * 8;
-        const s = Math.sqrt(1 - u * u);
-        stars.set([Math.cos(th) * s * r, u * r, Math.sin(th) * s * r], i * 3);
-    }
-    const shapes = [sphere, wave, cube, stars];
-    // 每個形狀對應的群組傾角、位置（桌機時地球放在右上，避開左下的標題）
-    const tilt = [0.25, 0.55, 0.45, 0.1];
-    const offX = small ? [0, 0, 0, 0] : [1.1, 0, 1.6, 0];
-    const offY = small ? [1.1, -0.2, 0, 0] : [0.55, -0.4, 0, 0];
-    // 各形狀的縮放：地球與立方體依畫面寬度自動縮到放得下（resize 時計算）
-    let scl = [1, 1, 1, 1];
+    // ── 4. 名字：字型載入後再填；先用一個圈佔位 ──
+    const P4 = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) { const a = rnd[i] * Math.PI * 2; P4.set([Math.cos(a), Math.sin(a) * 0.3, 0], i * 3); }
 
-    const pos = new Float32Array(sphere);
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+    geo.setAttribute('aP0', new THREE.BufferAttribute(P0, 3));
+    geo.setAttribute('aP1', new THREE.BufferAttribute(P1, 3));
+    geo.setAttribute('aP2', new THREE.BufferAttribute(P2, 3));
+    geo.setAttribute('aP3', new THREE.BufferAttribute(P3, 3));
+    const aP4 = new THREE.BufferAttribute(P4, 3);
+    geo.setAttribute('aP4', aP4);
     geo.setAttribute('aRnd', new THREE.BufferAttribute(rnd, 1));
+    geo.setAttribute('aKind', new THREE.BufferAttribute(kind, 1));
+    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 50);   // shader 會移動粒子，別讓它被裁掉
 
+    const text = small ? ['李冠廷', '800 300px "Noto Sans TC"'] : ['LI KUAN-TING', '600 300px Oswald'];
+    textPoints(text[0], text[1], N).then(pts => { if (pts) { P4.set(pts); aP4.needsUpdate = true; } });
+
+    const uni = {
+        uTime: { value: 0 }, uStage: { value: 0 }, uPR: { value: 1 }, uSize: { value: small ? 2.6 : 2.2 },
+        uOpacity: { value: 1 }, uBurst: { value: 0 }, uMouse: { value: new THREE.Vector2(9, 9) }, uMouseF: { value: 0 },
+        uAspect: { value: 1 }, uGlobeRot: { value: 0 }, uS: { value: [1, 1, 1, 1, 1] }
+    };
     const mat = new THREE.ShaderMaterial({
-        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-        uniforms: {
-            uTime: { value: 0 }, uPR: { value: 1 }, uSize: { value: small ? 3.2 : 2.8 }, uOpacity: { value: 1 },
-            uC1: { value: new THREE.Color('#2E86C8') }, uC2: { value: new THREE.Color('#bfe6ff') }
-        },
+        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: uni,
         vertexShader: `
-            attribute float aRnd;
-            uniform float uTime, uPR, uSize;
-            varying float vR, vDepth;
+            attribute vec3 aP0, aP1, aP2, aP3, aP4;
+            attribute float aRnd, aKind;
+            uniform float uTime, uStage, uPR, uSize, uBurst, uMouseF, uAspect, uGlobeRot;
+            uniform float uS[5];
+            uniform vec2 uMouse;
+            varying vec3 vColor; varying float vAlpha;
+
+            // Ashima 3D simplex noise
+            vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+            vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
+            vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
+            vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
+            float snoise(vec3 v){
+                const vec2 C=vec2(1./6.,1./3.); const vec4 D=vec4(0.,.5,1.,2.);
+                vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+                vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+                vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy;
+                i=mod289(i);
+                vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
+                float n_=.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+                vec4 j=p-49.*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.*x_);
+                vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.-abs(x)-abs(y);
+                vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+                vec4 s0=floor(b0)*2.+1.; vec4 s1=floor(b1)*2.+1.; vec4 sh=-step(h,vec4(0.));
+                vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+                vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+                vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+                p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+                vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.); m=m*m;
+                return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+            }
+            vec3 noise3(vec3 p){ return vec3(snoise(p), snoise(p+vec3(31.4,7.1,0.)), snoise(p+vec3(0.,57.2,13.9))); }
+            vec3 rotY(vec3 p, float a){ float c=cos(a), s=sin(a); return vec3(c*p.x+s*p.z, p.y, -s*p.x+c*p.z); }
+
             void main() {
-                vec3 p = position + 0.03 * vec3(sin(uTime * .9 + aRnd * 40.), cos(uTime * 1.1 + aRnd * 23.), sin(uTime * .7 + aRnd * 31.));
+                // 每顆粒子錯開一點出發：變形像一陣風掃過
+                float k = floor(uStage), f = uStage - k;
+                float fl = smoothstep(0., 1., clamp(f * 1.6 - aRnd * .6, 0., 1.));
+                float s = k + fl;
+                float w0 = max(0., 1. - abs(s - 0.)), w1 = max(0., 1. - abs(s - 1.)), w2 = max(0., 1. - abs(s - 2.)),
+                      w3 = max(0., 1. - abs(s - 3.)), w4 = max(0., 1. - abs(s - 4.));
+
+                vec3 g  = rotY(aP0, uGlobeRot) * uS[0];
+                vec3 fb = aP1;
+                vec3 fw = fb + 1.25 * noise3(fb * .32 + vec3(0., 0., uTime * .12));
+                float r = aP2.x, th = aP2.z + uTime * (1.1 / (r + .35));
+                vec3 ty = vec3(r * cos(th), aP2.y, r * sin(th)) * uS[2];
+                vec3 kn = aP3 * uS[3];
+                vec3 tx = aP4 * uS[4];
+                vec3 p = g * w0 + fw * w1 + ty * w2 + kn * w3 + tx * w4;
+
+                // 形狀轉換中：亂流把粒子打散，再重新聚合
+                float chaos = sin(3.14159 * fl);
+                p += chaos * 1.5 * noise3(p * .45 + aRnd * 5. + uTime * .25);
+                // 待機時的微微呼吸
+                p += .025 * vec3(sin(uTime * .9 + aRnd * 40.), cos(uTime * 1.1 + aRnd * 23.), sin(uTime * .7 + aRnd * 31.));
+                // 點擊：從中心往外炸開
+                p += normalize(p + 1e-4) * uBurst * (1.2 + aRnd * 2.8);
+
                 vec4 mv = modelViewMatrix * vec4(p, 1.);
+                // 滑鼠：在螢幕座標上把附近的粒子推開
+                vec4 cp = projectionMatrix * mv;
+                vec2 d = cp.xy / cp.w - uMouse; d.x *= uAspect;
+                float push = uMouseF * smoothstep(.32, 0., length(d));
+                mv.xy += normalize(d + 1e-5) * push * .75;
                 gl_Position = projectionMatrix * mv;
-                gl_PointSize = uSize * uPR * (.6 + aRnd * .8) * (9. / -mv.z);
-                vR = aRnd; vDepth = smoothstep(16., 5., -mv.z);
+
+                float tw = aKind > 1.5 ? .7 + .6 * sin(uTime * 3. + aRnd * 6.2831) : 1.;   // 臺灣閃爍
+                float sz = 1. + w0 * (aKind > .5 && aKind < 1.5 ? .25 : 0.) + w1 * .35;
+                gl_PointSize = uSize * uPR * (.55 + aRnd * .9) * (9. / -mv.z) * sz * tw;
+
+                // 顏色：全部是藍色系，各形狀有自己的深淺
+                vec3 deep = vec3(.18, .52, .78), light = vec3(.75, .9, 1.);
+                vec3 cG = aKind > 1.5 ? vec3(1.) : (aKind > .5 ? mix(vec3(.45,.78,1.), light, aRnd) : deep * .8);
+                vec3 cF = mix(deep, light, aRnd);
+                vec3 cT = mix(vec3(.9, .97, 1.), deep, clamp((r - .5) / 3.5, 0., 1.));
+                vec3 cK = mix(deep, light, .3 + .7 * aRnd);
+                vec3 cX = mix(vec3(.6, .85, 1.), vec3(1.), aRnd);
+                vColor = cG * w0 + cF * w1 + cT * w2 + cK * w3 + cX * w4 + push * .4;
+                float aG = aKind > 1.5 ? .9 : (aKind > .5 ? 1.15 : .3);
+                vAlpha = (aG * w0 + w1 * 1.5 + w2 + w3 + w4) * (.35 + .65 * smoothstep(18., 5., -mv.z));
             }`,
         fragmentShader: `
-            uniform vec3 uC1, uC2; uniform float uOpacity;
-            varying float vR, vDepth;
+            uniform float uOpacity;
+            varying vec3 vColor; varying float vAlpha;
             void main() {
                 float d = length(gl_PointCoord - .5);
                 if (d > .5) discard;
                 float a = smoothstep(.5, 0., d);
-                gl_FragColor = vec4(mix(uC1, uC2, vR), a * uOpacity * (.3 + .7 * vDepth));
+                gl_FragColor = vec4(vColor, a * a * uOpacity * vAlpha);
             }`
     });
     group.add(new THREE.Points(geo, mat));
 
-    // ── 捲動位置 → 形狀進度（0..3），以各區塊在頁面中的位置為錨點 ──
-    const anchors = ['.hero', '.statement', '#projects', '#contact'].map(s => document.querySelector(s));
+    // ── 捲動位置 → 形狀進度（0..4），以各區塊在頁面中的位置為錨點 ──
+    const anchors = ['.hero', '.statement', '#about', '#projects', '#contact'].map(s => document.querySelector(s));
     let marks = [];
     function measure() {
         marks = anchors.map(el => el ? el.getBoundingClientRect().top + scrollY : 0);
         marks[0] = 0;
     }
     // 每段先讓形狀完整停留 HOLD 比例的距離，快到下一個區塊才開始變形
-    //（否則手機上 02 很長，立方體整段都處在半散開、往外擴的狀態）
-    const HOLD = 0.7;
+    const HOLD = 0.6;
     function stageNow() {
         const y = scrollY + innerHeight * 0.55;
         for (let k = 0; k < marks.length - 1; k++) {
@@ -698,31 +845,44 @@ function init() {
     }
     const ease = t => t * t * (3 - 2 * t);
 
+    // 各形狀的群組傾角與位置（桌機時地球放在右上，避開左下的標題）
+    const tilt = [0.25, 0.5, 0.95, 0.35, 0];
+    let offX = [0, 0, 0, 0, 0], offY = [0, 0, 0, 0, 0];
     function resize() {
         const w = innerWidth, h = innerHeight;
         renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
         renderer.setSize(w, h, false);
-        mat.uniforms.uPR.value = renderer.getPixelRatio();
+        uni.uPR.value = renderer.getPixelRatio();
+        uni.uAspect.value = w / h;
         camera.aspect = w / h;
         camera.position.z = w < 700 ? 12 : 9;
         camera.updateProjectionMatrix();
-        // 以外接球半徑 r 估算：不論怎麼旋轉，整個形狀都留在畫面寬度內（留 12% 邊）。
-        // 可見半寬 = 距離 × tan(fov/2) × 寬高比；形狀最靠近鏡頭的點距離為 z − r·s。
+        // 形狀依畫面寬度縮到放得下：以外接球半徑 r 估算，留 12% 邊
         const k = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect, m = 0.88, z = camera.position.z;
         const fit = r => Math.min(1, m * z * k / (r * (1 + m * k)));
-        scl = [fit(2.3), 1, fit(1.7 * Math.sqrt(3)), 1];
+        const halfW = z * k;                        // 名字所在平面（z=0）的可見半寬
+        const wide = w >= 900;
+        uni.uS.value = [fit(2.35), 1, fit(4.4), fit(2.6), halfW * (wide ? 0.42 : 0.82)];
+        offX = wide ? [1.1, 0, 1.4, 1.6, halfW * 0.45] : [0, 0, 0, 0, 0];
+        offY = wide ? [0.55, -0.4, 0, 0, 0.9] : [1.1, -0.2, 0, 0, 1.4];
         measure();
     }
     resize();
-    group.scale.setScalar(scl[0]);
     addEventListener('resize', resize);
     addEventListener('load', measure);
 
-    // 滑鼠視差：整群粒子微微跟著游標轉
-    let mx = 0, my = 0, rx = 0, ry = 0, spin = 0;
+    // 滑鼠／觸控：記錄位置（NDC），推開附近的粒子；點一下炸開
+    let mx = 0, my = 0, rx = 0, ry = 0, spin = 0, mouseTarget = 0, lastMove = 0;
     addEventListener('pointermove', e => {
         mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5;
+        uni.uMouse.value.set(mx * 2, -my * 2);
+        mouseTarget = 1; lastMove = performance.now();
     }, { passive: true });
+    addEventListener('pointerdown', e => {
+        if (reduced || e.target.closest('a, button, input, select, textarea, iframe')) return;
+        uni.uBurst.value = 1;
+    });
+    document.documentElement.addEventListener('mouseleave', () => { mouseTarget = 0; });
 
     // 淺色主題：粒子只畫在黑色封面範圍內（和颱風站的地球同一招）
     const hero = document.querySelector('.hero');
@@ -732,46 +892,36 @@ function init() {
             cv.style.clipPath = `inset(${Math.max(0, r.top)}px 0 ${Math.max(0, innerHeight - r.bottom)}px 0)`;
         } else cv.style.clipPath = 'none';
     }
+    const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
+    const D2R = Math.PI / 180;
 
-    let t = 0, last = performance.now();
+    let t = 0, last = performance.now(), stSm = stageNow();
     function frame(now) {
         const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
         if (!reduced) t += dt;
         const st = stageNow();
-        const k = Math.min(2, Math.floor(st)), f = ease(Math.min(1, st - k));
-        const A = shapes[k], B = shapes[k + 1];
+        stSm += (st - stSm) * (reduced ? 1 : Math.min(1, dt * 4));   // 捲動很快時也平滑過渡
+        uni.uStage.value = stSm;
+        uni.uTime.value = t;
+        uni.uGlobeRot.value = -121 * D2R + t * 0.12;               // 一開始讓臺灣朝向鏡頭
 
-        if (k <= 1) {                              // 波浪面有參與變形才更新
-            for (let i = 0; i < N; i++) {
-                const x = waveXZ[i * 2], z = waveXZ[i * 2 + 1];
-                wave[i * 3] = x; wave[i * 3 + 2] = z;
-                wave[i * 3 + 1] = 0.32 * Math.sin(x * 1.1 + t * 1.2) + 0.22 * Math.cos(z * 1.6 + t * 0.9) + 0.12 * Math.sin((x + z) * 2.2 - t * 1.6);
-            }
-        }
-        const lerp = reduced ? 1 : 0.07;
-        for (let i = 0; i < N; i++) {
-            // 每顆粒子錯開一點出發時間，變形時像一陣風掃過
-            const ff = ease(Math.min(1, Math.max(0, f * 1.5 - rnd[i] * 0.5)));
-            const j = i * 3;
-            for (let c = 0; c < 3; c++) {
-                const target = A[j + c] + (B[j + c] - A[j + c]) * ff;
-                pos[j + c] += (target - pos[j + c]) * lerp;
-            }
-        }
-        geo.attributes.position.needsUpdate = true;
+        // 觸控時手指離開後推力慢慢消失；滑鼠停著不動也慢慢放掉
+        if (now - lastMove > 1400) mouseTarget = 0;
+        uni.uMouseF.value += (mouseTarget - uni.uMouseF.value) * Math.min(1, dt * 5);
+        uni.uBurst.value *= reduced ? 0 : Math.pow(0.04, dt);
 
-        const k0 = Math.min(3, Math.floor(st)), k1 = Math.min(3, k0 + 1), g = ease(st - Math.floor(st));
+        const k0 = Math.min(4, Math.floor(stSm)), k1 = Math.min(4, k0 + 1), g = ease(stSm - Math.floor(stSm));
         const mix = arr => arr[k0] + (arr[k1] - arr[k0]) * g;
-        spin += dt * (Math.round(st) === 1 ? 0.03 : 0.12);
+        // 只有氣流與扭結跟著整群自轉；地球有自己的自轉、颱風有差速旋轉、名字要正對鏡頭
+        const spinW = Math.max(0, 1 - Math.abs(stSm - 1)) + Math.max(0, 1 - Math.abs(stSm - 3));
+        spin += dt * 0.15;
         rx += (mix(tilt) + my * 0.25 - rx) * (reduced ? 1 : 0.05);
         ry += (mx * 0.4 - ry) * 0.05;
-        group.rotation.set(rx, spin + ry, 0);
+        group.rotation.set(rx, wrap(spin) * spinW + ry * (1 - 0.7 * Math.max(0, 1 - Math.abs(stSm - 4))), 0);
         group.position.x += (mix(offX) - group.position.x) * (reduced ? 1 : 0.06);
         group.position.y += (mix(offY) - group.position.y) * (reduced ? 1 : 0.06);
-        group.scale.setScalar(group.scale.x + (mix(scl) - group.scale.x) * (reduced ? 1 : 0.06));
         // 離開封面後粒子調暗，不和內文搶
-        mat.uniforms.uOpacity.value = st < 0.6 ? 1 : 0.8;
-        mat.uniforms.uTime.value = t;
+        uni.uOpacity.value = stSm < 0.5 ? 1 : 0.75;
 
         clip();
         renderer.render(scene, camera);
@@ -779,9 +929,11 @@ function init() {
     }
     root.classList.add('has-particles');
     requestAnimationFrame(frame);
-    if (reduced) addEventListener('scroll', () => requestAnimationFrame(frame), { passive: true });
-    // 減少動態時沒有連續動畫，切換主題要手動重畫一次（裁切範圍會變）
-    if (reduced) new MutationObserver(() => requestAnimationFrame(frame)).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    if (reduced) {
+        addEventListener('scroll', () => requestAnimationFrame(frame), { passive: true });
+        // 減少動態時沒有連續動畫，切換主題要手動重畫一次（裁切範圍會變）
+        new MutationObserver(() => requestAnimationFrame(frame)).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    }
 }
 </script>
 
