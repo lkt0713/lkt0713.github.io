@@ -633,8 +633,10 @@ function init() {
     const shapes = [sphere, wave, cube, stars];
     // 每個形狀對應的群組傾角、位置（桌機時地球放在右上，避開左下的標題）
     const tilt = [0.25, 0.55, 0.45, 0.1];
-    const offX = small ? [0, 0, 0, 0] : [0.8, 0, 1.6, 0];
+    const offX = small ? [0, 0, 0, 0] : [1.1, 0, 1.6, 0];
     const offY = small ? [1.1, -0.2, 0, 0] : [0.55, -0.4, 0, 0];
+    // 手機畫面窄：立方體旋轉成菱形時對角線會超出畫面，縮小一點
+    const scl = small ? [1, 1, 0.68, 1] : [1, 1, 1, 1];
 
     const pos = new Float32Array(sphere);
     const geo = new THREE.BufferGeometry();
@@ -750,6 +752,7 @@ function init() {
         group.rotation.set(rx, spin + ry, 0);
         group.position.x += (mix(offX) - group.position.x) * (reduced ? 1 : 0.06);
         group.position.y += (mix(offY) - group.position.y) * (reduced ? 1 : 0.06);
+        group.scale.setScalar(group.scale.x + (mix(scl) - group.scale.x) * (reduced ? 1 : 0.06));
         // 離開封面後粒子調暗，不和內文搶
         mat.uniforms.uOpacity.value = st < 0.6 ? 1 : 0.8;
         mat.uniforms.uTime.value = t;
