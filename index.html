@@ -222,7 +222,8 @@
     .work-go { color: var(--c); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
     /* 箭頭原本和填色同色，hover 時改深色才看得到 */
     .work:hover .work-go { transform: rotate(-45deg); color: #0a0a0a; }
-    .work:hover .work-go.ext { transform: none; }
+    /* 外部連結的 ↗ 本來就是斜的，不旋轉，改成往右上滑出一點 */
+    .work:hover .work-go.ext { transform: translate(4px, -4px); }
 
     /* ── Contact ───────────────────────────────────────────── */
     .contact { padding-top: clamp(90px, 14vh, 160px); padding-bottom: 20px; }
@@ -680,10 +681,16 @@ function init() {
         marks = anchors.map(el => el ? el.getBoundingClientRect().top + scrollY : 0);
         marks[0] = 0;
     }
+    // 每段先讓形狀完整停留 HOLD 比例的距離，快到下一個區塊才開始變形
+    //（否則手機上 02 很長，立方體整段都處在半散開、往外擴的狀態）
+    const HOLD = 0.7;
     function stageNow() {
         const y = scrollY + innerHeight * 0.55;
         for (let k = 0; k < marks.length - 1; k++) {
-            if (y < marks[k + 1]) return k + Math.max(0, (y - marks[k]) / (marks[k + 1] - marks[k]));
+            if (y < marks[k + 1]) {
+                const f = Math.max(0, (y - marks[k]) / (marks[k + 1] - marks[k]));
+                return k + Math.max(0, (f - HOLD) / (1 - HOLD));
+            }
         }
         return marks.length - 1;
     }
