@@ -902,8 +902,20 @@ async function init() {
             const a = rg.getBoundingClientRect().right, b = ph.getBoundingClientRect().left;
             if (b > a) globeX = ((a + b) / 2 / w * 2 - 1) * halfW;
         }
+        // 垂直方向：置中在封面看得到的範圍內；封面較矮（筆電）時地球跟著縮小，不頂到頁首
+        let globeY = 0.55;
+        const hero = document.querySelector('.hero');
+        if (wide && hero) {
+            const r = hero.getBoundingClientRect(), top = Math.max(r.top + scrollY, 0), bot = Math.min(r.bottom + scrollY, h);
+            if (bot > top) {
+                const halfH = z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+                globeY = -(((top + bot) / 2) / h * 2 - 1) * halfH;
+                const maxR = 0.42 * (bot - top) / (h / 2) * halfH;       // 地球半徑最多佔封面高度的 42%
+                uni.uS.value[0] = Math.min(uni.uS.value[0], maxR / 2.35);
+            }
+        }
         offX = wide ? [globeX, 0, 1.4, 1.6, halfW * 0.45] : [0, 0, 0, 0, 0];
-        offY = wide ? [0.55, -0.4, 0, 0, 0.9] : [1.1, -0.2, 0, 0, 1.4];
+        offY = wide ? [globeY, -0.4, 0, 0, 0.9] : [1.1, -0.2, 0, 0, 1.4];
         measure();
     }
     resize();
