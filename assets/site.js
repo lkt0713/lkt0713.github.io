@@ -52,18 +52,17 @@ function buildSiteHeader(opts) {
     var hdr = document.createElement('header');
     hdr.className = 'site-header';
     hdr.innerHTML =
-        '<a class="site-brand" href="' + home + '">' +
+        '<div class="site-brand">' +
           '<div class="brand-icon">' + icon + '</div>' +
           '<div class="brand-text">' +
             '<div class="bt-title">' + title + '</div>' +
             (subtitle ? '<small>' + subtitle + '</small>' : '') +
           '</div>' +
-        '</a>' +
+        '</div>' +
         '<div class="site-actions">' +
           '<a class="hdr-btn" href="' + home + '">← 回作品集</a>' +
           '<button class="hdr-btn" id="theme-btn" type="button">☾ Dark</button>' +
-        '</div>' +
-        '<div class="scroll-progress"></div>';
+        '</div>';
 
     document.body.insertBefore(hdr, document.body.firstChild);
     hdr.querySelector('#theme-btn').addEventListener('click', toggleTheme);
@@ -116,15 +115,10 @@ document.addEventListener('DOMContentLoaded', function () {
         b.appendChild(credit);
     }
 
-    // ── 頁首下緣的捲動進度線 ──
-    var bar = document.querySelector('.scroll-progress');
+    // ── 標語逐字點亮 ──
     var words = [].slice.call(document.querySelectorAll('.words'));
     words.forEach(splitWords);
     function onScroll() {
-        if (bar) {
-            var max = document.documentElement.scrollHeight - innerHeight;
-            bar.style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : 0);
-        }
         words.forEach(function (el) {
             var ws = el.querySelectorAll('.wd');
             var r = el.getBoundingClientRect();

@@ -95,11 +95,6 @@ html[lang^="zh"] h1, html[lang^="zh"] h2 { letter-spacing: .06em; }
     from { opacity:0; transform:translateY(-12px); }
     to   { opacity:1; transform:translateY(0); }
 }
-.scroll-progress {
-    position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
-    transform-origin: 0 50%; transform: scaleX(var(--p, 0));
-    background: var(--spectrum); height: 2px; pointer-events: none;
-}
 .site-brand { display:flex; align-items:center; gap:12px; flex:1; min-width:0; text-decoration:none; color:inherit; }
 .brand-icon {
     width: 38px; height: 38px;

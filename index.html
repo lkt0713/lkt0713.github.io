@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>李冠廷 | 地球科學 × 資料分析</title>
-<link rel="stylesheet" href="assets/theme.css?v=20260927e">
-<script src="assets/site.js?v=20260927e"></script>
+<link rel="stylesheet" href="assets/theme.css?v=20260927g">
+<script src="assets/site.js?v=20260927g"></script>
 <style>
     /* ── Header ────────────────────────────────────────────── */
     [data-theme="dark"] .site-header { background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.15)); }
@@ -324,7 +324,6 @@
         </nav>
         <button class="hdr-btn" id="theme-btn" type="button" onclick="toggleTheme()">☀ Light</button>
     </div>
-    <div class="scroll-progress"></div>
 </header>
 
 <!-- ═══════════════ 封面 ═══════════════ -->
@@ -347,7 +346,7 @@
             </div>
         </div>
         <div class="photo-frame">
-            <img src="assets/photo.jpg?v=20260927f" alt="李冠廷">
+            <img src="assets/photo.jpg?v=20260927g" alt="李冠廷">
             <span class="photo-tag">⚾ 師大乙組棒球隊</span>
         </div>
     </div>
@@ -863,13 +862,22 @@ async function init() {
         const halfW = z * k;                        // 名字所在平面（z=0）的可見半寬
         const wide = w >= 900;
         uni.uS.value = [fit(2.35), 1, fit(4.4), fit(2.6), halfW * (wide ? 0.42 : 0.82)];
-        offX = wide ? [1.1, 0, 1.4, 1.6, halfW * 0.45] : [0, 0, 0, 0, 0];
+        // 電腦版地球放在「李冠廷」字尾與照片左緣的正中間（依實際版面量）
+        let globeX = 1.1;
+        const h1 = document.querySelector('.hero-title'), ph = document.querySelector('.photo-frame');
+        if (wide && h1 && ph) {
+            const rg = document.createRange(); rg.selectNodeContents(h1);
+            const a = rg.getBoundingClientRect().right, b = ph.getBoundingClientRect().left;
+            if (b > a) globeX = ((a + b) / 2 / w * 2 - 1) * halfW;
+        }
+        offX = wide ? [globeX, 0, 1.4, 1.6, halfW * 0.45] : [0, 0, 0, 0, 0];
         offY = wide ? [0.55, -0.4, 0, 0, 0.9] : [1.1, -0.2, 0, 0, 1.4];
         measure();
     }
     resize();
     addEventListener('resize', resize);
-    addEventListener('load', measure);
+    addEventListener('load', resize);
+    if (document.fonts) document.fonts.ready.then(resize);   // 字型載入後標題變寬，重新量
 
     // 滑鼠／觸控：記錄位置（NDC），推開附近的粒子；點一下炸開
     let mx = 0, my = 0, rx = 0, ry = 0, spin = 0, mouseTarget = 0, lastMove = 0;
