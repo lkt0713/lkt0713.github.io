@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant" data-theme="light">
+<html lang="zh-Hant" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,9 +58,9 @@
   }
   .controls button {
     background: var(--btn-bg);
-    color: #fff;
+    color: var(--on-btn);
     border: 1px solid transparent;
-    border-radius: 10px;
+    border-radius: 0;
     padding: 9px 18px;
     font-size: 0.88rem;
     font-weight: 700;
@@ -68,10 +68,10 @@
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 4px 14px rgba(21,88,214,.3);
+    box-shadow: none;
     transition: all .18s;
   }
-  .controls button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,88,214,.4); }
+  .controls button:hover { transform: translateY(-2px); box-shadow: none; }
   .controls button.secondary {
     background: var(--surface);
     color: var(--text-2);
@@ -90,9 +90,9 @@
     text-align: center;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 9px;
+    border-radius: 0;
     padding: 7px 12px;
-    font-family: 'Courier New', monospace;
+    font-family: var(--mono);
     color: var(--text);
   }
   .frame-count {
@@ -133,10 +133,10 @@
   .panel-head .tag {
     font-size: 0.7rem;
     color: var(--text-3);
-    font-family: 'Courier New', monospace;
+    font-family: var(--mono);
     background: var(--surface-3);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 0;
     padding: 3px 8px;
   }
   .panel.left  .panel-head { border-bottom: 2px solid var(--accent); }
@@ -178,10 +178,10 @@
   code {
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 0;
     padding: 2px 6px;
     font-size: 0.85em;
-    font-family: 'Courier New', monospace;
+    font-family: var(--mono);
     color: var(--accent);
   }
 

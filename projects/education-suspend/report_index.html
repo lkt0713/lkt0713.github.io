@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW" data-theme="light">
+<html lang="zh-TW" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,54 +10,15 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Portfolio palette (Typhoon tokens) — light default */
-    :root {
-      --bg:            #eef2f7;
-      --surface:       #ffffff;
-      --surface-2:     #f4f7fb;
-      --surface-3:     #eaeff7;
-      --border:        #d4dce8;
-      --text:          #0c1a2e;
-      --text-2:        #4a5a72;
-      --text-3:        #8898aa;
-      --muted:         #4a5a72;
-      --accent:        #1558d6;
-      --accent-2:      #0891b2;
-      --accent2:       #0891b2;
-      --accent-lo:     rgba(21,88,214,.1);
-      --link:          #1558d6;
-      --nav-bg:        rgba(255,255,255,0.92);
-      --hover-surface: #eaeff7;
-      --toggle-bg:     #f4f7fb;
-      --toggle-color:  #4a5a72;
-      --btn-bg:        linear-gradient(135deg,#1558d6,#0891b2);
-      --shadow:        0 2px 12px rgba(12,26,46,.07);
-      --shadow-md:     0 8px 32px rgba(12,26,46,.10);
-      --shadow-lg:     0 20px 60px rgba(12,26,46,.13);
-      --radius:        14px;
-    }
-    [data-theme="dark"] {
-      --bg:            #020c18;
-      --surface:       #091524;
-      --surface-2:     #0e1f33;
-      --surface-3:     #132840;
-      --border:        rgba(56,189,248,.14);
-      --text:          #dde8f4;
-      --text-2:        #8ba0ba;
-      --text-3:        #516078;
-      --muted:         #8ba0ba;
-      --accent:        #38bdf8;
-      --accent-2:      #2dd4bf;
-      --accent2:       #2dd4bf;
-      --accent-lo:     rgba(56,189,248,.10);
-      --link:          #38bdf8;
-      --nav-bg:        rgba(9,21,36,0.90);
-      --hover-surface: #132840;
-      --toggle-bg:     #0e1f33;
-      --toggle-color:  #8ba0ba;
-      --shadow:        0 2px 12px rgba(0,0,0,.30);
-      --shadow-md:     0 8px 32px rgba(0,0,0,.40);
-      --shadow-lg:     0 20px 60px rgba(0,0,0,.55);
+    /* 這頁原本自己的變數名，改成指向共用 Noir token（assets/theme.css） */
+    :root, [data-theme="light"], [data-theme="dark"] {
+      --muted:         var(--text-2);
+      --accent2:       var(--accent-2);
+      --link:          var(--text);
+      --nav-bg:        var(--glass);
+      --hover-surface: var(--surface-3);
+      --toggle-bg:     transparent;
+      --toggle-color:  var(--text-2);
     }
 
     html { scroll-behavior: smooth; }
@@ -84,7 +45,7 @@
     nav .brand { font-weight: 800; font-size: 1rem; color: var(--accent); white-space: nowrap; }
     nav .back-link {
       background: var(--surface-2); border: 1px solid var(--border);
-      color: var(--text-2); border-radius: 8px;
+      color: var(--text-2); border-radius: 0;
       padding: 6px 13px; font-size: .78rem; font-weight: 700;
       text-decoration: none; white-space: nowrap; transition: all .2s;
     }
@@ -101,7 +62,7 @@
       background: var(--toggle-bg);
       border: 1px solid var(--border);
       color: var(--toggle-color);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 4px 10px;
       font-size: 1rem;
       cursor: pointer;
@@ -125,14 +86,14 @@
       position: absolute; inset: 0;
       background:
         radial-gradient(720px 340px at 12% -10%, var(--accent-lo), transparent 65%),
-        radial-gradient(620px 300px at 88% 110%, rgba(8,145,178,.10), transparent 62%);
+        radial-gradient(620px 300px at 88% 110%, transparent, transparent 62%);
       pointer-events: none;
     }
     .hero-badge {
       display: inline-block;
       padding: 6px 15px;
       border: 1px solid var(--border);
-      border-radius: 999px;
+      border-radius: 0;
       font-size: 0.76rem;
       font-weight: 700;
       color: var(--text-2);
@@ -217,7 +178,7 @@
     .q-badge {
       display: inline-block;
       width: 32px; height: 32px; line-height: 32px;
-      text-align: center; border-radius: 8px;
+      text-align: center; border-radius: 0;
       font-weight: 700; font-size: .875rem;
       background: var(--accent-lo);
       color: var(--accent);
@@ -250,7 +211,7 @@
     }
     .card-tag {
       display: inline-block; width: fit-content;
-      padding: 2px 10px; border-radius: 6px;
+      padding: 2px 10px; border-radius: 0;
       font-size: 0.75rem; font-weight: 700;
       letter-spacing: .05em;
     }
@@ -287,7 +248,7 @@
     tbody tr:hover { background: var(--surface-2); }
     .pill {
       display: inline-block; padding: 2px 10px;
-      border-radius: 999px; font-size: 0.75rem;
+      border-radius: 0; font-size: 0.75rem;
       white-space: nowrap;
     }
     .pill-ok  { background: rgba(16,185,129,0.15); color: #34d399; }
@@ -312,7 +273,7 @@
     }
     .verdict {
       display: inline-block; padding: 3px 12px;
-      border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+      border-radius: 0; font-size: 0.75rem; font-weight: 600;
     }
     .verdict.sig   { background: rgba(16,185,129,0.15); color: #34d399; }
     .verdict.nosig { background: rgba(245,158,11,0.15);  color: #fbbf24; }
@@ -323,7 +284,7 @@
     .ans-stat {
       background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 0;
       padding: .5rem .85rem;
       text-align: center; min-width: 90px;
     }
@@ -345,7 +306,7 @@
     .file-item {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 1rem 1.25rem;
       text-decoration: none; color: inherit;
       display: flex; align-items: center; gap: .75rem;
@@ -388,7 +349,7 @@
       display: inline-block;
       padding: 3px 14px;
       background: linear-gradient(90deg, #f59e0b, #ef4444);
-      color: #fff; border-radius: 999px;
+      color: #fff; border-radius: 0;
       font-size: 0.75rem; font-weight: 700; letter-spacing: .05em;
     }
     .ntnu-info-grid {
@@ -399,7 +360,7 @@
     .ntnu-info-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 0;
       padding: 1.1rem 1.25rem;
       text-align: center;
       transition: border-color .2s, transform .2s;
@@ -423,7 +384,7 @@
       .hero { padding: 3rem 1.25rem 2.5rem; }
       .hero h1 { font-size: 1.6rem; }
       .hero .subtitle { font-size: 0.9rem; }
-      .stats-strip { border-radius: 10px; }
+      .stats-strip { border-radius: 0; }
       .stat-item { min-width: 90px; padding: 1rem; }
       .stat-value { font-size: 1.4rem; }
 
@@ -446,7 +407,7 @@
       .ans-stat { min-width: 75px; }
 
       /* 表格：水平捲動 */
-      .data-table-wrap { border-radius: 8px; }
+      .data-table-wrap { border-radius: 0; }
       table { font-size: 0.8rem; }
       thead th, tbody td { padding: 8px 12px; }
 

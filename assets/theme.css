@@ -1,171 +1,296 @@
 /* ══════════════════════════════════════════════════════════════
-   Shared theme — extracted from Typhoon Forecast (docs/index.html)
-   Used by every project page in this portfolio.
+   Shared theme — Noir（與 Typhoon Forecast v4 同一套語言）
+   參考 usta.agency：純黑底、白字、Oswald 大寫巨型標題、描邊字跑馬燈、
+   difference 混色游標、hover 由下往上填滿的反白、方角無陰影。
+   每一個專案頁都共用這份 token 與元件；淺色主題是同一套語言的「白紙黑字」版。
    ══════════════════════════════════════════════════════════════ */
 
 /* ── Design Tokens ─────────────────────────────────────────── */
-:root {
-    --bg:        #eef2f7;
-    --surface:   #ffffff;
-    --surface-2: #f4f7fb;
-    --surface-3: #eaeff7;
-    --accent:    #1558d6;
-    --accent-2:  #0891b2;
-    --accent-lo: rgba(21,88,214,.1);
-    --text:      #0c1a2e;
-    --text-2:    #4a5a72;
-    --text-3:    #8898aa;
-    --border:    #d4dce8;
-    --shadow:    0 2px 12px rgba(12,26,46,.07);
-    --shadow-md: 0 8px 32px rgba(12,26,46,.10);
-    --shadow-lg: 0 20px 60px rgba(12,26,46,.13);
-    --btn-bg:    linear-gradient(135deg,#1558d6,#0891b2);
+:root, [data-theme="light"] {
+    --bg:        #f3f1ec;
+    --surface:   #f8f7f3;
+    --surface-2: #ece9e2;
+    --surface-3: #e2ded5;
+    --accent:    #1b5c94;
+    --accent-2:  #0f9b8e;
+    --accent-lo: rgba(27,92,148,.10);
+    --accent-rgb: 27,92,148;
+    --text:      #0a0a0a;
+    --text-2:    #3a3a3a;
+    --text-3:    #7a756c;
+    --border:    rgba(0,0,0,.16);
+    --shadow: none; --shadow-md: none; --shadow-lg: none;
+    --btn-bg:    #0a0a0a;
+    --on-btn:    #f3f1ec;           /* 實心按鈕上的字色（按鈕底色的反色） */
+    --glass:     rgba(243,241,236,.62);
     --header-h:  64px;
-    --radius:    14px;
+    --radius:    0px;
+    --ease-out:  cubic-bezier(.16,1,.3,1);
+    --fill-ease: cubic-bezier(0,0,.2,1);
+    --display: 'Oswald', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    --font:    'Montserrat', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+    --mono:    'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+    /* 點綴色：與颱風預報站的強度色階同源（TS → Cat5） */
+    --c-ts: #2E86C8; --c-1: #1FA97E; --c-2: #E0AC2B; --c-3: #EE7A22; --c-4: #DC3A4E; --c-5: #A548C8;
+    --spectrum: linear-gradient(90deg, var(--c-ts), var(--c-1), var(--c-2), var(--c-3), var(--c-4), var(--c-5));
 }
 [data-theme="dark"] {
-    --bg:        #020c18;
-    --surface:   #091524;
-    --surface-2: #0e1f33;
-    --surface-3: #132840;
-    --accent:    #38bdf8;
-    --accent-2:  #2dd4bf;
-    --accent-lo: rgba(56,189,248,.10);
-    --text:      #dde8f4;
-    --text-2:    #8ba0ba;
-    --text-3:    #516078;
-    --border:    rgba(56,189,248,.14);
-    --shadow:    0 2px 12px rgba(0,0,0,.30);
-    --shadow-md: 0 8px 32px rgba(0,0,0,.40);
-    --shadow-lg: 0 20px 60px rgba(0,0,0,.55);
-    --btn-bg:    linear-gradient(135deg,#1558d6,#0891b2);
+    --bg:        #000000;
+    --surface:   #050505;
+    --surface-2: #0d0d0d;
+    --surface-3: #181818;
+    --accent:    #58b0e8;
+    --accent-2:  #3fcbb4;
+    --accent-lo: rgba(88,176,232,.12);
+    --accent-rgb: 88,176,232;
+    --text:      #ffffff;
+    --text-2:    #d1d5db;
+    --text-3:    #7d828a;
+    --border:    rgba(255,255,255,.2);
+    --btn-bg:    #ffffff;
+    --on-btn:    #000000;
+    --glass:     rgba(0,0,0,.55);
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, "Microsoft JhengHei", sans-serif;
+    font-family: var(--font) !important;
+    font-weight: 400;
     background: var(--bg);
     min-height: 100vh;
     color: var(--text);
     transition: background .35s, color .35s;
+    -webkit-font-smoothing: antialiased;
 }
+html[lang^="zh"] body { letter-spacing: .02em; }
 html, body { max-width: 100%; overflow-x: hidden; }
 img { max-width: 100%; height: auto; }
 a { color: var(--accent); }
+::selection { background: #fff3dd; color: #000; }
+:focus-visible { outline: 1px solid var(--text); outline-offset: 3px; }
 
-/* ── Site header (shared across every project page) ────────── */
+/* 標題一律 Oswald 大寫；中文落到 Noto Sans TC（大寫對中文無作用） */
+h1, h2, .display {
+    font-family: var(--display);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+html[lang^="zh"] h1, html[lang^="zh"] h2 { letter-spacing: .06em; }
+
+/* ── Site header（每個專案頁共用）─────────────────────────── */
 .site-header {
     position: sticky; top: 0; z-index: 300;
     min-height: var(--header-h);
-    background: var(--surface);
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow);
     display: flex; align-items: center; flex-wrap: wrap;
-    padding: 10px 28px; gap: 16px;
+    padding: 10px 32px; gap: 16px;
     transition: background .35s, border .35s;
-    animation: slideDown .4s ease-out;
+    animation: slideDown .5s var(--ease-out);
 }
 @keyframes slideDown {
     from { opacity:0; transform:translateY(-12px); }
     to   { opacity:1; transform:translateY(0); }
 }
-.site-brand { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+.scroll-progress {
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    transform-origin: 0 50%; transform: scaleX(var(--p, 0));
+    background: var(--spectrum); height: 2px; pointer-events: none;
+}
+.site-brand { display:flex; align-items:center; gap:12px; flex:1; min-width:0; text-decoration:none; color:inherit; }
 .brand-icon {
-    width: 38px; height: 38px; border-radius: 10px;
-    background: var(--btn-bg);
+    width: 38px; height: 38px;
+    border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.2em; flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(21,88,214,.35);
+    font-size: 1.1em; flex-shrink: 0;
 }
 .brand-text h1, .brand-text .bt-title {
-    font-size: 1.05em; font-weight: 800; letter-spacing: -.3px;
-    color: var(--text); line-height: 1.15; overflow-wrap:anywhere;
+    font-family: var(--display); text-transform: uppercase;
+    font-size: 1.12em; font-weight: 600; letter-spacing: .06em;
+    color: var(--text); line-height: 1.2; overflow-wrap:anywhere;
 }
+html[lang^="zh"] .brand-text .bt-title { letter-spacing: .08em; }
 .brand-text small {
-    font-size: .72em; color: var(--text-3); font-weight: 500;
-    display: block; margin-top: 1px;
+    font-size: .68em; color: var(--text-3); font-weight: 500;
+    text-transform: uppercase; letter-spacing: .14em;
+    display: block; margin-top: 3px;
 }
 .site-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.hdr-btn {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--text-2); border-radius: 8px;
-    padding: 7px 14px; cursor: pointer;
-    font-size: .8em; font-weight: 600;
-    display: flex; align-items: center; gap: 5px;
-    transition: all .2s; text-decoration: none;
-    font-family: inherit; white-space: nowrap;
+
+/* hover 時色塊由下往上填滿、字反白（usta 的招牌動作） */
+.hdr-btn, .fill {
+    isolation: isolate; overflow: hidden; position: relative;
+    transition: color .55s var(--fill-ease), border-color .3s;
 }
-.hdr-btn:hover {
-    background: var(--accent-lo); color: var(--accent); border-color: var(--accent);
+.hdr-btn::before, .fill::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 100%; bottom: 0; z-index: -1;
+    background: var(--fill, var(--text));
+    transition: top .6s var(--fill-ease);
+}
+.hdr-btn:hover::before, .fill:hover::before { top: 0; }
+.hdr-btn:hover, .fill:hover { color: var(--fill-ink, var(--bg)) !important; border-color: var(--fill, var(--text)) !important; }
+/* 頁首按鈕用品牌藍填滿 */
+.hdr-btn { --fill: var(--accent); --fill-ink: var(--on-btn); }
+.brand-icon { border-color: var(--accent); background: var(--accent-lo); }
+
+.hdr-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 8px 15px; cursor: pointer;
+    font-size: .74em; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .14em;
+    display: flex; align-items: center; gap: 6px;
+    text-decoration: none;
+    font-family: inherit; white-space: nowrap;
 }
 
 /* ── Layout ────────────────────────────────────────────────── */
-.page { max-width: 1380px; margin: 0 auto; padding: 28px 20px 48px; }
+.page { max-width: 1480px; margin: 0 auto; padding: 40px 32px 72px; }
 @keyframes fadeUp {
-    from { opacity:0; transform:translateY(12px); }
+    from { opacity:0; transform:translateY(16px); }
     to   { opacity:1; transform:translateY(0); }
 }
-.fade-up { animation: fadeUp .5s ease-out .1s both; }
+.fade-up { animation: fadeUp .8s var(--ease-out) .1s both; }
 
-/* ── Panel (generic section card) ──────────────────────────── */
+/* 捲動進場 */
+.js .reveal { opacity:0; transform: translateY(22px); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); transition-delay: calc(var(--i,0) * 70ms); }
+.js .reveal.in { opacity:1; transform:none; }
+
+/* 區塊小標：前面一條細線＋拉開字距 */
+.kicker {
+    display: flex; align-items: center; gap: 12px;
+    font-size: .72em; font-weight: 500; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 14px;
+}
+.kicker { color: var(--accent); }
+.kicker::before { content: ""; width: 32px; height: 2px; background: var(--spectrum); }
+
+/* ── Panel（通用區塊）：透明底＋細框 ──────────────────────── */
 .panel {
-    background: var(--surface);
+    background: transparent;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
-    padding: 22px 24px;
-    transition: background .35s, border .35s;
+    padding: 28px;
+    transition: background .35s, border-color .35s;
 }
 .panel-header {
     display: flex; align-items: center; gap: 10px;
-    font-size: 1.05em; font-weight: 700; color: var(--text);
-    margin-bottom: 16px; padding-bottom: 13px;
-    border-bottom: 2px solid var(--accent);
+    font-family: var(--display); text-transform: uppercase;
+    font-size: 1.5em; font-weight: 500; letter-spacing: .05em; color: var(--text);
+    margin-bottom: 22px; padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+    border-image: var(--spectrum) 1;
 }
 
-/* ── Buttons / tabs (matches Typhoon .model-tab-btn) ───────── */
+/* ── Buttons / tabs ────────────────────────────────────────── */
 .t-btn {
-    background: var(--surface);
+    background: transparent;
     border: 1px solid var(--border);
     color: var(--text-2);
-    padding: 9px 20px; border-radius: 10px;
-    font-size: .88em; font-weight: 700; letter-spacing: .3px;
-    cursor: pointer; transition: all .18s;
-    box-shadow: var(--shadow); font-family: inherit;
+    padding: 10px 20px;
+    font-size: .78em; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+    cursor: pointer; transition: all .25s; font-family: inherit;
 }
-.t-btn:hover { border-color: var(--accent); color: var(--accent); }
-.t-btn.active, .t-btn.primary {
-    background: var(--btn-bg); color: #fff; border-color: transparent;
-    box-shadow: 0 4px 14px rgba(21,88,214,.3);
-}
+.t-btn:hover { border-color: var(--text); color: var(--text); }
+.t-btn.active, .t-btn.primary { background: var(--accent); color: var(--on-btn); border-color: var(--accent); }
 
 /* ── Form controls ─────────────────────────────────────────── */
 select, input[type=number], input[type=text] {
-    background: var(--surface-2); color: var(--text);
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 12px; font-size: .85em; font-weight: 600;
-    font-family: inherit; transition: all .2s;
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border); border-radius: 0;
+    padding: 8px 12px; font-size: .85em; font-weight: 500;
+    font-family: inherit; transition: border-color .2s;
 }
-select:hover, input[type=number]:hover, input[type=text]:hover { border-color: var(--accent); }
-input[type=range] { accent-color: var(--accent); }
+select option { background: var(--bg); color: var(--text); }
+select:hover, input[type=number]:hover, input[type=text]:hover { border-color: var(--text); }
+input[type=range] { accent-color: var(--text); }
+
+/* ── 跑馬燈：實心／描邊交替的巨型字，中間用小圓點隔開 ─────── */
+.marquee {
+    overflow: hidden; padding: clamp(28px, 5vw, 64px) 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: clamp(8px, 1.5vw, 20px);
+}
+.strip { display: flex; width: max-content; animation: run 42s linear infinite; will-change: transform; }
+.strip.reverse { animation-direction: reverse; animation-duration: 56s; }
+.marquee:hover .strip { animation-play-state: paused; }
+@keyframes run { to { transform: translate3d(-50%,0,0); } }
+.mq {
+    display: inline-flex; align-items: center; white-space: nowrap;
+    font-family: var(--display); text-transform: uppercase;
+    font-size: clamp(3rem, 9vw, 8.5rem); font-weight: 600; line-height: 1.02; letter-spacing: .01em;
+    color: var(--c, var(--text));
+}
+.mq::after {
+    content: ""; flex-shrink: 0; width: .09em; height: .09em; min-width: 7px; min-height: 7px; border-radius: 50%;
+    background: var(--text); margin: 0 .45em;
+}
+.mq.o { color: transparent; -webkit-text-stroke: 1px var(--text); }
+/* 實心字依序套上強度色階，描邊字維持白 */
+.strip .mq:not(.o):not([style]):nth-child(4n+1) { color: var(--c-ts); }
+.strip .mq:not(.o):not([style]):nth-child(4n+3) { color: var(--c-3); }
+.strip.reverse .mq:not(.o):nth-child(4n+2) { color: var(--c-1); }
+.strip.reverse .mq:not(.o):nth-child(4n)   { color: var(--c-5); }
+.mq::after { background: var(--c-2) !important; }
+@media (min-width: 1024px) { .mq.o { -webkit-text-stroke-width: 2px; } }
+.strip.reverse .mq { font-size: clamp(2.2rem, 6vw, 5.5rem); font-weight: 300; }
+.footer-marquee { border-top: 1px solid var(--border); border-bottom: 0; margin-bottom: 40px; }
+
+/* ── 標語：捲動時逐字點亮 ──────────────────────────────────── */
+.words { color: var(--text-3); }
+.wd { opacity: .22; transition: opacity .5s ease, color .5s ease; }
+.wd.lit { opacity: 1; color: var(--text-2); }
+.words strong .wd.lit { color: var(--accent); }
+.words strong:nth-of-type(2n) .wd.lit { color: var(--c-2); }
 
 /* ── Footer ────────────────────────────────────────────────── */
 .site-footer {
     text-align: center; padding: 32px 20px 40px;
-    color: var(--text-3); font-size: .82em; line-height: 1.7;
-    border-top: 1px solid var(--border); margin-top: 40px;
+    color: var(--text-3); font-size: .72em; line-height: 1.9;
+    text-transform: uppercase; letter-spacing: .14em;
+    border-top: 1px solid var(--border); margin-top: 60px;
 }
 
+/* ── 自訂游標：外層跟著滑鼠平移，內層圓點縮放；整顆用 difference 混色 ── */
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+html.has-cursor input[type="range"], html.has-cursor select,
+html.has-cursor input[type="text"], html.has-cursor input[type="number"],
+html.has-cursor textarea, html.has-cursor iframe { cursor: auto !important; }
+#cursor {
+    position: fixed; left: 0; top: 0; z-index: 100000; pointer-events: none;
+    width: 0; height: 0; mix-blend-mode: difference;
+    opacity: 0; transition: opacity .3s;
+}
+#cursor::before {
+    content: ""; position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%;
+    background: #fff;
+    transition: transform .45s var(--ease-out);
+}
+#cursor.on { opacity: 1; }
+#cursor.big::before  { transform: scale(3.4); }
+#cursor.press::before { transform: scale(.7); }
+#cursor.big.press::before { transform: scale(2.8); }
+
 /* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-track { background: var(--surface-2); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
     .site-header { padding: 10px 16px; }
-    .page { padding: 20px 14px 40px; }
+    .page { padding: 28px 20px 56px; }
+}
+@media (max-width: 600px) {
+    .page { padding: 20px 16px 48px; }
+    .brand-text small { display: none; }
+    .hdr-btn { padding: 8px 11px; letter-spacing: .08em; }
+}
+
+/* 使用者要求減少動態時：停掉所有非必要的動畫與轉場 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; }
 }

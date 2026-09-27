@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="zh-TW" data-theme="light">
+<html lang="zh-TW" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,7 +58,7 @@
             content: ''; position: absolute; inset: 0;
             background:
                 radial-gradient(620px 300px at 15% -20%, var(--accent-lo), transparent 65%),
-                radial-gradient(520px 260px at 85% 120%, rgba(8,145,178,.10), transparent 62%);
+                radial-gradient(520px 260px at 85% 120%, transparent, transparent 62%);
             pointer-events: none;
         }
 
@@ -154,14 +154,14 @@
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            box-shadow: none;
+            border-radius: 0;
             overflow: hidden;
         }
 
         thead {
             background: var(--btn-bg);
-            color: white;
+            color: var(--on-btn);
         }
 
         th {
@@ -210,7 +210,7 @@
             color: var(--accent);
             font-size: 1em;
             border-right: 2px solid var(--border);
-            font-family: 'Courier New', monospace;
+            font-family: var(--mono);
         }
 
         td:last-child {
@@ -335,25 +335,25 @@
         .venue-figure {
             position: relative;
             overflow: hidden;
-            border-radius: 12px;
+            border-radius: 0;
         }
         .venue-img {
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-radius: 0;
+            box-shadow: none;
         }
         .venue-badge {
             position: absolute;
             top: 14px;
             left: 14px;
-            background: rgba(21,88,214,.9);
-            color: #fff;
+            background: var(--btn-bg);
+            color: var(--on-btn);
             padding: 8px 12px;
-            border-radius: 999px;
+            border-radius: 0;
             font-weight: 700;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: none;
             font-size: 0.95em;
         }
         .venue-caption {
@@ -376,15 +376,15 @@
         }
         .doc-card {
             background: var(--surface);
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 0;
+            box-shadow: none;
             overflow: hidden;
             border: 1px solid var(--border);
         }
         .doc-card header {
             padding: 16px 18px;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-            color: #fff;
+            color: var(--on-btn);
             font-weight: 700;
             letter-spacing: 0.5px;
         }
@@ -454,7 +454,7 @@
                 background: var(--surface);
                 margin: 0 0 12px;
                 border: 1px solid var(--border);
-                border-radius: 10px;
+                border-radius: 0;
                 box-shadow: var(--shadow);
             }
             td {
@@ -499,12 +499,12 @@
 
         .table-container::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 10px;
+            border-radius: 0;
         }
 
         .table-container::-webkit-scrollbar-thumb {
             background: var(--accent);
-            border-radius: 10px;
+            border-radius: 0;
         }
 
         .table-container::-webkit-scrollbar-thumb:hover {

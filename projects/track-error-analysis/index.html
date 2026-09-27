@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW" data-theme="light">
+<html lang="zh-TW" data-theme="dark">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +38,7 @@
 			content: ''; position: absolute; inset: 0;
 			background:
 				radial-gradient(620px 300px at 15% -20%, var(--accent-lo), transparent 65%),
-				radial-gradient(520px 260px at 85% 120%, rgba(8,145,178,.10), transparent 62%);
+				radial-gradient(520px 260px at 85% 120%, transparent, transparent 62%);
 			pointer-events: none;
 		}
 		header#top > * { position: relative; }
@@ -60,7 +60,7 @@
 			box-shadow: var(--shadow);
 			color: var(--text-2);
 			padding: 16px 18px;
-			border-radius: 11px;
+			border-radius: 0;
 			max-width: 1024px;
 			font-size: .92em; line-height: 1.7;
 		}
@@ -71,7 +71,7 @@
 			color: var(--text-2);
 			border: 1px solid var(--border);
 			padding: 5px 12px;
-			border-radius: 999px;
+			border-radius: 0;
 			font-weight: 700;
 			font-size: 0.82em;
 		}
@@ -89,7 +89,7 @@
 		.link-badge {
 			display: inline-block;
 			padding: 10px 12px;
-			border-radius: 9px;
+			border-radius: 0;
 			text-decoration: none;
 			color: var(--text-2);
 			background: var(--surface-2);
@@ -134,7 +134,7 @@
 			background: var(--surface);
 			border: 1px solid var(--border);
 			padding: 16px;
-			border-radius: 11px;
+			border-radius: 0;
 			box-shadow: var(--shadow);
 			transition: transform 0.25s ease, box-shadow 0.25s ease, border-color .25s;
 			position: relative;
@@ -146,15 +146,15 @@
 			font-weight: 700; text-align: center;
 		}
 		.image-box img {
-			width: 100%; height: auto; border-radius: 8px;
+			width: 100%; height: auto; border-radius: 0;
 			border: 1px solid var(--border); display: block;
 			background: #fff;
 		}
 		.card-link { position: relative; display: block; text-decoration: none; color: inherit; }
 		.card-link .hint {
 			position: absolute; right: 10px; bottom: 10px;
-			background: rgba(12,26,46,.72); backdrop-filter: blur(4px);
-			color: #fff; padding: 6px 12px; border-radius: 999px;
+			background: rgba(0,0,0,.82); backdrop-filter: blur(4px);
+			color: #fff; padding: 6px 12px; border-radius: 0;
 			font-size: 0.78em; font-weight: 700;
 			opacity: 0; transition: opacity 0.2s ease;
 		}
