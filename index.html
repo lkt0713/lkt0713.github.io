@@ -220,7 +220,8 @@
     .work:hover .chip, .work:hover .work-go { border-color: rgba(0,0,0,.45); }
     .work:hover .work-kind::before { background: #0a0a0a; }
     .work-go { color: var(--c); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
-    .work:hover .work-go { transform: rotate(-45deg); }
+    /* 箭頭原本和填色同色，hover 時改深色才看得到 */
+    .work:hover .work-go { transform: rotate(-45deg); color: #0a0a0a; }
     .work:hover .work-go.ext { transform: none; }
 
     /* ── Contact ───────────────────────────────────────────── */
@@ -635,8 +636,8 @@ function init() {
     const tilt = [0.25, 0.55, 0.45, 0.1];
     const offX = small ? [0, 0, 0, 0] : [1.1, 0, 1.6, 0];
     const offY = small ? [1.1, -0.2, 0, 0] : [0.55, -0.4, 0, 0];
-    // 手機畫面窄：立方體旋轉成菱形時對角線會超出畫面，縮小一點
-    const scl = small ? [1, 1, 0.68, 1] : [1, 1, 1, 1];
+    // 各形狀的縮放：地球與立方體依畫面寬度自動縮到放得下（resize 時計算）
+    let scl = [1, 1, 1, 1];
 
     const pos = new Float32Array(sphere);
     const geo = new THREE.BufferGeometry();
@@ -696,9 +697,15 @@ function init() {
         camera.aspect = w / h;
         camera.position.z = w < 700 ? 12 : 9;
         camera.updateProjectionMatrix();
+        // 以外接球半徑 r 估算：不論怎麼旋轉，整個形狀都留在畫面寬度內（留 12% 邊）。
+        // 可見半寬 = 距離 × tan(fov/2) × 寬高比；形狀最靠近鏡頭的點距離為 z − r·s。
+        const k = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect, m = 0.88, z = camera.position.z;
+        const fit = r => Math.min(1, m * z * k / (r * (1 + m * k)));
+        scl = [fit(2.3), 1, fit(1.7 * Math.sqrt(3)), 1];
         measure();
     }
     resize();
+    group.scale.setScalar(scl[0]);
     addEventListener('resize', resize);
     addEventListener('load', measure);
 
