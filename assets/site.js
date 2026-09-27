@@ -108,6 +108,14 @@ document.addEventListener('DOMContentLoaded', function () {
         applyTheme(root.getAttribute('data-theme'), false);
     }
 
+    // ── 設計出處：版面參考 usta.agency。頁面自己沒放的話，補在最底部 ──
+    if (!document.querySelector('.design-credit')) {
+        var credit = document.createElement('p');
+        credit.className = 'design-credit';
+        credit.innerHTML = 'Design inspired by <a href="https://usta.agency/" target="_blank" rel="noopener">USTA Agency（usta.agency）</a>';
+        b.appendChild(credit);
+    }
+
     // ── 頁首下緣的捲動進度線 ──
     var bar = document.querySelector('.scroll-progress');
     var words = [].slice.call(document.querySelectorAll('.words'));

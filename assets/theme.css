@@ -254,6 +254,15 @@ input[type=range] { accent-color: var(--text); }
     border-top: 1px solid var(--border); margin-top: 60px;
 }
 
+/* ── 設計出處（usta.agency）──────────────────────────────── */
+.design-credit {
+    text-align: center; padding: 18px 20px 28px;
+    font-size: .68em; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-3);
+}
+.design-credit a { color: var(--text-2); text-decoration: none; box-shadow: inset 0 -1px 0 currentColor; }
+.design-credit a:hover { color: var(--accent); }
+
 /* ── 自訂游標：外層跟著滑鼠平移，內層圓點縮放；整顆用 difference 混色 ── */
 html.has-cursor, html.has-cursor * { cursor: none !important; }
 html.has-cursor input[type="range"], html.has-cursor select,

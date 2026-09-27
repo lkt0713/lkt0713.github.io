@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>李冠廷 | 地球科學 × 資料分析</title>
-<link rel="stylesheet" href="assets/theme.css?v=20260927c">
-<script src="assets/site.js?v=20260927c"></script>
+<link rel="stylesheet" href="assets/theme.css?v=20260927d">
+<script src="assets/site.js?v=20260927d"></script>
 <style>
     /* ── Header ────────────────────────────────────────────── */
     [data-theme="dark"] .site-header { background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.15)); }
@@ -30,7 +30,19 @@
             radial-gradient(700px 420px at 5% 100%, rgba(31,169,126,.16), transparent 60%),
             #000;
     }
-    .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+    /* 背景粒子（three.js）：載入成功才加 html.has-particles，封面改透明讓粒子透出來 */
+    #particles {
+        position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1;
+        pointer-events: none; opacity: 0; transition: opacity 1.2s ease;
+    }
+    html.has-particles #particles { opacity: 1; }
+    [data-theme="light"] #particles { background: #000; }
+    html.has-particles .hero {
+        background:
+            radial-gradient(900px 560px at 68% 42%, rgba(46,134,200,.22), transparent 62%),
+            radial-gradient(640px 480px at 88% 95%, rgba(165,72,200,.14), transparent 60%),
+            transparent;
+    }
     [data-theme="light"] .hero::after {
         content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; z-index: 0; pointer-events: none;
         background: linear-gradient(to bottom, transparent, var(--bg));
@@ -247,6 +259,8 @@
         font-size: .68em; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3);
     }
 
+    .footer-inner .design-credit { padding: 0; font-size: inherit; text-align: left; }
+
     @media (max-width: 900px) {
         .nav-links { display: none; }
         .hero-inner { grid-template-columns: minmax(0, 1fr); padding: 48px 20px 44px; gap: 36px; }
@@ -286,6 +300,7 @@
 </style>
 </head>
 <body>
+<canvas id="particles" aria-hidden="true"></canvas>
 
 <header class="site-header">
     <a class="site-brand" href="#top">
@@ -308,7 +323,6 @@
 
 <!-- ═══════════════ 封面 ═══════════════ -->
 <section class="hero" id="top">
-    <canvas class="hero-canvas" aria-hidden="true"></canvas>
     <div class="hero-inner">
         <div>
             <div class="eyebrow">NTNU · Earth Sciences · Portfolio</div>
@@ -548,84 +562,206 @@
     <div class="footer-inner">
         <span>© 2026 李冠廷 · 國立臺灣師範大學 地球科學系</span>
         <span>以 Python 建立資料處理與視覺化流程，網頁自動產生</span>
+        <span class="design-credit">Design inspired by <a href="https://usta.agency/" target="_blank" rel="noopener">USTA Agency（usta.agency）</a></span>
     </div>
 </footer>
 
-<script>
-/* ── 封面背景：粒子沿著一個緩慢旋轉的渦旋流場漂移，留下淡淡的軌跡（像風場動畫） ── */
-(function () {
-    var cv = document.querySelector('.hero-canvas');
-    if (!cv || !cv.getContext) return;
-    var ctx = cv.getContext('2d');
-    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var W = 0, H = 0, dpr = 1, ps = [], running = true, t = 0;
-    // 全用藍色：越快越亮（深藍 → 淺藍）
-    var COLORS = ['rgba(46,134,200,.6)', 'rgba(66,150,215,.7)', 'rgba(88,176,232,.8)',
-                  'rgba(125,198,242,.88)', 'rgba(165,218,250,.94)', 'rgba(205,236,255,1)'];
+<script type="module">
+/* ══════════════════════════════════════════════════════════════
+   背景粒子（參考 usta.agency 的 three.js 粒子變形）：
+   同一群粒子隨捲動在四種形狀間變形 ——
+   地球（封面）→ 海面波浪（標語）→ 資料格點立方體（專案）→ 星空（聯絡）。
+   深色主題時粒子固定在整頁背景；淺色主題只在黑色封面範圍內出現。
+   WebGL 或 CDN 載入失敗時什麼都不做，封面維持原本的黑底。
+   ══════════════════════════════════════════════════════════════ */
+const cv = document.getElementById('particles');
+const root = document.documentElement;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let THREE = null;
+try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js'); }
+catch (e) { console.warn('[particles]', e); }
+if (THREE && cv) init();
+
+function init() {
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false, alpha: true, powerPreference: 'low-power' }); }
+    catch (e) { console.warn('[particles]', e); return; }
+    const small = Math.min(innerWidth, innerHeight) < 700;
+    const side = small ? 17 : 21;                 // 立方體每邊的格點數
+    const N = side * side * side;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // ── 四種形狀的目標座標 ──
+    const rnd = new Float32Array(N);
+    for (let i = 0; i < N; i++) rnd[i] = Math.random();
+
+    const sphere = new Float32Array(N * 3);        // 費氏球面：均勻分布的地球
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < N; i++) {
+        const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = golden * i;
+        const R = 2.3 + (rnd[i] - 0.5) * 0.06;
+        sphere.set([Math.cos(th) * r * R, y * R, Math.sin(th) * r * R], i * 3);
+    }
+
+    const cols = Math.ceil(Math.sqrt(N * 1.7)), rows = Math.ceil(N / cols);
+    const waveXZ = new Float32Array(N * 2);        // 波浪面：y 每一格依時間計算
+    const wave = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+        waveXZ[i * 2] = ((i % cols) / (cols - 1) - 0.5) * 11;
+        waveXZ[i * 2 + 1] = (Math.floor(i / cols) / (rows - 1) - 0.5) * 6.5;
+    }
+
+    const cube = new Float32Array(N * 3);          // 資料格點
+    const step = 3.4 / (side - 1);
+    for (let i = 0; i < N; i++) {
+        const x = i % side, y = Math.floor(i / side) % side, z = Math.floor(i / (side * side));
+        cube.set([x * step - 1.7, y * step - 1.7, z * step - 1.7], i * 3);
+    }
+
+    const stars = new Float32Array(N * 3);         // 散開成星空
+    for (let i = 0; i < N; i++) {
+        const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, r = 4 + Math.pow(Math.random(), 0.6) * 8;
+        const s = Math.sqrt(1 - u * u);
+        stars.set([Math.cos(th) * s * r, u * r, Math.sin(th) * s * r], i * 3);
+    }
+    const shapes = [sphere, wave, cube, stars];
+    // 每個形狀對應的群組傾角、位置（桌機時地球放在右上，避開左下的標題）
+    const tilt = [0.25, 0.55, 0.45, 0.1];
+    const offX = small ? [0, 0, 0, 0] : [1.5, 0, 1.6, 0];
+    const offY = small ? [1.1, -0.2, 0, 0] : [0.55, -0.4, 0, 0];
+
+    const pos = new Float32Array(sphere);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('aRnd', new THREE.BufferAttribute(rnd, 1));
+
+    const mat = new THREE.ShaderMaterial({
+        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        uniforms: {
+            uTime: { value: 0 }, uPR: { value: 1 }, uSize: { value: small ? 3.2 : 2.8 }, uOpacity: { value: 1 },
+            uC1: { value: new THREE.Color('#2E86C8') }, uC2: { value: new THREE.Color('#bfe6ff') }
+        },
+        vertexShader: `
+            attribute float aRnd;
+            uniform float uTime, uPR, uSize;
+            varying float vR, vDepth;
+            void main() {
+                vec3 p = position + 0.03 * vec3(sin(uTime * .9 + aRnd * 40.), cos(uTime * 1.1 + aRnd * 23.), sin(uTime * .7 + aRnd * 31.));
+                vec4 mv = modelViewMatrix * vec4(p, 1.);
+                gl_Position = projectionMatrix * mv;
+                gl_PointSize = uSize * uPR * (.6 + aRnd * .8) * (9. / -mv.z);
+                vR = aRnd; vDepth = smoothstep(16., 5., -mv.z);
+            }`,
+        fragmentShader: `
+            uniform vec3 uC1, uC2; uniform float uOpacity;
+            varying float vR, vDepth;
+            void main() {
+                float d = length(gl_PointCoord - .5);
+                if (d > .5) discard;
+                float a = smoothstep(.5, 0., d);
+                gl_FragColor = vec4(mix(uC1, uC2, vR), a * uOpacity * (.3 + .7 * vDepth));
+            }`
+    });
+    group.add(new THREE.Points(geo, mat));
+
+    // ── 捲動位置 → 形狀進度（0..3），以各區塊在頁面中的位置為錨點 ──
+    const anchors = ['.hero', '.statement', '#projects', '#contact'].map(s => document.querySelector(s));
+    let marks = [];
+    function measure() {
+        marks = anchors.map(el => el ? el.getBoundingClientRect().top + scrollY : 0);
+        marks[0] = 0;
+    }
+    function stageNow() {
+        const y = scrollY + innerHeight * 0.55;
+        for (let k = 0; k < marks.length - 1; k++) {
+            if (y < marks[k + 1]) return k + Math.max(0, (y - marks[k]) / (marks[k + 1] - marks[k]));
+        }
+        return marks.length - 1;
+    }
+    const ease = t => t * t * (3 - 2 * t);
 
     function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2);
-        W = cv.clientWidth; H = cv.clientHeight;
-        cv.width = W * dpr; cv.height = H * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, W, H);
-        var n = Math.round(Math.min(900, W * H / 1400));
-        ps = [];
-        for (var i = 0; i < n; i++) ps.push(spawn());
+        const w = innerWidth, h = innerHeight;
+        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+        renderer.setSize(w, h, false);
+        mat.uniforms.uPR.value = renderer.getPixelRatio();
+        camera.aspect = w / h;
+        camera.position.z = w < 700 ? 12 : 9;
+        camera.updateProjectionMatrix();
+        measure();
     }
-    function spawn() { return { x: Math.random() * W, y: Math.random() * H, age: Math.random() * 200 }; }
-
-    // 流場：以畫面右側為中心的氣旋式渦旋 + 向內的輻合 + 一點背景西風
-    function field(x, y) {
-        var cx = W * (W > 900 ? 0.68 : 0.5), cy = H * 0.42;
-        var dx = x - cx, dy = y - cy, r2 = dx * dx + dy * dy + 900, r = Math.sqrt(r2);
-        var s = 2600 / r * Math.min(1, r / 80);
-        // 螢幕 y 軸朝下，(dy, -dx) 才是看起來逆時針（北半球氣旋）的切向
-        var u = ( dy / r) * s * 0.9 - dx / r * 0.35 + 0.25 * Math.sin(y / 160 + t * 0.002);
-        var v = (-dx / r) * s * 0.9 - dy / r * 0.35 + 0.25 * Math.cos(x / 180 + t * 0.002);
-        return [u, v];
-    }
-
-    function draw() {
-        t++;
-        // 軌跡淡出用 destination-out，畫布維持透明，後面的彩色光暈才透得出來
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = 'rgba(0,0,0,0.08)';
-        ctx.fillRect(0, 0, W, H);
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.lineWidth = 1.2;
-        // 依風速分深淺
-        var paths = COLORS.map(function () { return new Path2D(); });
-        for (var i = 0; i < ps.length; i++) {
-            var p = ps[i], f = field(p.x, p.y);
-            var nx = p.x + f[0] * 0.12, ny = p.y + f[1] * 0.12;
-            var sp = Math.hypot(nx - p.x, ny - p.y);
-            var k = Math.min(COLORS.length - 1, Math.floor(sp / 0.7));
-            paths[k].moveTo(p.x, p.y); paths[k].lineTo(nx, ny);
-            p.x = nx; p.y = ny; p.age++;
-            if (p.age > 260 || nx < 0 || ny < 0 || nx > W || ny > H) ps[i] = spawn(), ps[i].age = 0;
-        }
-        for (var c = 0; c < COLORS.length; c++) { ctx.strokeStyle = COLORS[c]; ctx.stroke(paths[c]); }
-    }
-    function step() {
-        if (!running) return;
-        draw();
-        requestAnimationFrame(step);
-    }
-    // 減少動態：只畫一張靜態的流線圖
-    function still() { for (var s = 0; s < 120; s++) draw(); }
-
     resize();
-    addEventListener('resize', function () { resize(); if (reduced) still(); });
-    if (reduced) { still(); return; }
-    // 封面捲出畫面就暫停，省電
-    new IntersectionObserver(function (es) {
-        var vis = es[0].isIntersecting;
-        if (vis && !running) { running = true; requestAnimationFrame(step); }
-        else if (!vis) running = false;
-    }).observe(cv);
-    requestAnimationFrame(step);
-})();
+    addEventListener('resize', resize);
+    addEventListener('load', measure);
+
+    // 滑鼠視差：整群粒子微微跟著游標轉
+    let mx = 0, my = 0, rx = 0, ry = 0, spin = 0;
+    addEventListener('pointermove', e => {
+        mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5;
+    }, { passive: true });
+
+    // 淺色主題：粒子只畫在黑色封面範圍內（和颱風站的地球同一招）
+    const hero = document.querySelector('.hero');
+    function clip() {
+        if (root.getAttribute('data-theme') === 'light' && hero) {
+            const r = hero.getBoundingClientRect();
+            cv.style.clipPath = `inset(${Math.max(0, r.top)}px 0 ${Math.max(0, innerHeight - r.bottom)}px 0)`;
+        } else cv.style.clipPath = 'none';
+    }
+
+    let t = 0, last = performance.now();
+    function frame(now) {
+        const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+        if (!reduced) t += dt;
+        const st = stageNow();
+        const k = Math.min(2, Math.floor(st)), f = ease(Math.min(1, st - k));
+        const A = shapes[k], B = shapes[k + 1];
+
+        if (k <= 1) {                              // 波浪面有參與變形才更新
+            for (let i = 0; i < N; i++) {
+                const x = waveXZ[i * 2], z = waveXZ[i * 2 + 1];
+                wave[i * 3] = x; wave[i * 3 + 2] = z;
+                wave[i * 3 + 1] = 0.32 * Math.sin(x * 1.1 + t * 1.2) + 0.22 * Math.cos(z * 1.6 + t * 0.9) + 0.12 * Math.sin((x + z) * 2.2 - t * 1.6);
+            }
+        }
+        const lerp = reduced ? 1 : 0.07;
+        for (let i = 0; i < N; i++) {
+            // 每顆粒子錯開一點出發時間，變形時像一陣風掃過
+            const ff = ease(Math.min(1, Math.max(0, f * 1.5 - rnd[i] * 0.5)));
+            const j = i * 3;
+            for (let c = 0; c < 3; c++) {
+                const target = A[j + c] + (B[j + c] - A[j + c]) * ff;
+                pos[j + c] += (target - pos[j + c]) * lerp;
+            }
+        }
+        geo.attributes.position.needsUpdate = true;
+
+        const k0 = Math.min(3, Math.floor(st)), k1 = Math.min(3, k0 + 1), g = ease(st - Math.floor(st));
+        const mix = arr => arr[k0] + (arr[k1] - arr[k0]) * g;
+        spin += dt * (Math.round(st) === 1 ? 0.03 : 0.12);
+        rx += (mix(tilt) + my * 0.25 - rx) * (reduced ? 1 : 0.05);
+        ry += (mx * 0.4 - ry) * 0.05;
+        group.rotation.set(rx, spin + ry, 0);
+        group.position.x += (mix(offX) - group.position.x) * (reduced ? 1 : 0.06);
+        group.position.y += (mix(offY) - group.position.y) * (reduced ? 1 : 0.06);
+        // 離開封面後粒子調暗，不和內文搶
+        mat.uniforms.uOpacity.value = st < 0.6 ? 1 : 0.8;
+        mat.uniforms.uTime.value = t;
+
+        clip();
+        renderer.render(scene, camera);
+        if (!reduced) requestAnimationFrame(frame);
+    }
+    root.classList.add('has-particles');
+    requestAnimationFrame(frame);
+    if (reduced) addEventListener('scroll', () => requestAnimationFrame(frame), { passive: true });
+    // 減少動態時沒有連續動畫，切換主題要手動重畫一次（裁切範圍會變）
+    if (reduced) new MutationObserver(() => requestAnimationFrame(frame)).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+}
 </script>
 
 </body>

@@ -37,6 +37,11 @@ projects/           各專案頁面與資料
 > Plotly 圖表頁原本各自內嵌一份 plotly.js，已改為每個專案共用一份
 > `plotly.min.js`，倉庫體積因此從 1.1GB 降到約 300MB。
 
+## 設計出處
+
+版面風格（黑底、Oswald 大寫標題、描邊跑馬燈、hover 反白、粒子變形背景）參考
+[USTA Agency — usta.agency](https://usta.agency/)。
+
 ## 聯絡
 
 - Instagram [@lkt_0713](https://www.instagram.com/lkt_0713/)
