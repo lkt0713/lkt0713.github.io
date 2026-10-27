@@ -33,6 +33,7 @@
   .page-section.active{display:block;}
 
   .main{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:20px 24px;max-width:1400px;margin:0 auto;}
+  .main>*{min-width:0;}  /* 讓左欄可以縮：否則場地卡片撐開 1fr，右側賽程欄在 1280 寬的筆電上會被擠出畫面 */
   @media(max-width:900px){.main{grid-template-columns:1fr;}}
 
   .timer-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:20px;border:1px solid var(--border);transition:background .35s,border .35s;}
@@ -61,7 +62,8 @@
   .slot-timer{text-align:center;padding:4px 0 10px;}
   @media(max-width:600px){.timer-main{font-size:2.2rem;}.timer-ms{font-size:1rem;}.slot-clock-left{position:static;transform:none;display:inline-block;margin-bottom:6px;}}
 
-  .courts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .courts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:14px;}  /* 左欄放不下兩張場地卡就改一欄 */
+  .courts-grid>*{min-width:0;}
   @media(max-width:900px){.courts-grid{grid-template-columns:1fr;}}
   .empty-board{color:var(--text-3);font-size:0.9rem;text-align:center;padding:26px 10px;}
 
@@ -263,6 +265,8 @@
     .del-btn{position:absolute;top:8px;right:8px;font-size:0.8rem;}
     .settings-footer .btn{flex:1;}
   }
+  /* 太窄放不下場地卡＋賽程欄時（含投影模式），賽程欄移到下方；放在最後才蓋得過投影模式的兩欄設定 */
+  @media (max-width: 1100px){ .main, body.projector .main{grid-template-columns:1fr;} }
 </style>
 </head>
 <body class="projector">
