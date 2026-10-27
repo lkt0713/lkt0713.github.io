@@ -32,7 +32,8 @@ projects/           各專案頁面與資料
 ```
 
 各專案頁面共用 `assets/theme.css` 的設計 token 與 `assets/site.js`
-（深淺色切換會跨頁記憶，使用 localStorage 的 `theme` 鍵）。
+（深淺色切換會跨頁記憶，使用 localStorage 的 `theme` 鍵；封面 `index.html` 以
+`data-theme-lock="dark"` 固定深色，不受也不影響這個設定）。
 
 > Plotly 圖表頁原本各自內嵌一份 plotly.js，已改為每個專案共用一份
 > `plotly.min.js`，倉庫體積因此從 1.1GB 降到約 300MB。
