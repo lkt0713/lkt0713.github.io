@@ -10,7 +10,7 @@
 
 | 專案 | 說明 |
 |---|---|
-| [西北太平洋熱帶氣旋路徑預測](https://lkt0713.github.io/Typhoon-Forecast/) | DeepMind WeatherNext、ECMWF 與 NOAA 共九個系集模式，與 JTWC、日本氣象廳、中央氣象署官方預報並列；含衛星雲圖動畫、侵襲機率、海洋熱含量、駛流場、預報校驗與颱風歷史存檔，每 10 分鐘自動更新（另一個 repo） |
+| [西北太平洋熱帶氣旋路徑預測](https://lkt0713.github.io/Typhoon-Forecast/) | DeepMind WeatherNext、ECMWF 與 NOAA 共九個系集模式，與 JTWC、日本氣象廳、中央氣象署官方預報並列；含衛星雲圖動畫、侵襲機率、海洋熱含量、AIFS 垂直風切與駛流場、預報校驗與颱風歷史存檔，每 10 分鐘自動更新（另一個 repo） |
 | 2023–2025 颱風路徑與誤差分析 | FNV3 / JMA / CWA 三家模式的路徑誤差驗證，50+ 個案 |
 | 莫拉克 850hPa 帶通濾波比對 | ERA5 資料，10–30 天 vs 30–90 天季內振盪訊號逐日比對 |
 | Bandpass 動畫檢視器 | 滾輪／拖曳刷時間軸的濾波動畫播放器 |
