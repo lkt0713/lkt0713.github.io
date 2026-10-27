@@ -7,10 +7,12 @@
 (function () {
     var d = document.documentElement;
     d.classList.add('js');
-    // 在第一次繪製前就決定主題（預設黑底，使用者切過就沿用上次的選擇），避免閃一下
+    // 在第一次繪製前就決定主題（預設黑底，使用者切過就沿用上次的選擇），避免閃一下。
+    // <html data-theme-lock="dark"> 的頁面（個人主頁）固定用那個主題，不讀也不改記住的選擇
     var saved = null;
     try { saved = localStorage.getItem('theme'); } catch (e) {}
-    d.setAttribute('data-theme', (saved === 'light' || saved === 'dark') ? saved : 'dark');
+    var lock = d.getAttribute('data-theme-lock');
+    d.setAttribute('data-theme', lock || ((saved === 'light' || saved === 'dark') ? saved : 'dark'));
 
     // 字體：Oswald（標題）、Montserrat（內文）、Noto Sans TC（中文）
     if (!document.querySelector('link[data-noir-fonts]')) {
@@ -29,6 +31,8 @@
 })();
 
 function applyTheme(theme, save) {
+    var lock = document.documentElement.getAttribute('data-theme-lock');
+    if (lock) { theme = lock; save = false; }          // 鎖定主題的頁面：不切換、不寫回 localStorage
     document.documentElement.setAttribute('data-theme', theme);
     var btn = document.getElementById('theme-btn');
     if (btn) btn.textContent = theme === 'dark' ? '☀ Light' : '☾ Dark';
