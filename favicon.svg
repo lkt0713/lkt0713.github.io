@@ -18,7 +18,7 @@
   </g>
   <g filter="url(#glow)" fill="none" stroke="url(#s)" stroke-width="40" stroke-linecap="round">
     <circle cx="256" cy="256" r="58"/>
-    <path d="M256 198 C 256 132, 214 104, 150 110"/>
-    <path d="M256 314 C 256 380, 298 408, 362 402"/>
+    <path d="M256 198 C 256 132, 298 104, 362 110"/>
+    <path d="M256 314 C 256 380, 214 408, 150 402"/>
   </g>
 </svg>
